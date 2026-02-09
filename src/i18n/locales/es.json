@@ -97,5 +97,20 @@
     "cities": "Ciudades principales de EE.UU. y Canadá",
     "personalized": "Itinerarios personalizados",
     "professional": "Guías profesionales"
+  },
+  "review": {
+    "label": "Comparta su experiencia",
+    "title": "Califique nuestros servicios",
+    "subtitle": "Sus comentarios nos ayudan a mejorar y ayudan a otros viajeros a tomar decisiones.",
+    "yourRating": "Su calificación",
+    "name": "Su nombre",
+    "email": "Correo electrónico (opcional)",
+    "comment": "Su reseña",
+    "commentPlaceholder": "Cuéntenos sobre su experiencia — lo que le gustó, momentos destacados, sugerencias...",
+    "submit": "Enviar reseña",
+    "required": "Por favor ingrese su nombre y una calificación.",
+    "thankYou": "¡Gracias!",
+    "thankYouMsg": "Su reseña ha sido enviada. ¡Apreciamos mucho sus comentarios!",
+    "backHome": "← Volver al inicio"
   }
 }

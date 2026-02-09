@@ -97,5 +97,20 @@
     "cities": "Główne miasta USA i Kanady",
     "personalized": "Spersonalizowane trasy",
     "professional": "Profesjonalni przewodnicy"
+  },
+  "review": {
+    "label": "Podziel się wrażeniami",
+    "title": "Oceń nasze usługi",
+    "subtitle": "Twoja opinia pomaga nam się doskonalić i pomaga innym podróżnikom w podjęciu decyzji.",
+    "yourRating": "Twoja ocena",
+    "name": "Twoje imię",
+    "email": "E-mail (opcjonalnie)",
+    "comment": "Twoja opinia",
+    "commentPlaceholder": "Opowiedz o swoim doświadczeniu — co Ci się podobało, najważniejsze momenty, sugestie...",
+    "submit": "Wyślij opinię",
+    "required": "Podaj swoje imię i ocenę.",
+    "thankYou": "Dziękujemy!",
+    "thankYouMsg": "Twoja opinia została wysłana. Bardzo cenimy Twój feedback!",
+    "backHome": "← Powrót na stronę główną"
   }
 }

@@ -97,5 +97,20 @@
     "cities": "Grandes villes USA & Canada",
     "personalized": "Itinéraires personnalisés",
     "professional": "Guides professionnels"
+  },
+  "review": {
+    "label": "Partagez votre expérience",
+    "title": "Évaluez nos services",
+    "subtitle": "Vos retours nous aident à nous améliorer et aident d'autres voyageurs à faire leur choix.",
+    "yourRating": "Votre note",
+    "name": "Votre nom",
+    "email": "E-mail (optionnel)",
+    "comment": "Votre avis",
+    "commentPlaceholder": "Parlez-nous de votre expérience — ce que vous avez aimé, les moments forts, vos suggestions...",
+    "submit": "Envoyer l'avis",
+    "required": "Veuillez indiquer votre nom et une note.",
+    "thankYou": "Merci !",
+    "thankYouMsg": "Votre avis a été envoyé. Nous apprécions sincèrement vos retours !",
+    "backHome": "← Retour à l'accueil"
   }
 }
