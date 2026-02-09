@@ -303,7 +303,27 @@ const GuideRegister = () => {
         } as any);
       }
 
+      // Send confirmation email to the guide
+      try {
+        const NOTIFY_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/send-notification`;
+        const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lZ2Z3b21sb2FpaHp3b213eXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDM4NTAsImV4cCI6MjA4NjA3OTg1MH0.ZRn_9BDZZM5uTdqAxaeBcwckzjqXe7HQXUN8OZSbLNM";
+        await fetch(NOTIFY_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": ANON_KEY, "Authorization": `Bearer ${ANON_KEY}` },
+          body: JSON.stringify({
+            type: "guide_application",
+            data: { guideName: `${firstName} ${lastName}`, guideEmail: user.email },
+          }),
+        });
+      } catch (e) {
+        console.error("Failed to send confirmation email:", e);
+      }
+
       toast.success(t("guideRegister.submitted"));
+      // Redirect to home after a short delay
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
     } finally {
