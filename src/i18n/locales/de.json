@@ -200,6 +200,21 @@
     "badge": "Erfahrene lokale Guides",
     "title": "Lernen Sie unsere",
     "titleGold": "Guides kennen",
-    "subtitle": "Handverlesene lokale Experten, die jedes Reiseziel mit Leidenschaft, Wissen und unvergesslichen Erlebnissen zum Leben erwecken."
+    "subtitle": "Handverlesene lokale Experten, die jedes Reiseziel mit Leidenschaft, Wissen und unvergesslichen Erlebnissen zum Leben erwecken.",
+    "filters": "Filter",
+    "clearFilters": "Filter löschen",
+    "filterArea": "Gebiet",
+    "filterLanguage": "Sprache",
+    "filterSpecialty": "Spezialität",
+    "filterMinReviews": "Min. Bewertungen",
+    "filterMinRating": "Min. Bewertung",
+    "allAreas": "Alle Gebiete",
+    "allLanguages": "Alle Sprachen",
+    "allSpecialties": "Alle Spezialitäten",
+    "any": "Alle",
+    "showing": "{{count}} von {{total}} Guides angezeigt",
+    "noResults": "Keine Guides entsprechen Ihren Filtern. Versuchen Sie, Ihre Kriterien anzupassen.",
+    "review": "Bewertung",
+    "reviews": "Bewertungen"
   }
 }

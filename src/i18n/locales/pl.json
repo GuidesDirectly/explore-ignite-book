@@ -200,6 +200,21 @@
     "badge": "Doświadczeni lokalni przewodnicy",
     "title": "Poznaj naszych",
     "titleGold": "Przewodników",
-    "subtitle": "Starannie wybrani lokalni eksperci, którzy ożywiają każdy cel podróży pasją, wiedzą i niezapomnianymi doświadczeniami."
+    "subtitle": "Starannie wybrani lokalni eksperci, którzy ożywiają każdy cel podróży pasją, wiedzą i niezapomnianymi doświadczeniami.",
+    "filters": "Filtry",
+    "clearFilters": "Wyczyść filtry",
+    "filterArea": "Obszar",
+    "filterLanguage": "Język",
+    "filterSpecialty": "Specjalność",
+    "filterMinReviews": "Min. recenzji",
+    "filterMinRating": "Min. ocena",
+    "allAreas": "Wszystkie obszary",
+    "allLanguages": "Wszystkie języki",
+    "allSpecialties": "Wszystkie specjalności",
+    "any": "Dowolne",
+    "showing": "Wyświetlanie {{count}} z {{total}} przewodników",
+    "noResults": "Żaden przewodnik nie pasuje do Twoich filtrów. Spróbuj zmienić kryteria.",
+    "review": "recenzja",
+    "reviews": "recenzje"
   }
 }

@@ -128,6 +128,7 @@ export type Database = {
           current_step: number
           form_data: Json
           id: string
+          service_areas: string[] | null
           status: string
           updated_at: string
           user_id: string
@@ -137,6 +138,7 @@ export type Database = {
           current_step?: number
           form_data?: Json
           id?: string
+          service_areas?: string[] | null
           status?: string
           updated_at?: string
           user_id: string
@@ -146,6 +148,7 @@ export type Database = {
           current_step?: number
           form_data?: Json
           id?: string
+          service_areas?: string[] | null
           status?: string
           updated_at?: string
           user_id?: string

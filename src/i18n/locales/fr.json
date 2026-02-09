@@ -200,6 +200,21 @@
     "badge": "Guides locaux experts",
     "title": "Rencontrez nos",
     "titleGold": "Guides",
-    "subtitle": "Des experts locaux triés sur le volet qui donnent vie à chaque destination avec passion, connaissances et expériences inoubliables."
+    "subtitle": "Des experts locaux triés sur le volet qui donnent vie à chaque destination avec passion, connaissances et expériences inoubliables.",
+    "filters": "Filtres",
+    "clearFilters": "Effacer les filtres",
+    "filterArea": "Zone",
+    "filterLanguage": "Langue",
+    "filterSpecialty": "Spécialité",
+    "filterMinReviews": "Avis minimum",
+    "filterMinRating": "Note minimum",
+    "allAreas": "Toutes les zones",
+    "allLanguages": "Toutes les langues",
+    "allSpecialties": "Toutes les spécialités",
+    "any": "Tous",
+    "showing": "{{count}} sur {{total}} guides affichés",
+    "noResults": "Aucun guide ne correspond à vos filtres. Essayez d'ajuster vos critères.",
+    "review": "avis",
+    "reviews": "avis"
   }
 }

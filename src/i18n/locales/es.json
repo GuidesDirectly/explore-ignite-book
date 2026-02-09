@@ -200,6 +200,21 @@
     "badge": "Guías locales expertos",
     "title": "Conoce a nuestros",
     "titleGold": "Guías",
-    "subtitle": "Expertos locales seleccionados que dan vida a cada destino con pasión, conocimiento y experiencias inolvidables."
+    "subtitle": "Expertos locales seleccionados que dan vida a cada destino con pasión, conocimiento y experiencias inolvidables.",
+    "filters": "Filtros",
+    "clearFilters": "Borrar filtros",
+    "filterArea": "Zona",
+    "filterLanguage": "Idioma",
+    "filterSpecialty": "Especialidad",
+    "filterMinReviews": "Reseñas mín.",
+    "filterMinRating": "Calificación mín.",
+    "allAreas": "Todas las zonas",
+    "allLanguages": "Todos los idiomas",
+    "allSpecialties": "Todas las especialidades",
+    "any": "Cualquiera",
+    "showing": "Mostrando {{count}} de {{total}} guías",
+    "noResults": "Ningún guía coincide con tus filtros. Intenta ajustar tus criterios.",
+    "review": "reseña",
+    "reviews": "reseñas"
   }
 }
