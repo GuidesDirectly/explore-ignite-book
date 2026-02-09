@@ -5,14 +5,14 @@ import heroBg from "@/assets/hero-dc.jpg";
 import logo from "@/assets/logo.jpg";
 
 const languages = [
-  { flag: "🇷🇺", name: "Russian" },
-  { flag: "🇬🇧", name: "English" },
-  { flag: "🇵🇱", name: "Polish" },
-  { flag: "🇩🇪", name: "German" },
-  { flag: "🇫🇷", name: "French" },
-  { flag: "🇪🇸", name: "Spanish" },
-  { flag: "🇨🇳", name: "Mandarin" },
-  { flag: "🇯🇵", name: "Japanese" },
+  { flag: "🇷🇺" },
+  { flag: "🇬🇧" },
+  { flag: "🇵🇱" },
+  { flag: "🇩🇪" },
+  { flag: "🇫🇷" },
+  { flag: "🇪🇸" },
+  { flag: "🇨🇳" },
+  { flag: "🇯🇵" },
 ];
 
 const stats = [
@@ -48,9 +48,9 @@ const HeroSection = () => {
             transition={{ duration: 0.6 }}
             className="flex flex-wrap items-center gap-3 mb-4"
           >
-            {languages.map(({ flag, name }) => (
-              <span key={name} className="inline-flex items-center gap-1.5 text-primary font-body text-sm uppercase tracking-[0.15em] font-semibold">
-                <span className="text-lg">{flag}</span>{name}
+            {languages.map(({ flag }, i) => (
+              <span key={i} className="text-2xl md:text-3xl">
+                {flag}
               </span>
             ))}
           </motion.div>
