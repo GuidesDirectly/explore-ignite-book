@@ -1,0 +1,683 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  MapPin,
+  Globe,
+  Briefcase,
+  User,
+  Upload,
+  Camera,
+} from "lucide-react";
+import logoImg from "@/assets/logo.jpg";
+
+const AREA_OPTIONS = [
+  "Washington DC",
+  "New York City",
+  "Niagara Falls",
+  "Toronto",
+  "Boston",
+  "Chicago",
+];
+
+const LANGUAGE_OPTIONS = [
+  "English",
+  "Spanish",
+  "French",
+  "German",
+  "Mandarin",
+  "Japanese",
+  "Russian",
+  "Polish",
+  "Portuguese",
+  "Arabic",
+  "Korean",
+  "Italian",
+  "Hindi",
+];
+
+const SPECIALIZATION_OPTIONS = [
+  "History & Culture",
+  "Food & Culinary",
+  "Art & Museums",
+  "Nature & Outdoors",
+  "Architecture",
+  "Nightlife & Entertainment",
+  "Photography Tours",
+  "Family-Friendly",
+  "Luxury & VIP",
+  "Adventure & Sports",
+];
+
+const TOUR_TYPE_OPTIONS = [
+  "Private Tours",
+  "Group Tours",
+  "Walking Tours",
+  "Driving Tours",
+  "Multi-Day Tours",
+];
+
+const STEPS = [
+  { icon: User, label: "Personal Info" },
+  { icon: MapPin, label: "Service Areas" },
+  { icon: Globe, label: "Languages" },
+  { icon: Briefcase, label: "Specialties" },
+  { icon: Camera, label: "Photo & Bio" },
+];
+
+const GuideRegister = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [profileExists, setProfileExists] = useState(false);
+
+  // Form state
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [serviceAreas, setServiceAreas] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>(["English"]);
+  const [specializations, setSpecializations] = useState<string[]>([]);
+  const [tourTypes, setTourTypes] = useState<string[]>([]);
+  const [biography, setBiography] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
+
+  // Auth check
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(true);
+
+  useEffect(() => {
+    const init = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const u = session?.user ?? null;
+      setUser(u);
+      if (u) {
+        setEmail(u.email || "");
+        // Check if profile already exists
+        const { data } = await supabase
+          .from("guide_profiles")
+          .select("id, form_data, current_step, service_areas, status")
+          .eq("user_id", u.id)
+          .maybeSingle();
+        if (data) {
+          setProfileExists(true);
+          const fd = data.form_data as any;
+          setFirstName(fd.firstName || "");
+          setLastName(fd.lastName || "");
+          setPhone(fd.phone || "");
+          setLanguages(fd.languages || ["English"]);
+          setSpecializations(fd.specializations || []);
+          setTourTypes(fd.tourTypes || []);
+          setBiography(fd.biography || "");
+          setServiceAreas(data.service_areas || []);
+          setCurrentStep(data.current_step || 0);
+        }
+      }
+      setLoading(false);
+    };
+    init();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const u = session?.user ?? null;
+      setUser(u);
+      if (u) setEmail(u.email || "");
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({
+        email: authEmail,
+        password: authPassword,
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Account created! You can now fill out your profile.");
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: authEmail,
+        password: authPassword,
+      });
+      if (error) toast.error(error.message);
+    }
+  };
+
+  const toggleItem = (
+    arr: string[],
+    setArr: (v: string[]) => void,
+    item: string
+  ) => {
+    if (arr.includes(item)) {
+      setArr(arr.filter((i) => i !== item));
+    } else {
+      setArr([...arr, item]);
+    }
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfilePhoto(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setProfilePhotoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const canProceed = () => {
+    switch (currentStep) {
+      case 0:
+        return firstName.trim() && lastName.trim();
+      case 1:
+        return serviceAreas.length > 0;
+      case 2:
+        return languages.length > 0;
+      case 3:
+        return specializations.length > 0;
+      case 4:
+        return biography.trim().length >= 20;
+      default:
+        return true;
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!user) return;
+    setSubmitting(true);
+
+    try {
+      // Upload profile photo if provided
+      if (profilePhoto) {
+        const { error: uploadError } = await supabase.storage
+          .from("guide-photos")
+          .upload(`${user.id}/profile.jpg`, profilePhoto, {
+            upsert: true,
+            contentType: profilePhoto.type,
+          });
+        if (uploadError) console.error("Photo upload error:", uploadError);
+      }
+
+      const formData = {
+        firstName,
+        lastName,
+        phone,
+        languages,
+        specializations,
+        tourTypes,
+        biography,
+      };
+
+      if (profileExists) {
+        await supabase
+          .from("guide_profiles")
+          .update({
+            form_data: formData,
+            service_areas: serviceAreas,
+            current_step: 5,
+            status: "pending",
+          } as any)
+          .eq("user_id", user.id);
+      } else {
+        await supabase.from("guide_profiles").insert({
+          user_id: user.id,
+          form_data: formData,
+          service_areas: serviceAreas,
+          current_step: 5,
+          status: "pending",
+        } as any);
+      }
+
+      toast.success(t("guideRegister.submitted"));
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  // Auth screen
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-navy flex items-center justify-center p-4">
+        <div className="max-w-sm w-full">
+          <div className="text-center mb-8">
+            <img
+              src={logoImg}
+              alt="iGuide Tours"
+              className="h-16 w-16 rounded-full object-cover mx-auto mb-4"
+            />
+            <h1 className="font-display text-2xl font-bold text-primary">
+              {t("guideRegister.title")}
+            </h1>
+            <p className="text-muted-foreground text-sm mt-2">
+              {t("guideRegister.authSubtitle")}
+            </p>
+          </div>
+          <form
+            onSubmit={handleAuth}
+            className="space-y-4 bg-card/10 backdrop-blur-sm rounded-2xl p-6 border border-primary/10"
+          >
+            <Input
+              type="email"
+              placeholder="Email"
+              value={authEmail}
+              onChange={(e) => setAuthEmail(e.target.value)}
+              className="bg-secondary/50 border-primary/20 text-primary-foreground"
+            />
+            <Input
+              type="password"
+              placeholder="Password"
+              value={authPassword}
+              onChange={(e) => setAuthPassword(e.target.value)}
+              className="bg-secondary/50 border-primary/20 text-primary-foreground"
+            />
+            <Button variant="hero" className="w-full" type="submit">
+              {isSignUp ? t("guideRegister.signUp") : t("guideRegister.signIn")}
+            </Button>
+            <p className="text-center text-sm text-muted-foreground">
+              {isSignUp ? t("guideRegister.haveAccount") : t("guideRegister.noAccount")}{" "}
+              <button
+                type="button"
+                className="text-primary hover:underline"
+                onClick={() => setIsSignUp(!isSignUp)}
+              >
+                {isSignUp ? t("guideRegister.signIn") : t("guideRegister.signUp")}
+              </button>
+            </p>
+          </form>
+          <a
+            href="/"
+            className="block text-center text-primary text-sm mt-4 hover:underline"
+          >
+            ← {t("guideRegister.backHome")}
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Submitted state
+  if (currentStep >= 5) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="max-w-md text-center">
+          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-8 h-8 text-primary" />
+          </div>
+          <h2 className="font-display text-2xl font-bold text-foreground mb-2">
+            {t("guideRegister.thankYou")}
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            {t("guideRegister.pendingReview")}
+          </p>
+          <Button variant="outline" onClick={() => navigate("/")}>
+            ← {t("guideRegister.backHome")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border px-6 py-4 flex items-center justify-between bg-card">
+        <div className="flex items-center gap-3">
+          <a href="/">
+            <img
+              src={logoImg}
+              alt="iGuide Tours"
+              className="h-8 w-8 rounded-full object-cover"
+            />
+          </a>
+          <h1 className="font-display text-xl font-bold text-foreground">
+            {t("guideRegister.title")}
+          </h1>
+        </div>
+        <span className="text-sm text-muted-foreground">{email}</span>
+      </header>
+
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        {/* Step indicators */}
+        <div className="flex items-center justify-between mb-10">
+          {STEPS.map((step, idx) => {
+            const Icon = step.icon;
+            const isActive = idx === currentStep;
+            const isDone = idx < currentStep;
+            return (
+              <div key={idx} className="flex flex-col items-center gap-1.5 flex-1">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
+                    isDone
+                      ? "bg-primary border-primary text-secondary"
+                      : isActive
+                      ? "border-primary text-primary bg-primary/10"
+                      : "border-border text-muted-foreground"
+                  }`}
+                >
+                  {isDone ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                </div>
+                <span
+                  className={`text-[10px] font-medium text-center hidden sm:block ${
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  }`}
+                >
+                  {step.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Step content */}
+        <div className="bg-card rounded-2xl border border-border p-6 sm:p-8 mb-6">
+          {/* Step 0: Personal Info */}
+          {currentStep === 0 && (
+            <div className="space-y-5">
+              <h2 className="font-display text-xl font-bold text-foreground">
+                {t("guideRegister.personalInfo")}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">
+                    {t("guideRegister.firstName")} *
+                  </label>
+                  <Input
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="John"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">
+                    {t("guideRegister.lastName")} *
+                  </label>
+                  <Input
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Doe"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  {t("guideRegister.phone")}
+                </label>
+                <Input
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 (555) 123-4567"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Step 1: Service Areas */}
+          {currentStep === 1 && (
+            <div className="space-y-5">
+              <h2 className="font-display text-xl font-bold text-foreground">
+                {t("guideRegister.serviceAreasTitle")}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {t("guideRegister.serviceAreasDesc")}
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {AREA_OPTIONS.map((area) => {
+                  const selected = serviceAreas.includes(area);
+                  return (
+                    <button
+                      key={area}
+                      type="button"
+                      onClick={() => toggleItem(serviceAreas, setServiceAreas, area)}
+                      className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all text-sm font-medium ${
+                        selected
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-foreground hover:border-primary/30"
+                      }`}
+                    >
+                      <MapPin className="w-4 h-4 flex-shrink-0" />
+                      {area}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Languages */}
+          {currentStep === 2 && (
+            <div className="space-y-5">
+              <h2 className="font-display text-xl font-bold text-foreground">
+                {t("guideRegister.languagesTitle")}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {t("guideRegister.languagesDesc")}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {LANGUAGE_OPTIONS.map((lang) => {
+                  const selected = languages.includes(lang);
+                  return (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => toggleItem(languages, setLanguages, lang)}
+                      className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-all ${
+                        selected
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-foreground hover:border-primary/30"
+                      }`}
+                    >
+                      {lang}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Specialties */}
+          {currentStep === 3 && (
+            <div className="space-y-5">
+              <h2 className="font-display text-xl font-bold text-foreground">
+                {t("guideRegister.specialtiesTitle")}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {t("guideRegister.specialtiesDesc")}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {SPECIALIZATION_OPTIONS.map((spec) => {
+                  const selected = specializations.includes(spec);
+                  return (
+                    <button
+                      key={spec}
+                      type="button"
+                      onClick={() =>
+                        toggleItem(specializations, setSpecializations, spec)
+                      }
+                      className={`flex items-center gap-2 p-3 rounded-xl border-2 text-sm font-medium transition-all ${
+                        selected
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-foreground hover:border-primary/30"
+                      }`}
+                    >
+                      <Briefcase className="w-4 h-4 flex-shrink-0" />
+                      {spec}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="pt-4">
+                <h3 className="text-sm font-semibold text-foreground mb-3">
+                  {t("guideRegister.tourTypes")}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {TOUR_TYPE_OPTIONS.map((tt) => {
+                    const selected = tourTypes.includes(tt);
+                    return (
+                      <button
+                        key={tt}
+                        type="button"
+                        onClick={() => toggleItem(tourTypes, setTourTypes, tt)}
+                        className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-all ${
+                          selected
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border text-foreground hover:border-primary/30"
+                        }`}
+                      >
+                        {tt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Photo & Bio */}
+          {currentStep === 4 && (
+            <div className="space-y-5">
+              <h2 className="font-display text-xl font-bold text-foreground">
+                {t("guideRegister.photoBioTitle")}
+              </h2>
+
+              {/* Photo upload */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t("guideRegister.profilePhoto")}
+                </label>
+                <div className="flex items-center gap-4">
+                  {profilePhotoPreview ? (
+                    <img
+                      src={profilePhotoPreview}
+                      alt="Preview"
+                      className="w-20 h-20 rounded-xl object-cover border-2 border-primary/30"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-muted flex items-center justify-center border-2 border-dashed border-border">
+                      <Camera className="w-6 h-6 text-muted-foreground" />
+                    </div>
+                  )}
+                  <label className="cursor-pointer">
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:border-primary/30 transition-colors text-sm text-foreground">
+                      <Upload className="w-4 h-4" />
+                      {t("guideRegister.uploadPhoto")}
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Biography */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  {t("guideRegister.biography")} *
+                </label>
+                <Textarea
+                  value={biography}
+                  onChange={(e) => setBiography(e.target.value)}
+                  placeholder={t("guideRegister.biographyPlaceholder")}
+                  rows={5}
+                  className="resize-none"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {biography.length}/500 ({t("guideRegister.minChars", { count: 20 })})
+                </p>
+              </div>
+
+              {/* Summary */}
+              <div className="bg-muted/50 rounded-xl p-4 space-y-2">
+                <h3 className="text-sm font-semibold text-foreground">
+                  {t("guideRegister.summary")}
+                </h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <span className="text-muted-foreground">{t("guideRegister.firstName")}:</span>
+                  <span className="text-foreground">{firstName} {lastName}</span>
+                  <span className="text-muted-foreground">{t("guideRegister.serviceAreasTitle")}:</span>
+                  <span className="text-foreground">{serviceAreas.join(", ") || "—"}</span>
+                  <span className="text-muted-foreground">{t("guideRegister.languagesTitle")}:</span>
+                  <span className="text-foreground">{languages.join(", ")}</span>
+                  <span className="text-muted-foreground">{t("guideRegister.specialtiesTitle")}:</span>
+                  <span className="text-foreground">
+                    {specializations.join(", ") || "—"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Navigation buttons */}
+        <div className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+            disabled={currentStep === 0}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t("guideRegister.back")}
+          </Button>
+
+          {currentStep < 4 ? (
+            <Button
+              onClick={() => setCurrentStep(currentStep + 1)}
+              disabled={!canProceed()}
+            >
+              {t("guideRegister.next")}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSubmit}
+              disabled={!canProceed() || submitting}
+            >
+              {submitting ? (
+                <div className="animate-spin w-4 h-4 border-2 border-secondary border-t-transparent rounded-full mr-2" />
+              ) : (
+                <Check className="w-4 h-4 mr-2" />
+              )}
+              {t("guideRegister.submit")}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default GuideRegister;

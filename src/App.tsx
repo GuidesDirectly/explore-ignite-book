@@ -8,6 +8,7 @@ import Chat from "./pages/Chat";
 import Review from "./pages/Review";
 import Admin from "./pages/Admin";
 import Testimonials from "./pages/Testimonials";
+import GuideRegister from "./pages/GuideRegister";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/review" element={<Review />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/guide-register" element={<GuideRegister />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
