@@ -5,14 +5,14 @@ import heroBg from "@/assets/hero-dc.jpg";
 import logo from "@/assets/logo.jpg";
 
 const languages = [
-  { flag: "🇷🇺" },
-  { flag: "🇬🇧" },
-  { flag: "🇵🇱" },
-  { flag: "🇩🇪" },
-  { flag: "🇫🇷" },
-  { flag: "🇪🇸" },
-  { flag: "🇨🇳" },
-  { flag: "🇯🇵" },
+  { code: "ru", name: "Russian" },
+  { code: "gb", name: "English" },
+  { code: "pl", name: "Polish" },
+  { code: "de", name: "German" },
+  { code: "fr", name: "French" },
+  { code: "es", name: "Spanish" },
+  { code: "cn", name: "Mandarin" },
+  { code: "jp", name: "Japanese" },
 ];
 
 const stats = [
@@ -48,10 +48,14 @@ const HeroSection = () => {
             transition={{ duration: 0.6 }}
             className="flex flex-wrap items-center gap-3 mb-4"
           >
-            {languages.map(({ flag }, i) => (
-              <span key={i} className="text-2xl md:text-3xl">
-                {flag}
-              </span>
+            {languages.map(({ code, name }) => (
+              <img
+                key={code}
+                src={`https://flagcdn.com/w80/${code}.png`}
+                alt={name}
+                title={name}
+                className="w-10 h-7 md:w-12 md:h-8 rounded-sm object-cover shadow-md"
+              />
             ))}
           </motion.div>
 
