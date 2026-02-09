@@ -7,10 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Send, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { supabase } from "@/integrations/supabase/client";
 
 const InquirySection = () => {
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -20,10 +22,24 @@ const InquirySection = () => {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.destination) {
       toast.error(t("inquiry.required"));
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.from("inquiries").insert({
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim() || null,
+      destination: formData.destination,
+      group_size: formData.groupSize || null,
+      message: formData.message.trim() || null,
+    });
+    setLoading(false);
+    if (error) {
+      toast.error("Something went wrong. Please try again.");
       return;
     }
     setSubmitted(true);
@@ -168,9 +184,9 @@ const InquirySection = () => {
               />
             </div>
 
-            <Button variant="hero" size="lg" className="w-full text-base py-6" type="submit">
+            <Button variant="hero" size="lg" className="w-full text-base py-6" type="submit" disabled={loading}>
               <Send className="w-5 h-5 mr-2" />
-              {t("inquiry.send")}
+              {loading ? "..." : t("inquiry.send")}
             </Button>
           </motion.form>
         </div>
