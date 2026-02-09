@@ -5,6 +5,7 @@ import ServicesSection from "@/components/ServicesSection";
 import DestinationsSection from "@/components/DestinationsSection";
 import GallerySection from "@/components/GallerySection";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import TourPlannerSection from "@/components/TourPlannerSection";
 import InquirySection from "@/components/InquirySection";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
@@ -20,6 +21,7 @@ const Index = () => {
       <DestinationsSection />
       <GallerySection />
       <TestimonialsSection />
+      <TourPlannerSection />
       <InquirySection />
       <Footer />
 

@@ -51,7 +51,7 @@ const Navbar = () => {
             (202) 243-8336
           </a>
           <Button variant="hero" size="sm" asChild>
-            <a href="#inquiry">{t("nav.bookTour")}</a>
+            <a href="#tour-planner">{t("nav.bookTour")}</a>
           </Button>
         </div>
 
@@ -96,7 +96,7 @@ const Navbar = () => {
                 </a>
               </div>
               <Button variant="hero" size="sm" className="mt-2" asChild>
-                <a href="#inquiry" onClick={() => setIsOpen(false)}>{t("nav.bookTour")}</a>
+                <a href="#tour-planner" onClick={() => setIsOpen(false)}>{t("nav.bookTour")}</a>
               </Button>
             </div>
           </motion.div>
