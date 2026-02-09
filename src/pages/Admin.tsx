@@ -203,6 +203,14 @@ const Admin = () => {
     }
   };
 
+  const deleteGuide = async (id: string) => {
+    if (!confirm("Are you sure you want to permanently delete this guide application?")) return;
+    const { error } = await supabase.from("guide_profiles").delete().eq("id", id);
+    if (error) { toast.error("Failed to delete guide"); return; }
+    setGuides((prev) => prev.filter((g) => g.id !== id));
+    toast.success("Guide application deleted");
+  };
+
   const pendingGuides = guides.filter((g) => g.status === "pending");
   const approvedGuides = guides.filter((g) => g.status === "approved");
   const rejectedGuides = guides.filter((g) => g.status === "rejected");
@@ -387,6 +395,14 @@ const Admin = () => {
                 <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
               </Button>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-destructive/30 text-destructive hover:bg-destructive/10"
+              onClick={() => deleteGuide(guide.id)}
+            >
+              <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
+            </Button>
           </div>
         </div>
       </div>
