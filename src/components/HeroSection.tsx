@@ -75,30 +75,25 @@ const HeroSection = () => {
             {/* Passport stamp - between title lines */}
             <motion.div
               initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
-              animate={{ opacity: 0.85, scale: 1, rotate: -14 }}
+              animate={{ opacity: 1, scale: 1, rotate: -10 }}
               transition={{ duration: 0.5, delay: 0.6, type: "spring", stiffness: 200 }}
-              className="my-2 md:my-3 inline-flex"
+              className="my-3 md:my-4 inline-flex"
             >
               <div
-                className="relative px-5 py-3 md:px-7 md:py-4 border-[3px] border-double rounded-sm font-bold text-sm md:text-lg uppercase tracking-widest overflow-hidden"
+                className="relative w-32 h-32 md:w-44 md:h-44 rounded-full border-[4px] border-double flex items-center justify-center text-center font-bold text-xs md:text-base uppercase tracking-wider overflow-hidden"
                 style={{
                   fontFamily: "'Courier New', monospace",
-                  color: "hsl(210, 70%, 45%)",
-                  borderColor: "hsl(210, 70%, 45%)",
-                  textShadow: "0 0 6px hsl(210 70% 45% / 0.3)",
-                  boxShadow: "inset 0 0 12px hsl(210 70% 45% / 0.15), 0 0 20px hsl(210 70% 45% / 0.1)",
-                  maskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
-                  WebkitMaskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
+                  color: "hsl(210, 80%, 60%)",
+                  borderColor: "hsl(210, 80%, 60%)",
+                  textShadow: "0 0 4px hsl(210 80% 60% / 0.5)",
+                  boxShadow: "inset 0 0 15px hsl(210 80% 60% / 0.2), 0 0 25px hsl(210 80% 60% / 0.15)",
+                  maskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
+                  WebkitMaskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
                 }}
               >
-                <div
-                  className="absolute inset-0 opacity-30 mix-blend-multiply pointer-events-none"
-                  style={{
-                    backgroundImage: "radial-gradient(circle at 20% 30%, transparent 40%, hsl(210 70% 45% / 0.1) 41%, transparent 42%), radial-gradient(circle at 70% 60%, transparent 30%, hsl(210 70% 45% / 0.08) 31%, transparent 33%)",
-                  }}
-                />
-                <div className="absolute inset-1 border rounded-sm pointer-events-none" style={{ borderColor: "hsl(210, 70%, 45%, 0.4)" }} />
-                <span className="relative z-10">In Your Own Language</span>
+                {/* Inner ring */}
+                <div className="absolute inset-2 border-2 rounded-full pointer-events-none" style={{ borderColor: "hsl(210, 80%, 60%, 0.5)" }} />
+                <span className="relative z-10 leading-tight px-4">IN YOUR<br />OWN<br />LANGUAGE</span>
               </div>
             </motion.div>
 
