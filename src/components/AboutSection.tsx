@@ -33,7 +33,9 @@ const AboutSection = () => {
               <p>{t("about.p1")}</p>
               <p>{t("about.p2")}</p>
               <p>{t("about.p3")}</p>
-              <p className="font-semibold text-foreground">{t("about.p4")}</p>
+              <div className="mt-2 rounded-xl bg-primary/10 border border-primary/20 p-5">
+                <p className="font-semibold text-foreground text-base md:text-lg">{t("about.p4")}</p>
+              </div>
             </div>
           </motion.div>
 
