@@ -38,19 +38,48 @@ const Admin = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    let isMounted = true;
+
+    const checkAdmin = async (userId: string) => {
+      try {
+        const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+        if (isMounted) setIsAdmin(!!data);
+      } catch {
+        if (isMounted) setIsAdmin(false);
+      }
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
       const u = session?.user ?? null;
       setUser(u);
       if (u) {
-        const { data } = await supabase.from("user_roles").select("role").eq("user_id", u.id).eq("role", "admin").maybeSingle();
-        setIsAdmin(!!data);
+        checkAdmin(u.id);
       } else {
         setIsAdmin(false);
       }
-      setLoading(false);
     });
-    supabase.auth.getSession();
-    return () => subscription.unsubscribe();
+
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!isMounted) return;
+        const u = session?.user ?? null;
+        setUser(u);
+        if (u) {
+          await checkAdmin(u.id);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    initAuth();
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
