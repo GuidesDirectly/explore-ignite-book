@@ -75,9 +75,9 @@ const InquirySection = () => {
               Fill out the form and our team will get back to you within 24 hours with a custom tour proposal. No commitment required — let's start planning!
             </p>
             <div className="space-y-4" style={{ color: "hsl(40, 33%, 75%)" }}>
-              <p className="flex items-center gap-2">📧 info@iguidetours.net</p>
-              <p className="flex items-center gap-2">📞 (202) 555-1234</p>
-              <p className="flex items-center gap-2">🌍 USA & Canada</p>
+              <p className="flex items-center gap-2">📧 michael@iguidetours.net</p>
+              <p className="flex items-center gap-2">📞 (202) 243-8336</p>
+              <p className="flex items-center gap-2">📍 6100 Cheshire Dr, Bethesda, MD 20814, USA</p>
             </div>
           </motion.div>
 
