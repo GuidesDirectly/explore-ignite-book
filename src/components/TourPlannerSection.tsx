@@ -1,21 +1,44 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Loader2, ArrowRight, ArrowLeft, RotateCcw, MapPin, Clock, DollarSign, Heart, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Sparkles, Loader2, ArrowRight, ArrowLeft, RotateCcw,
+  MapPin, Clock, DollarSign, Heart, User, Mail, Phone,
+  CheckCircle2, Globe, RefreshCw, Users, Send,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import { supabase } from "@/integrations/supabase/client";
 
 const PLAN_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/plan-tour`;
+const NOTIFY_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/send-notification`;
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lZ2Z3b21sb2FpaHp3b213eXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDM4NTAsImV4cCI6MjA4NjA3OTg1MH0.ZRn_9BDZZM5uTdqAxaeBcwckzjqXe7HQXUN8OZSbLNM";
 
 const DEST_KEYS = ["dest_dc", "dest_nyc", "dest_niagara", "dest_toronto", "dest_boston", "dest_chicago"] as const;
 const BUDGET_KEYS = ["budget_under500", "budget_500_1000", "budget_1000_2500", "budget_2500_5000", "budget_5000plus", "budget_flexible"] as const;
 const EXP_KEYS = ["exp_history", "exp_food", "exp_art", "exp_architecture", "exp_nature", "exp_nightlife", "exp_shopping", "exp_photography", "exp_family", "exp_romantic", "exp_vip", "exp_wine"] as const;
 
+const MAX_REFINEMENTS = 4;
+
+interface GuideProfile {
+  id: string;
+  user_id: string;
+  form_data: {
+    firstName: string;
+    lastName: string;
+    biography: string;
+    languages: string[];
+    specializations: string[];
+    tourTypes: string[];
+    targetAudience: string[];
+  };
+}
+
 const STEP_ICONS = [
+  <User className="w-5 h-5" />,
   <MapPin className="w-5 h-5" />,
   <Clock className="w-5 h-5" />,
   <DollarSign className="w-5 h-5" />,
@@ -26,6 +49,14 @@ const STEP_ICONS = [
 const TourPlannerSection = () => {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
+
+  // Step 0: Contact info
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  // Steps 1-5: Tour preferences
   const [destination, setDestination] = useState("");
   const [otherDestination, setOtherDestination] = useState("");
   const [days, setDays] = useState("");
@@ -33,12 +64,31 @@ const TourPlannerSection = () => {
   const [budget, setBudget] = useState("");
   const [experiences, setExperiences] = useState<string[]>([]);
   const [guideDescription, setGuideDescription] = useState("");
+
+  // Results
   const [plan, setPlan] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
+  const [tourPlanId, setTourPlanId] = useState<string | null>(null);
+
+  // Refinement
+  const [refinementCount, setRefinementCount] = useState(0);
+  const [refinementText, setRefinementText] = useState("");
+  const [showRefinementInput, setShowRefinementInput] = useState(false);
+  const [refinementHistory, setRefinementHistory] = useState<string[]>([]);
+
+  // Final states
+  const [showMaxRefinements, setShowMaxRefinements] = useState(false);
+  const [showGuides, setShowGuides] = useState(false);
+  const [guides, setGuides] = useState<GuideProfile[]>([]);
+  const [emailSent, setEmailSent] = useState(false);
+
   const resultRef = useRef<HTMLDivElement>(null);
 
+  const totalSteps = 6; // 0=contact, 1=dest, 2=duration, 3=budget, 4=experiences, 5=guide desc
+
   const stepTitles = [
+    { title: t("planner.contactTitle"), subtitle: t("planner.contactSubtitle") },
     { title: t("planner.step1Title"), subtitle: t("planner.step1Subtitle") },
     { title: t("planner.step2Title"), subtitle: t("planner.step2Subtitle") },
     { title: t("planner.step3Title"), subtitle: t("planner.step3Subtitle") },
@@ -52,19 +102,22 @@ const TourPlannerSection = () => {
     );
   };
 
+  const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+
   const canProceed = () => {
     switch (currentStep) {
-      case 0: return destination !== "" && (destination !== "other" || otherDestination.trim().length > 0);
-      case 1: return days.trim().length > 0;
-      case 2: return budget !== "";
-      case 3: return experiences.length > 0;
-      case 4: return guideDescription.trim().length > 5;
+      case 0: return firstName.trim().length > 0 && lastName.trim().length > 0 && isValidEmail(email);
+      case 1: return destination !== "" && (destination !== "other" || otherDestination.trim().length > 0);
+      case 2: return days.trim().length > 0;
+      case 3: return budget !== "";
+      case 4: return experiences.length > 0;
+      case 5: return guideDescription.trim().length > 5;
       default: return false;
     }
   };
 
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < totalSteps - 1) {
       setCurrentStep(prev => prev + 1);
       setError("");
     } else {
@@ -79,26 +132,73 @@ const TourPlannerSection = () => {
     }
   };
 
-  const buildDescription = () => {
+  const buildDescription = (refinement?: string) => {
     const dest = destination === "other" ? otherDestination : t(`planner.${destination}`);
     const expLabels = experiences.map(key => t(`planner.${key}`)).join(", ");
     const budgetLabel = t(`planner.${budget}`);
-    return `I want to visit ${dest} for ${days} days, spending about ${hoursPerDay || "flexible"} hours per day touring. My budget is ${budgetLabel}. I'm interested in: ${expLabels}. For my ideal guide: ${guideDescription}`;
+    let desc = `I want to visit ${dest} for ${days} days, spending about ${hoursPerDay || "flexible"} hours per day touring. My budget is ${budgetLabel}. I'm interested in: ${expLabels}. For my ideal guide: ${guideDescription}`;
+
+    if (refinementHistory.length > 0 || refinement) {
+      desc += "\n\n--- Previous plan and refinements ---\n";
+      desc += `Previous plan:\n${plan}\n`;
+      refinementHistory.forEach((r, i) => {
+        desc += `\nRefinement ${i + 1}: ${r}`;
+      });
+      if (refinement) {
+        desc += `\nRefinement ${refinementHistory.length + 1}: ${refinement}`;
+      }
+      desc += "\n\nPlease create a new improved plan accounting for all the refinement requests above.";
+    }
+
+    return desc;
   };
 
-  const handleGenerate = async () => {
+  const saveTourPlan = async (aiPlan?: string, refCount?: number, refHistory?: string[]) => {
+    const dest = destination === "other" ? otherDestination : t(`planner.${destination}`);
+    const data: Record<string, unknown> = {
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+      email: email.trim(),
+      phone: phone.trim() || null,
+      destination: dest,
+      days,
+      hours_per_day: hoursPerDay || null,
+      budget: t(`planner.${budget}`),
+      experiences: experiences.map(key => t(`planner.${key}`)),
+      guide_description: guideDescription,
+    };
+
+    if (aiPlan !== undefined) data.ai_plan = aiPlan;
+    if (refCount !== undefined) data.refinement_count = refCount;
+    if (refHistory !== undefined) data.refinement_history = refHistory;
+
+    if (tourPlanId) {
+      await supabase.from("tour_plans").update(data as any).eq("id", tourPlanId);
+    } else {
+      const { data: inserted } = await supabase.from("tour_plans").insert(data as any).select("id").single();
+      if (inserted) setTourPlanId(inserted.id);
+    }
+  };
+
+  const handleGenerate = async (refinement?: string) => {
     setError("");
     setPlan("");
     setIsGenerating(true);
+    setShowRefinementInput(false);
 
     try {
+      // Save to DB before AI processing (first time)
+      if (!tourPlanId && !refinement) {
+        await saveTourPlan();
+      }
+
       const resp = await fetch(PLAN_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${ANON_KEY}`,
         },
-        body: JSON.stringify({ description: buildDescription() }),
+        body: JSON.stringify({ description: buildDescription(refinement) }),
       });
 
       if (!resp.ok || !resp.body) {
@@ -139,6 +239,18 @@ const TourPlannerSection = () => {
           }
         }
       }
+
+      // Update refinement tracking
+      const newHistory = refinement ? [...refinementHistory, refinement] : refinementHistory;
+      const newCount = refinement ? refinementCount + 1 : refinementCount;
+      if (refinement) {
+        setRefinementHistory(newHistory);
+        setRefinementCount(newCount);
+      }
+
+      // Save plan to DB
+      await saveTourPlan(accumulated, newCount, newHistory);
+
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -146,9 +258,99 @@ const TourPlannerSection = () => {
     }
   };
 
+  const handleRefine = () => {
+    if (refinementCount >= MAX_REFINEMENTS) {
+      setShowMaxRefinements(true);
+      saveTourPlan(plan, refinementCount, refinementHistory);
+      // Send notification
+      sendAdminNotification();
+      return;
+    }
+    setShowRefinementInput(true);
+  };
+
+  const handleSubmitRefinement = () => {
+    if (refinementText.trim().length < 5) return;
+    handleGenerate(refinementText.trim());
+    setRefinementText("");
+  };
+
+  const handleSatisfied = async () => {
+    // Send email to customer
+    await sendCustomerEmail();
+    setEmailSent(true);
+    // Update status
+    if (tourPlanId) {
+      await supabase.from("tour_plans").update({ status: "completed" } as any).eq("id", tourPlanId);
+    }
+  };
+
+  const handleMatchGuides = async () => {
+    const { data } = await supabase
+      .from("guide_profiles")
+      .select("id, user_id, form_data")
+      .eq("status", "approved")
+      .limit(10);
+
+    if (data) {
+      setGuides(data as unknown as GuideProfile[]);
+      setShowGuides(true);
+    }
+  };
+
+  const sendCustomerEmail = async () => {
+    try {
+      await fetch(NOTIFY_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          type: "tour_plan",
+          data: {
+            customerEmail: email,
+            customerName: `${firstName} ${lastName}`,
+            plan,
+          },
+        }),
+      });
+    } catch (e) {
+      console.error("Failed to send customer email:", e);
+    }
+  };
+
+  const sendAdminNotification = async () => {
+    try {
+      await fetch(NOTIFY_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          type: "inquiry",
+          data: {
+            name: `${firstName} ${lastName}`,
+            email,
+            phone,
+            destination: destination === "other" ? otherDestination : t(`planner.${destination}`),
+            message: `AI Tour Plan customer reached max refinements. Plan ID: ${tourPlanId}`,
+          },
+        }),
+      });
+    } catch (e) {
+      console.error("Failed to send admin notification:", e);
+    }
+  };
+
   const handleReset = () => {
     setPlan("");
     setCurrentStep(0);
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setPhone("");
     setDestination("");
     setOtherDestination("");
     setDays("");
@@ -157,11 +359,82 @@ const TourPlannerSection = () => {
     setExperiences([]);
     setGuideDescription("");
     setError("");
+    setTourPlanId(null);
+    setRefinementCount(0);
+    setRefinementText("");
+    setRefinementHistory([]);
+    setShowRefinementInput(false);
+    setShowMaxRefinements(false);
+    setShowGuides(false);
+    setGuides([]);
+    setEmailSent(false);
   };
 
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: "hsl(40, 33%, 85%)" }}>
+                  {t("planner.firstName")} *
+                </label>
+                <Input
+                  placeholder={t("planner.firstNamePlaceholder")}
+                  className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: "hsl(40, 33%, 85%)" }}>
+                  {t("planner.lastName")} *
+                </label>
+                <Input
+                  placeholder={t("planner.lastNamePlaceholder")}
+                  className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5" style={{ color: "hsl(40, 33%, 85%)" }}>
+                {t("planner.emailLabel")} *
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="email"
+                  placeholder={t("planner.emailPlaceholder")}
+                  className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground pl-10"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5" style={{ color: "hsl(40, 33%, 85%)" }}>
+                {t("planner.phoneLabel")}
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="tel"
+                  placeholder={t("planner.phonePlaceholder")}
+                  className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground pl-10"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+              <p className="text-xs mt-1" style={{ color: "hsl(40, 33%, 60%)" }}>{t("planner.phoneOptional")}</p>
+            </div>
+          </div>
+        );
+
+      case 1:
         return (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {DEST_KEYS.map(key => (
@@ -207,7 +480,7 @@ const TourPlannerSection = () => {
           </div>
         );
 
-      case 1:
+      case 2:
         return (
           <div className="space-y-5">
             <div>
@@ -242,7 +515,7 @@ const TourPlannerSection = () => {
           </div>
         );
 
-      case 2:
+      case 3:
         return (
           <div className="grid grid-cols-2 gap-3">
             {BUDGET_KEYS.map(key => (
@@ -263,7 +536,7 @@ const TourPlannerSection = () => {
           </div>
         );
 
-      case 3:
+      case 4:
         return (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {EXP_KEYS.map(key => (
@@ -287,7 +560,7 @@ const TourPlannerSection = () => {
           </div>
         );
 
-      case 4:
+      case 5:
         return (
           <div>
             <Textarea
@@ -335,7 +608,128 @@ const TourPlannerSection = () => {
 
         <div className="max-w-2xl mx-auto">
           <AnimatePresence mode="wait">
-            {!plan && !isGenerating ? (
+            {/* === GUIDE MATCHING VIEW === */}
+            {showGuides ? (
+              <motion.div
+                key="guides"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-primary/10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Users className="w-6 h-6 text-primary" />
+                    <h3 className="font-display text-2xl font-bold" style={{ color: "hsl(40, 33%, 97%)" }}>
+                      {t("planner.matchedGuides")}
+                    </h3>
+                  </div>
+                  <p className="text-sm mb-6" style={{ color: "hsl(40, 33%, 75%)" }}>
+                    {t("planner.matchedGuidesSubtitle")}
+                  </p>
+
+                  {guides.length === 0 ? (
+                    <p style={{ color: "hsl(40, 33%, 70%)" }}>{t("planner.noGuidesAvailable")}</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {guides.map((guide) => {
+                        const fd = guide.form_data;
+                        const initials = `${fd.firstName?.[0] || ""}${fd.lastName?.[0] || ""}`;
+                        return (
+                          <div
+                            key={guide.id}
+                            className="bg-secondary/10 rounded-xl p-5 border border-primary/10 hover:border-primary/30 transition-all"
+                          >
+                            <div className="flex items-start gap-4">
+                              <div className="w-14 h-14 rounded-xl bg-primary text-secondary font-display font-bold text-lg flex items-center justify-center flex-shrink-0">
+                                {initials}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-display text-lg font-bold" style={{ color: "hsl(40, 33%, 95%)" }}>
+                                  {fd.firstName} {fd.lastName}
+                                </h4>
+                                <div className="flex items-center gap-1.5 text-sm mb-2" style={{ color: "hsl(40, 33%, 70%)" }}>
+                                  <Globe className="w-3.5 h-3.5 text-primary/70" />
+                                  <span>{fd.languages?.join(", ")}</span>
+                                </div>
+                                {fd.biography && (
+                                  <p className="text-sm mb-3" style={{ color: "hsl(40, 33%, 75%)" }}>
+                                    {fd.biography.length > 150 ? fd.biography.slice(0, 150) + "…" : fd.biography}
+                                  </p>
+                                )}
+                                <div className="flex flex-wrap gap-1.5">
+                                  {fd.specializations?.slice(0, 4).map((spec) => (
+                                    <Badge
+                                      key={spec}
+                                      variant="secondary"
+                                      className="text-xs bg-primary/10 text-primary border-primary/20"
+                                    >
+                                      {spec}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full border-primary/30 text-primary hover:bg-primary/10"
+                  onClick={handleReset}
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  {t("planner.startOver")}
+                </Button>
+              </motion.div>
+
+            /* === MAX REFINEMENTS REACHED === */
+            ) : showMaxRefinements ? (
+              <motion.div
+                key="max-refinements"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-primary/10 text-center">
+                  <CheckCircle2 className="w-12 h-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-display text-2xl font-bold mb-3" style={{ color: "hsl(40, 33%, 97%)" }}>
+                    {t("planner.inquirySaved")}
+                  </h3>
+                  <p className="text-base mb-2" style={{ color: "hsl(40, 33%, 80%)" }}>
+                    {t("planner.inquirySavedMsg")}
+                  </p>
+                  <p className="text-sm" style={{ color: "hsl(40, 33%, 65%)" }}>
+                    {t("planner.maxRefinementsReached")}
+                  </p>
+                </div>
+
+                {plan && (
+                  <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-primary/10">
+                    <h4 className="text-sm font-semibold text-primary mb-3">{t("planner.yourLatestPlan")}</h4>
+                    <div className="prose prose-invert prose-sm max-w-none prose-headings:text-primary prose-headings:font-display prose-strong:text-primary/90 prose-li:text-[hsl(40,33%,80%)]" style={{ color: "hsl(40, 33%, 80%)" }}>
+                      <ReactMarkdown>{plan}</ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full border-primary/30 text-primary hover:bg-primary/10"
+                  onClick={handleReset}
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  {t("planner.startOver")}
+                </Button>
+              </motion.div>
+
+            /* === WIZARD STEPS === */
+            ) : !plan && !isGenerating ? (
               <motion.div
                 key={`step-${currentStep}`}
                 initial={{ opacity: 0, x: 40 }}
@@ -359,7 +753,7 @@ const TourPlannerSection = () => {
                   {/* Step indicator */}
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                      {currentStep + 1} / {stepTitles.length}
+                      {currentStep + 1} / {totalSteps}
                     </span>
                   </div>
 
@@ -405,7 +799,7 @@ const TourPlannerSection = () => {
                       onClick={handleNext}
                       disabled={!canProceed()}
                     >
-                      {currentStep < 4 ? (
+                      {currentStep < totalSteps - 1 ? (
                         <>
                           {t("planner.next")}
                           <ArrowRight className="w-4 h-4 ml-2" />
@@ -420,6 +814,8 @@ const TourPlannerSection = () => {
                   </div>
                 </div>
               </motion.div>
+
+            /* === RESULTS VIEW === */
             ) : (
               <motion.div
                 key="result"
@@ -455,22 +851,95 @@ const TourPlannerSection = () => {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col sm:flex-row gap-4"
+                    className="space-y-4"
                   >
-                    <Link
-                      to="/chat"
-                      className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-primary text-secondary font-bold text-base hover:opacity-90 transition-opacity"
-                    >
-                      <ArrowRight className="w-5 h-5" />
-                      {t("planner.refineInChat")}
-                    </Link>
+                    {/* Refinement counter */}
+                    {refinementCount > 0 && (
+                      <p className="text-xs text-center" style={{ color: "hsl(40, 33%, 60%)" }}>
+                        {t("planner.refinementsUsed", { used: refinementCount, max: MAX_REFINEMENTS })}
+                      </p>
+                    )}
+
+                    {/* Refinement input */}
+                    {showRefinementInput && (
+                      <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-6 border border-primary/10">
+                        <label className="block text-sm font-semibold mb-2 text-primary">
+                          {t("planner.whatToChange")}
+                        </label>
+                        <Textarea
+                          placeholder={t("planner.refinePlaceholder")}
+                          rows={3}
+                          className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground/60 resize-none mb-3"
+                          value={refinementText}
+                          onChange={(e) => setRefinementText(e.target.value)}
+                          autoFocus
+                        />
+                        <Button
+                          variant="hero"
+                          size="lg"
+                          className="w-full"
+                          onClick={handleSubmitRefinement}
+                          disabled={refinementText.trim().length < 5}
+                        >
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          {t("planner.submitRefinement")}
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Action buttons */}
+                    {!showRefinementInput && (
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        {!emailSent ? (
+                          <>
+                            <Button
+                              variant="hero"
+                              size="lg"
+                              className="flex-1 text-base py-5"
+                              onClick={handleSatisfied}
+                            >
+                              <CheckCircle2 className="w-5 h-5 mr-2" />
+                              {t("planner.imSatisfied")}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="lg"
+                              className="flex-1 border-primary/30 text-primary hover:bg-primary/10"
+                              onClick={handleRefine}
+                            >
+                              <RefreshCw className="w-4 h-4 mr-2" />
+                              {t("planner.refinePlan")}
+                            </Button>
+                          </>
+                        ) : (
+                          <div className="w-full space-y-4">
+                            <div className="bg-primary/10 rounded-xl p-4 border border-primary/20 text-center">
+                              <CheckCircle2 className="w-8 h-8 text-primary mx-auto mb-2" />
+                              <p className="font-semibold text-primary">{t("planner.planSentToEmail")}</p>
+                              <p className="text-sm" style={{ color: "hsl(40, 33%, 70%)" }}>{t("planner.planSentToEmailSub")}</p>
+                            </div>
+                            <Button
+                              variant="hero"
+                              size="lg"
+                              className="w-full text-base py-5"
+                              onClick={handleMatchGuides}
+                            >
+                              <Users className="w-5 h-5 mr-2" />
+                              {t("planner.matchMeWithGuides")}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Start over */}
                     <Button
-                      variant="outline"
-                      size="lg"
-                      className="flex-1 border-primary/30 text-primary hover:bg-primary/10"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-primary/60 hover:text-primary hover:bg-primary/5"
                       onClick={handleReset}
                     >
-                      <RotateCcw className="w-4 h-4 mr-2" />
+                      <RotateCcw className="w-3 h-3 mr-1" />
                       {t("planner.startOver")}
                     </Button>
                   </motion.div>
