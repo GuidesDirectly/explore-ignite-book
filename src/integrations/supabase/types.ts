@@ -348,6 +348,66 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_plans: {
+        Row: {
+          ai_plan: string | null
+          budget: string | null
+          created_at: string
+          days: string | null
+          destination: string
+          email: string
+          experiences: string[] | null
+          first_name: string
+          guide_description: string | null
+          hours_per_day: string | null
+          id: string
+          last_name: string
+          phone: string | null
+          refinement_count: number
+          refinement_history: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ai_plan?: string | null
+          budget?: string | null
+          created_at?: string
+          days?: string | null
+          destination: string
+          email: string
+          experiences?: string[] | null
+          first_name: string
+          guide_description?: string | null
+          hours_per_day?: string | null
+          id?: string
+          last_name: string
+          phone?: string | null
+          refinement_count?: number
+          refinement_history?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_plan?: string | null
+          budget?: string | null
+          created_at?: string
+          days?: string | null
+          destination?: string
+          email?: string
+          experiences?: string[] | null
+          first_name?: string
+          guide_description?: string | null
+          hours_per_day?: string | null
+          id?: string
+          last_name?: string
+          phone?: string | null
+          refinement_count?: number
+          refinement_history?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
