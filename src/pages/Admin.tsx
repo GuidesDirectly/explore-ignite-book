@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3 } from "lucide-react";
+import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye } from "lucide-react";
 import { toast } from "sonner";
 import logoImg from "@/assets/logo.jpg";
 
@@ -24,6 +24,7 @@ interface Review {
   rating: number;
   comment: string | null;
   created_at: string;
+  hidden: boolean;
 }
 
 const Admin = () => {
@@ -88,6 +89,13 @@ const Admin = () => {
     if (error) { toast.error("Failed to delete"); return; }
     setReviews((prev) => prev.filter((r) => r.id !== id));
     toast.success("Review deleted");
+  };
+
+  const toggleHidden = async (id: string, currentHidden: boolean) => {
+    const { error } = await supabase.from("reviews").update({ hidden: !currentHidden } as any).eq("id", id);
+    if (error) { toast.error("Failed to update"); return; }
+    setReviews((prev) => prev.map((r) => r.id === id ? { ...r, hidden: !currentHidden } : r));
+    toast.success(!currentHidden ? "Review hidden from website" : "Review visible on website");
   };
 
   if (loading) {
@@ -244,10 +252,10 @@ const Admin = () => {
               <p className="text-center text-muted-foreground py-12">No reviews yet.</p>
             )}
             {reviews.map((rev) => (
-              <div key={rev.id} className="bg-card rounded-xl border border-border p-6">
+              <div key={rev.id} className={`bg-card rounded-xl border border-border p-6 ${rev.hidden ? "opacity-50" : ""}`}>
                 <div className="flex items-start justify-between">
                   <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-wrap">
                       <h3 className="font-semibold text-foreground">{rev.reviewer_name}</h3>
                       <div className="flex gap-0.5">
                         {[1, 2, 3, 4, 5].map((s) => (
@@ -257,6 +265,9 @@ const Admin = () => {
                       <span className="text-xs text-muted-foreground">
                         {new Date(rev.created_at).toLocaleDateString()}
                       </span>
+                      {rev.hidden && (
+                        <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">Hidden</span>
+                      )}
                     </div>
                     {rev.reviewer_email && (
                       <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -267,9 +278,19 @@ const Admin = () => {
                       <p className="text-foreground/80 text-sm bg-muted/50 p-3 rounded-lg">{rev.comment}</p>
                     )}
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => deleteReview(rev.id)} className="text-destructive hover:text-destructive">
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => toggleHidden(rev.id, rev.hidden)}
+                      title={rev.hidden ? "Show on website" : "Hide from website"}
+                    >
+                      {rev.hidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => deleteReview(rev.id)} className="text-destructive hover:text-destructive">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}

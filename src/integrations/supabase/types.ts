@@ -259,6 +259,7 @@ export type Database = {
           comment: string | null
           created_at: string
           guide_user_id: string
+          hidden: boolean
           id: string
           rating: number
           reviewer_email: string | null
@@ -269,6 +270,7 @@ export type Database = {
           comment?: string | null
           created_at?: string
           guide_user_id: string
+          hidden?: boolean
           id?: string
           rating: number
           reviewer_email?: string | null
@@ -279,6 +281,7 @@ export type Database = {
           comment?: string | null
           created_at?: string
           guide_user_id?: string
+          hidden?: boolean
           id?: string
           rating?: number
           reviewer_email?: string | null
