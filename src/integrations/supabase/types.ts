@@ -152,6 +152,39 @@ export type Database = {
         }
         Relationships: []
       }
+      inquiries: {
+        Row: {
+          created_at: string
+          destination: string
+          email: string
+          group_size: string | null
+          id: string
+          message: string | null
+          name: string
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          destination: string
+          email: string
+          group_size?: string | null
+          id?: string
+          message?: string | null
+          name: string
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          destination?: string
+          email?: string
+          group_size?: string | null
+          id?: string
+          message?: string | null
+          name?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
