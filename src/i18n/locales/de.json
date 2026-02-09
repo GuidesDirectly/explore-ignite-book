@@ -97,5 +97,20 @@
     "cities": "Großstädte in USA & Kanada",
     "personalized": "Individuelle Routen",
     "professional": "Professionelle Guides"
+  },
+  "review": {
+    "label": "Teilen Sie Ihre Erfahrung",
+    "title": "Bewerten Sie unsere Leistungen",
+    "subtitle": "Ihr Feedback hilft uns, besser zu werden, und hilft anderen Reisenden bei ihrer Entscheidung.",
+    "yourRating": "Ihre Bewertung",
+    "name": "Ihr Name",
+    "email": "E-Mail (optional)",
+    "comment": "Ihre Bewertung",
+    "commentPlaceholder": "Erzählen Sie von Ihrem Erlebnis — was Ihnen gefallen hat, Highlights, Vorschläge...",
+    "submit": "Bewertung abgeben",
+    "required": "Bitte geben Sie Ihren Namen und eine Sternebewertung an.",
+    "thankYou": "Vielen Dank!",
+    "thankYouMsg": "Ihre Bewertung wurde gesendet. Wir schätzen Ihr Feedback sehr!",
+    "backHome": "← Zurück zur Startseite"
   }
 }

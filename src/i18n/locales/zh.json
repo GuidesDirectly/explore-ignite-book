@@ -97,5 +97,20 @@
     "cities": "美国和加拿大主要城市",
     "personalized": "个性化行程",
     "professional": "专业导游"
+  },
+  "review": {
+    "label": "分享您的体验",
+    "title": "评价我们的服务",
+    "subtitle": "您的反馈帮助我们改进，也帮助其他旅行者做出明智的决定。",
+    "yourRating": "您的评分",
+    "name": "您的姓名",
+    "email": "电子邮箱（可选）",
+    "comment": "您的评价",
+    "commentPlaceholder": "告诉我们您的体验——您喜欢什么、亮点、建议...",
+    "submit": "提交评价",
+    "required": "请提供您的姓名和星级评分。",
+    "thankYou": "谢谢！",
+    "thankYouMsg": "您的评价已提交。我们非常感谢您的反馈！",
+    "backHome": "← 返回首页"
   }
 }

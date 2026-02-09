@@ -97,5 +97,20 @@
     "cities": "Major US & Canada Cities",
     "personalized": "Personalized Itineraries",
     "professional": "Professional Guides"
+  },
+  "review": {
+    "label": "Share Your Experience",
+    "title": "Rate Our Services",
+    "subtitle": "Your feedback helps us improve and helps other travelers make informed decisions.",
+    "yourRating": "Your Rating",
+    "name": "Your Name",
+    "email": "Email (optional)",
+    "comment": "Your Review",
+    "commentPlaceholder": "Tell us about your experience — what you loved, highlights, suggestions...",
+    "submit": "Submit Review",
+    "required": "Please provide your name and a star rating.",
+    "thankYou": "Thank You!",
+    "thankYouMsg": "Your review has been submitted. We truly appreciate your feedback!",
+    "backHome": "← Back to Home"
   }
 }
