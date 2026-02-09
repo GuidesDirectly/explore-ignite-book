@@ -44,6 +44,20 @@ const InquirySection = () => {
     }
     setSubmitted(true);
     toast.success(t("inquiry.success"));
+    // Send email notification (fire-and-forget)
+    supabase.functions.invoke("send-notification", {
+      body: {
+        type: "inquiry",
+        data: {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim() || null,
+          destination: formData.destination,
+          group_size: formData.groupSize || null,
+          message: formData.message.trim() || null,
+        },
+      },
+    }).catch(console.error);
   };
 
   if (submitted) {
