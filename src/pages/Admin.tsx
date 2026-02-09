@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye, UserCheck, CheckCircle, XCircle, Globe, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 import logoImg from "@/assets/logo.jpg";
 
@@ -27,15 +28,34 @@ interface Review {
   hidden: boolean;
 }
 
+interface GuideApplication {
+  id: string;
+  user_id: string;
+  status: string;
+  service_areas: string[] | null;
+  created_at: string;
+  form_data: {
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    biography?: string;
+    languages?: string[];
+    specializations?: string[];
+    tourTypes?: string[];
+  };
+}
+
 const Admin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"inquiries" | "reviews">("inquiries");
+  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides">("inquiries");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [guides, setGuides] = useState<GuideApplication[]>([]);
+  const [expandedGuide, setExpandedGuide] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -88,12 +108,14 @@ const Admin = () => {
   }, [isAdmin]);
 
   const fetchData = async () => {
-    const [inqRes, revRes] = await Promise.all([
+    const [inqRes, revRes, guideRes] = await Promise.all([
       supabase.from("inquiries").select("*").order("created_at", { ascending: false }),
       supabase.from("reviews").select("*").order("created_at", { ascending: false }),
+      supabase.from("guide_profiles").select("*").order("created_at", { ascending: false }),
     ]);
     if (inqRes.data) setInquiries(inqRes.data);
     if (revRes.data) setReviews(revRes.data);
+    if (guideRes.data) setGuides(guideRes.data as any);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -126,6 +148,20 @@ const Admin = () => {
     setReviews((prev) => prev.map((r) => r.id === id ? { ...r, hidden: !currentHidden } : r));
     toast.success(!currentHidden ? "Review hidden from website" : "Review visible on website");
   };
+
+  const updateGuideStatus = async (id: string, newStatus: "approved" | "rejected") => {
+    const { error } = await supabase
+      .from("guide_profiles")
+      .update({ status: newStatus } as any)
+      .eq("id", id);
+    if (error) { toast.error("Failed to update guide status"); return; }
+    setGuides((prev) => prev.map((g) => g.id === id ? { ...g, status: newStatus } : g));
+    toast.success(`Guide ${newStatus === "approved" ? "approved" : "rejected"} successfully`);
+  };
+
+  const pendingGuides = guides.filter((g) => g.status === "pending");
+  const approvedGuides = guides.filter((g) => g.status === "approved");
+  const rejectedGuides = guides.filter((g) => g.status === "rejected");
 
   if (loading) {
     return (
@@ -173,6 +209,146 @@ const Admin = () => {
     ? (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)
     : "—";
 
+  const renderGuideCard = (guide: GuideApplication) => {
+    const fd = guide.form_data;
+    const isExpanded = expandedGuide === guide.id;
+    const photoUrl = supabase.storage.from("guide-photos").getPublicUrl(`${guide.user_id}/profile.jpg`).data.publicUrl;
+
+    return (
+      <div key={guide.id} className="bg-card rounded-xl border border-border p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4 flex-1">
+            <img
+              src={photoUrl}
+              alt={`${fd.firstName} ${fd.lastName}`}
+              className="w-14 h-14 rounded-xl object-cover border border-border flex-shrink-0"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 flex-wrap mb-1">
+                <h3 className="font-semibold text-foreground text-lg">
+                  {fd.firstName} {fd.lastName}
+                </h3>
+                <Badge
+                  variant="secondary"
+                  className={`text-xs ${
+                    guide.status === "approved"
+                      ? "bg-primary/10 text-primary"
+                      : guide.status === "rejected"
+                      ? "bg-destructive/10 text-destructive"
+                      : "bg-accent text-accent-foreground"
+                  }`}
+                >
+                  {guide.status}
+                </Badge>
+              </div>
+
+              <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap mb-2">
+                {fd.phone && (
+                  <span className="flex items-center gap-1">
+                    <Phone className="w-3 h-3" /> {fd.phone}
+                  </span>
+                )}
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" /> {new Date(guide.created_at).toLocaleDateString()}
+                </span>
+              </div>
+
+              {/* Service areas */}
+              {guide.service_areas && guide.service_areas.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap mb-2">
+                  <MapPin className="w-3.5 h-3.5 text-primary/70" />
+                  {guide.service_areas.map((area) => (
+                    <Badge key={area} variant="secondary" className="text-xs">
+                      {area}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {/* Languages */}
+              {fd.languages && fd.languages.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap mb-2">
+                  <Globe className="w-3.5 h-3.5 text-primary/70" />
+                  <span className="text-sm text-muted-foreground">{fd.languages.join(", ")}</span>
+                </div>
+              )}
+
+              {/* Expandable details */}
+              {isExpanded && (
+                <div className="mt-3 space-y-3">
+                  {fd.specializations && fd.specializations.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Specializations</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {fd.specializations.map((spec) => (
+                          <Badge key={spec} variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
+                            {spec}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {fd.tourTypes && fd.tourTypes.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Tour Types</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {fd.tourTypes.map((tt) => (
+                          <Badge key={tt} variant="secondary" className="text-xs">
+                            {tt}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {fd.biography && (
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Biography</p>
+                      <p className="text-sm text-foreground/80 bg-muted/50 p-3 rounded-lg">{fd.biography}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <button
+                onClick={() => setExpandedGuide(isExpanded ? null : guide.id)}
+                className="text-xs text-primary hover:underline mt-2"
+              >
+                {isExpanded ? "Show less" : "Show more"}
+              </button>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-col gap-1.5 flex-shrink-0">
+            {guide.status !== "approved" && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-primary/30 text-primary hover:bg-primary/10"
+                onClick={() => updateGuideStatus(guide.id, "approved")}
+              >
+                <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve
+              </Button>
+            )}
+            {guide.status !== "rejected" && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                onClick={() => updateGuideStatus(guide.id, "rejected")}
+              >
+                <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -191,7 +367,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Stats */}
-        <div className="grid sm:grid-cols-3 gap-4 mb-8">
+        <div className="grid sm:grid-cols-4 gap-4 mb-8">
           <div className="bg-card rounded-xl border border-border p-6 flex items-center gap-4">
             <div className="bg-primary/10 p-3 rounded-lg">
               <MessageSquare className="w-6 h-6 text-primary" />
@@ -212,6 +388,15 @@ const Admin = () => {
           </div>
           <div className="bg-card rounded-xl border border-border p-6 flex items-center gap-4">
             <div className="bg-primary/10 p-3 rounded-lg">
+              <UserCheck className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-foreground">{pendingGuides.length}</p>
+              <p className="text-sm text-muted-foreground">Pending Guides</p>
+            </div>
+          </div>
+          <div className="bg-card rounded-xl border border-border p-6 flex items-center gap-4">
+            <div className="bg-primary/10 p-3 rounded-lg">
               <BarChart3 className="w-6 h-6 text-primary" />
             </div>
             <div>
@@ -222,7 +407,7 @@ const Admin = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 flex-wrap">
           <Button
             variant={tab === "inquiries" ? "default" : "outline"}
             onClick={() => setTab("inquiries")}
@@ -234,6 +419,15 @@ const Admin = () => {
             onClick={() => setTab("reviews")}
           >
             <Star className="w-4 h-4 mr-2" /> Reviews ({reviews.length})
+          </Button>
+          <Button
+            variant={tab === "guides" ? "default" : "outline"}
+            onClick={() => setTab("guides")}
+          >
+            <UserCheck className="w-4 h-4 mr-2" /> Guides ({guides.length})
+            {pendingGuides.length > 0 && (
+              <Badge className="ml-2 bg-primary text-secondary text-xs px-1.5 py-0">{pendingGuides.length}</Badge>
+            )}
           </Button>
         </div>
 
@@ -323,6 +517,51 @@ const Admin = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Guides Tab */}
+        {tab === "guides" && (
+          <div className="space-y-6">
+            {guides.length === 0 && (
+              <p className="text-center text-muted-foreground py-12">No guide applications yet.</p>
+            )}
+
+            {/* Pending section */}
+            {pendingGuides.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                  Pending Review ({pendingGuides.length})
+                </h3>
+                <div className="space-y-4">
+                  {pendingGuides.map(renderGuideCard)}
+                </div>
+              </div>
+            )}
+
+            {/* Approved section */}
+            {approvedGuides.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                  Approved ({approvedGuides.length})
+                </h3>
+                <div className="space-y-4">
+                  {approvedGuides.map(renderGuideCard)}
+                </div>
+              </div>
+            )}
+
+            {/* Rejected section */}
+            {rejectedGuides.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                  Rejected ({rejectedGuides.length})
+                </h3>
+                <div className="space-y-4">
+                  {rejectedGuides.map(renderGuideCard)}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
