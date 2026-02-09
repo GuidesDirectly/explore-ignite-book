@@ -21,6 +21,7 @@ interface GuideProfile {
   };
   reviewCount: number;
   avgRating: number;
+  photoUrl: string | null;
 }
 
 interface ReviewStats {
@@ -74,11 +75,15 @@ const MeetGuidesSection = () => {
 
       const enriched: GuideProfile[] = guideData.map((g: any) => {
         const stats = statsMap.get(g.user_id);
+        const { data: photoData } = supabase.storage
+          .from("guide-photos")
+          .getPublicUrl(`${g.user_id}/profile.jpg`);
         return {
           ...g,
           service_areas: g.service_areas || [],
           reviewCount: stats?.count || 0,
           avgRating: stats ? Math.round((stats.total / stats.count) * 10) / 10 : 0,
+          photoUrl: photoData?.publicUrl || null,
         };
       });
 
@@ -335,10 +340,23 @@ const MeetGuidesSection = () => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="group relative bg-card rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
                 >
-                  {/* Header with initials avatar */}
+                  {/* Header with photo or initials avatar */}
                   <div className="relative h-28 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent">
                     <div className="absolute -bottom-8 left-6">
-                      <div className="w-16 h-16 rounded-xl bg-primary text-secondary font-display font-bold text-xl flex items-center justify-center ring-4 ring-card shadow-lg">
+                      {guide.photoUrl ? (
+                        <img
+                          src={guide.photoUrl}
+                          alt={`${fd.firstName} ${fd.lastName}`}
+                          className="w-16 h-16 rounded-xl object-cover ring-4 ring-card shadow-lg"
+                          onError={(e) => {
+                            // Fallback to initials on load error
+                            const target = e.currentTarget;
+                            target.style.display = "none";
+                            target.nextElementSibling?.classList.remove("hidden");
+                          }}
+                        />
+                      ) : null}
+                      <div className={`w-16 h-16 rounded-xl bg-primary text-secondary font-display font-bold text-xl flex items-center justify-center ring-4 ring-card shadow-lg ${guide.photoUrl ? "hidden" : ""}`}>
                         {initials}
                       </div>
                     </div>
