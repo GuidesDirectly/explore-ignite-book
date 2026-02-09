@@ -95,6 +95,7 @@ const GuideRegister = () => {
   const [specializations, setSpecializations] = useState<string[]>([]);
   const [tourTypes, setTourTypes] = useState<string[]>([]);
   const [biography, setBiography] = useState("");
+  const [address, setAddress] = useState("");
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
 
@@ -135,6 +136,7 @@ const GuideRegister = () => {
           setFirstName(fd.firstName || "");
           setLastName(fd.lastName || "");
           setPhone(fd.phone || "");
+          setAddress(fd.address || "");
           setLanguages(fd.languages || ["English"]);
           setSpecializations(fd.specializations || []);
           setTourTypes(fd.tourTypes || []);
@@ -244,7 +246,7 @@ const GuideRegister = () => {
   const canProceed = () => {
     switch (currentStep) {
       case 0:
-        return firstName.trim() && lastName.trim() && isValidEmail(email.trim()) && phone.replace(/\D/g, "").length >= 10;
+        return firstName.trim() && lastName.trim() && isValidEmail(email.trim()) && phone.replace(/\D/g, "").length >= 10 && address.trim().length > 0;
       case 1:
         return serviceAreas.length > 0;
       case 2:
@@ -309,6 +311,7 @@ const GuideRegister = () => {
         firstName,
         lastName,
         phone,
+        address,
         languages,
         specializations,
         tourTypes,
@@ -569,6 +572,16 @@ const GuideRegister = () => {
                 {phoneError && (
                   <p className="text-xs text-destructive mt-1">{phoneError}</p>
                 )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  {t("guideRegister.address", "Address")} *
+                </label>
+                <Input
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="123 Main St, City, State, ZIP"
+                />
               </div>
             </div>
           )}

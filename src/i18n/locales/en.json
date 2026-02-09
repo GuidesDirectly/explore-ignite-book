@@ -233,6 +233,7 @@
     "firstName": "First Name",
     "lastName": "Last Name",
     "phone": "Phone Number",
+    "address": "Address",
     "serviceAreasTitle": "Service Areas",
     "serviceAreasDesc": "Select the cities where you offer tour guide services.",
     "languagesTitle": "Languages",
