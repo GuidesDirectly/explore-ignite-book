@@ -361,9 +361,10 @@ const GuideRegister = () => {
       }
 
       toast.success(t("guideRegister.submitted"));
-      // Redirect to home after a short delay
+      // Redirect to home and scroll to top after a short delay
       setTimeout(() => {
         navigate("/");
+        window.scrollTo({ top: 0, behavior: "instant" });
       }, 2000);
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
