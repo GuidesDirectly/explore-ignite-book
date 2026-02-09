@@ -13,7 +13,7 @@ import logoImg from "@/assets/logo.jpg";
 const GUIDE_USER_ID = "26477b85-de16-4946-935a-f6e238a0fd8d";
 
 // Replace this with your actual Google review URL
-const GOOGLE_REVIEW_URL = "https://g.page/r/YOUR_GOOGLE_PLACE_ID/review";
+const GOOGLE_REVIEW_URL = "https://g.page/r/CdOtbvUwpEGLEBI/review";
 
 type Step = "rating" | "google-redirect" | "review-form" | "submitted";
 
