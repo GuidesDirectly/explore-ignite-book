@@ -35,9 +35,9 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          <a href="tel:+12025551234" className="flex items-center gap-2 text-sm text-primary-foreground/70 hover:text-primary transition-colors">
+          <a href="tel:+12022438336" className="flex items-center gap-2 text-sm text-primary-foreground/70 hover:text-primary transition-colors">
             <Phone className="w-4 h-4" />
-            (202) 555-1234
+            (202) 243-8336
           </a>
           <Button variant="hero" size="sm" asChild>
             <a href="#inquiry">Book a Tour</a>

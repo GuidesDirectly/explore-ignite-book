@@ -34,15 +34,15 @@ const Footer = () => {
             <div className="space-y-3 text-sm text-primary-foreground/60">
               <p className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-primary" />
-                (202) 555-1234
+                (202) 243-8336
               </p>
               <p className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-primary" />
-                info@iguidetours.net
+                michael@iguidetours.net
               </p>
               <p className="flex items-center gap-3">
                 <MapPin className="w-4 h-4 text-primary" />
-                Washington DC, USA
+                6100 Cheshire Dr, Bethesda, MD 20814
               </p>
             </div>
           </div>
