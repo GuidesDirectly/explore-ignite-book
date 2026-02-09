@@ -2,17 +2,20 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "Destinations", href: "#destinations" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Contact", href: "#contact" },
-];
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
+
+  const navLinks = [
+    { label: t("nav.home"), href: "#home" },
+    { label: t("nav.services"), href: "#services" },
+    { label: t("nav.destinations"), href: "#destinations" },
+    { label: t("nav.testimonials"), href: "#testimonials" },
+    { label: t("nav.contact"), href: "#contact" },
+  ];
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-md border-b border-primary/10">
@@ -25,7 +28,7 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <a
-              key={link.label}
+              key={link.href}
               href={link.href}
               className="text-sm font-medium text-primary-foreground/70 hover:text-primary transition-colors duration-200"
             >
@@ -35,22 +38,26 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
+          <LanguageSwitcher />
           <a href="tel:+12022438336" className="flex items-center gap-2 text-sm text-primary-foreground/70 hover:text-primary transition-colors">
             <Phone className="w-4 h-4" />
             (202) 243-8336
           </a>
           <Button variant="hero" size="sm" asChild>
-            <a href="#inquiry">Book a Tour</a>
+            <a href="#inquiry">{t("nav.bookTour")}</a>
           </Button>
         </div>
 
         {/* Mobile toggle */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-primary-foreground/70 hover:text-primary transition-colors"
-        >
-          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <LanguageSwitcher />
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-primary-foreground/70 hover:text-primary transition-colors"
+          >
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -65,7 +72,7 @@ const Navbar = () => {
             <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
               {navLinks.map((link) => (
                 <a
-                  key={link.label}
+                  key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
                   className="text-sm font-medium text-primary-foreground/70 hover:text-primary transition-colors py-2"
@@ -74,7 +81,7 @@ const Navbar = () => {
                 </a>
               ))}
               <Button variant="hero" size="sm" className="mt-2" asChild>
-                <a href="#inquiry" onClick={() => setIsOpen(false)}>Book a Tour</a>
+                <a href="#inquiry" onClick={() => setIsOpen(false)}>{t("nav.bookTour")}</a>
               </Button>
             </div>
           </motion.div>

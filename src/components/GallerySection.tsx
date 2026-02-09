@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Camera } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import galleryLincoln from "@/assets/gallery-lincoln.jpg";
 import galleryCentralPark from "@/assets/gallery-centralpark.jpg";
@@ -20,6 +21,7 @@ const photos = [
 
 const GallerySection = () => {
   const [selected, setSelected] = useState<number | null>(null);
+  const { t } = useTranslation();
 
   return (
     <section id="gallery" className="py-24 bg-background">
@@ -32,13 +34,13 @@ const GallerySection = () => {
           className="text-center mb-16"
         >
           <p className="text-primary font-body text-sm uppercase tracking-[0.2em] font-semibold mb-3">
-            Tour Moments
+            {t("gallery.label")}
           </p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Happy Travelers
+            {t("gallery.title")}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            A glimpse into the unforgettable experiences our guests enjoy on every tour.
+            {t("gallery.subtitle")}
           </p>
         </motion.div>
 

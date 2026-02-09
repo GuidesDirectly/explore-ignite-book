@@ -1,27 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { MapPin, Star, Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import heroBg from "@/assets/hero-dc.jpg";
 import logo from "@/assets/logo.jpg";
-
-const languages = [
-  { code: "ru", name: "Russian" },
-  { code: "gb", name: "English" },
-  { code: "pl", name: "Polish" },
-  { code: "de", name: "German" },
-  { code: "fr", name: "French" },
-  { code: "es", name: "Spanish" },
-  { code: "cn", name: "Mandarin" },
-  { code: "jp", name: "Japanese" },
-];
-
-const stats = [
-  { icon: Star, value: "4.9★", label: "Average Rating" },
-  { icon: Users, value: "10,000+", label: "Happy Travelers" },
-  { icon: MapPin, value: "50+", label: "Cities Covered" },
-];
+import { languages } from "@/i18n/config";
 
 const HeroSection = () => {
+  const { t } = useTranslation();
+
+  const stats = [
+    { icon: Star, value: "4.9★", label: t("hero.avgRating") },
+    { icon: Users, value: "10,000+", label: t("hero.happyTravelers") },
+    { icon: MapPin, value: "50+", label: t("hero.citiesCovered") },
+  ];
+
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background image */}
@@ -48,10 +41,10 @@ const HeroSection = () => {
             transition={{ duration: 0.6 }}
             className="flex flex-wrap items-center gap-3 mb-4"
           >
-            {languages.map(({ code, name }) => (
+            {languages.map(({ flag, name }) => (
               <img
-                key={code}
-                src={`https://flagcdn.com/w80/${code}.png`}
+                key={flag}
+                src={`https://flagcdn.com/w80/${flag}.png`}
                 alt={name}
                 title={name}
                 className="w-10 h-7 md:w-12 md:h-8 rounded-sm object-cover shadow-md"
@@ -69,7 +62,7 @@ const HeroSection = () => {
               className="font-display text-5xl md:text-7xl font-bold leading-tight"
               style={{ color: "hsl(40, 33%, 97%)" }}
             >
-              Discover America
+              {t("hero.discoverAmerica")}
             </h1>
 
             <div className="flex items-center gap-4 md:gap-6 flex-wrap">
@@ -77,7 +70,7 @@ const HeroSection = () => {
                 className="font-display text-5xl md:text-7xl font-bold leading-tight"
                 style={{ color: "hsl(40, 33%, 97%)" }}
               >
-                <span className="text-gradient-gold">Like a Local</span>
+                <span className="text-gradient-gold">{t("hero.likeALocal")}</span>
               </h1>
 
               {/* Passport stamp */}
@@ -100,7 +93,7 @@ const HeroSection = () => {
                   }}
                 >
                   <div className="absolute inset-2 border-2 rounded-full pointer-events-none" style={{ borderColor: "rgba(255,255,255,0.5)" }} />
-                  <span className="relative z-10 leading-tight px-3">IN YOUR<br />OWN<br />LANGUAGE</span>
+                  <span className="relative z-10 leading-tight px-3 whitespace-pre-line">{t("hero.stamp")}</span>
                 </div>
               </motion.div>
             </div>
@@ -113,8 +106,7 @@ const HeroSection = () => {
             className="text-lg md:text-xl leading-relaxed mb-8 max-w-xl"
             style={{ color: "hsl(40, 33%, 90%)" }}
           >
-            Premium private tour guides across the USA & Canada. 
-            Custom VIP experiences crafted just for you — from historic landmarks to hidden gems.
+            {t("hero.subtitle")}
           </motion.p>
 
           <motion.div
@@ -124,10 +116,10 @@ const HeroSection = () => {
             className="flex flex-col sm:flex-row gap-4 mb-16"
           >
             <Button variant="hero" size="lg" className="text-base px-8 py-6" asChild>
-              <a href="#inquiry">Plan Your Tour</a>
+              <a href="#inquiry">{t("hero.planTour")}</a>
             </Button>
             <Button variant="heroOutline" size="lg" className="text-base px-8 py-6" asChild>
-              <a href="#services">Explore Services</a>
+              <a href="#services">{t("hero.exploreServices")}</a>
             </Button>
           </motion.div>
 

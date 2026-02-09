@@ -1,6 +1,17 @@
 import { MapPin, Phone, Mail } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
+
+  const navLinks = [
+    { label: t("nav.home"), href: "#home" },
+    { label: t("nav.services"), href: "#services" },
+    { label: t("nav.destinations"), href: "#destinations" },
+    { label: t("nav.testimonials"), href: "#testimonials" },
+    { label: t("nav.contact"), href: "#contact" },
+  ];
+
   return (
     <footer id="contact" className="bg-secondary py-16">
       <div className="container mx-auto px-4">
@@ -10,27 +21,27 @@ const Footer = () => {
               iGuide<span className="text-gradient-gold">Tours</span>
             </h3>
             <p className="text-primary-foreground/60 leading-relaxed">
-              Premium local tour guides across the United States and Canada. Russian, English, Polish, German, French, Spanish, Mandarin & Japanese speaking.
+              {t("footer.description")}
             </p>
           </div>
 
           <div>
-            <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">Quick Links</h4>
+            <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">{t("footer.quickLinks")}</h4>
             <div className="space-y-3">
-              {["Home", "Services", "Destinations", "Testimonials", "Contact"].map((link) => (
+              {navLinks.map((link) => (
                 <a
-                  key={link}
-                  href={`#${link.toLowerCase()}`}
+                  key={link.href}
+                  href={link.href}
                   className="block text-primary-foreground/60 hover:text-primary transition-colors text-sm"
                 >
-                  {link}
+                  {link.label}
                 </a>
               ))}
             </div>
           </div>
 
           <div>
-            <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">Contact Us</h4>
+            <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">{t("footer.contactUs")}</h4>
             <div className="space-y-3 text-sm text-primary-foreground/60">
               <p className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-primary" />
@@ -50,7 +61,7 @@ const Footer = () => {
 
         <div className="border-t border-primary-foreground/10 pt-8 text-center">
           <p className="text-sm text-primary-foreground/40">
-            © {new Date().getFullYear()} iGuide Tours. All rights reserved.
+            © {new Date().getFullYear()} {t("footer.rights")}
           </p>
         </div>
       </div>

@@ -1,28 +1,31 @@
 import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
-
-const testimonials = [
-  {
-    name: "Anna K.",
-    location: "Moscow, Russia",
-    text: "Our guide made Washington DC come alive! Speaking Russian was a huge plus — we understood every detail of American history like never before.",
-    rating: 5,
-  },
-  {
-    name: "David L.",
-    location: "Tel Aviv, Israel",
-    text: "The VIP tour of New York was incredible. Our Hebrew-speaking guide took us to spots we never would have found on our own. Worth every penny!",
-    rating: 5,
-  },
-  {
-    name: "Sarah M.",
-    location: "London, UK",
-    text: "We booked a custom family tour across three cities. The attention to detail and personalized itinerary was beyond our expectations.",
-    rating: 5,
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const TestimonialsSection = () => {
+  const { t } = useTranslation();
+
+  const testimonials = [
+    {
+      name: "Anna K.",
+      location: "Moscow, Russia",
+      text: t("testimonials.t1"),
+      rating: 5,
+    },
+    {
+      name: "David L.",
+      location: "Tel Aviv, Israel",
+      text: t("testimonials.t2"),
+      rating: 5,
+    },
+    {
+      name: "Sarah M.",
+      location: "London, UK",
+      text: t("testimonials.t3"),
+      rating: 5,
+    },
+  ];
+
   return (
     <section id="testimonials" className="py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -34,17 +37,17 @@ const TestimonialsSection = () => {
           className="text-center mb-16"
         >
           <p className="text-primary font-body text-sm uppercase tracking-[0.2em] font-semibold mb-3">
-            Testimonials
+            {t("testimonials.label")}
           </p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            What Travelers Say
+            {t("testimonials.title")}
           </h2>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((t, i) => (
+          {testimonials.map((item, i) => (
             <motion.div
-              key={t.name}
+              key={item.name}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -53,16 +56,16 @@ const TestimonialsSection = () => {
             >
               <Quote className="w-8 h-8 text-primary/20 absolute top-6 right-6" />
               <div className="flex gap-1 mb-4">
-                {Array.from({ length: t.rating }).map((_, j) => (
+                {Array.from({ length: item.rating }).map((_, j) => (
                   <Star key={j} className="w-4 h-4 fill-primary text-primary" />
                 ))}
               </div>
               <p className="text-foreground leading-relaxed mb-6 italic">
-                "{t.text}"
+                "{item.text}"
               </p>
               <div>
-                <p className="font-display font-semibold text-foreground">{t.name}</p>
-                <p className="text-sm text-muted-foreground">{t.location}</p>
+                <p className="font-display font-semibold text-foreground">{item.name}</p>
+                <p className="text-sm text-muted-foreground">{item.location}</p>
               </div>
             </motion.div>
           ))}

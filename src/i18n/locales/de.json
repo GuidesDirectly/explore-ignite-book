@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "services": "Leistungen",
+    "destinations": "Reiseziele",
+    "testimonials": "Bewertungen",
+    "contact": "Kontakt",
+    "bookTour": "Tour buchen"
+  },
+  "hero": {
+    "discoverAmerica": "Entdecke Amerika",
+    "likeALocal": "Wie ein Einheimischer",
+    "stamp": "IN DEINER\nSPRACHE",
+    "subtitle": "Premium-Privatreiseführer in den USA und Kanada. Maßgeschneiderte VIP-Erlebnisse nur für Sie — von historischen Sehenswürdigkeiten bis zu verborgenen Schätzen.",
+    "planTour": "Tour planen",
+    "exploreServices": "Unsere Leistungen",
+    "avgRating": "Durchschnittsbewertung",
+    "happyTravelers": "Zufriedene Reisende",
+    "citiesCovered": "Städte"
+  },
+  "services": {
+    "label": "Was wir bieten",
+    "title": "Tourleistungen",
+    "subtitle": "Von VIP-Privattouren bis zu Gruppenabenteuern — wir schaffen unvergessliche Reiseerlebnisse in Nordamerika.",
+    "vip": "VIP Privattouren",
+    "vipDesc": "Exklusive Erlebnisse, maßgeschneidert auf Ihre Interessen. Unsere Guides entwerfen die perfekte Route nur für Sie.",
+    "group": "Gruppentouren",
+    "groupDesc": "Schließen Sie sich Gleichgesinnten auf kuratierten Gruppenreisen an. Perfekt für soziale Abenteurer.",
+    "custom": "Individuelle Routen",
+    "customDesc": "Erzählen Sie uns von Ihrer Zeit und Ihren Interessen — wir erstellen eine einzigartige Route mit verborgenen Schätzen und ikonischen Sehenswürdigkeiten.",
+    "multilingual": "Mehrsprachige Guides",
+    "multilingualDesc": "Unsere Guides sprechen fließend Russisch, Englisch, Polnisch, Deutsch, Französisch, Spanisch, Mandarin und Japanisch."
+  },
+  "destinations": {
+    "label": "Beliebte Reiseziele",
+    "title": "Wo wir führen",
+    "subtitle": "Lokale Guides in den meisten Großstädten der USA und Kanadas.",
+    "tours": "Touren"
+  },
+  "gallery": {
+    "label": "Tourmomente",
+    "title": "Glückliche Reisende",
+    "subtitle": "Ein Blick auf die unvergesslichen Erlebnisse, die unsere Gäste bei jeder Tour genießen."
+  },
+  "testimonials": {
+    "label": "Bewertungen",
+    "title": "Was Reisende sagen",
+    "t1": "Unser Guide hat Washington DC zum Leben erweckt! Russisch sprechen zu können war ein riesiger Vorteil — wir haben jedes Detail der amerikanischen Geschichte verstanden.",
+    "t2": "Die VIP-Tour durch New York war unglaublich. Unser Guide brachte uns zu Orten, die wir alleine nie gefunden hätten!",
+    "t3": "Wir haben eine maßgeschneiderte Familientour durch drei Städte gebucht. Die Liebe zum Detail und die personalisierte Route übertrafen unsere Erwartungen."
+  },
+  "inquiry": {
+    "label": "Starten Sie Ihre Reise",
+    "title": "Buchen Sie Ihre",
+    "titleGold": "Traumtour",
+    "subtitle": "Füllen Sie das Formular aus und unser Team meldet sich innerhalb von 24 Stunden mit einem individuellen Tourangebot. Keine Verpflichtung!",
+    "fullName": "Vollständiger Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "groupSize": "Gruppengröße",
+    "selectSize": "Größe wählen",
+    "people": "Personen",
+    "destination": "Reiseziel",
+    "chooseDest": "Reiseziel wählen",
+    "message": "Nachricht",
+    "messagePlaceholder": "Erzählen Sie uns von Ihrer idealen Tour — Daten, Interessen, besondere Wünsche...",
+    "send": "Anfrage senden",
+    "required": "Bitte füllen Sie alle Pflichtfelder aus.",
+    "success": "Touranfrage gesendet! Wir melden uns innerhalb von 24 Stunden.",
+    "thankYou": "Vielen Dank!",
+    "thankYouMsg": "Ihre Touranfrage wurde erhalten. Unser Team wird sich innerhalb von 24 Stunden bei Ihnen melden.",
+    "submitAnother": "Weitere Anfrage senden"
+  },
+  "footer": {
+    "description": "Premium-Reiseführer in den Vereinigten Staaten und Kanada. Wir sprechen Russisch, Englisch, Polnisch, Deutsch, Französisch, Spanisch, Mandarin und Japanisch.",
+    "quickLinks": "Schnellzugriff",
+    "contactUs": "Kontakt",
+    "rights": "iGuide Tours. Alle Rechte vorbehalten."
+  },
+  "chat": {
+    "title": "Reiseassistent",
+    "subtitle": "KI-gestützt • Fragen zu Reisezielen, Touren & mehr",
+    "howCanHelp": "Wie kann ich Ihnen heute helfen?",
+    "askAnything": "Fragen Sie mich nach unseren Reisezielen, Reisetipps, Routenplanung oder lokalen Empfehlungen.",
+    "placeholder": "Fragen zu Reisezielen, Touren, Tipps…",
+    "q1": "Beste Reisezeit für Washington?",
+    "q2": "3-Tage NYC-Trip planen",
+    "q3": "Niagarafälle Touroptionen"
+  }
+}
