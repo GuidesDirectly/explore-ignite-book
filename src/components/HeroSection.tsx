@@ -77,19 +77,30 @@ const HeroSection = () => {
             {/* Passport stamp */}
             <motion.div
               initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
-              animate={{ opacity: 0.9, scale: 1, rotate: -12 }}
+              animate={{ opacity: 0.85, scale: 1, rotate: -14 }}
               transition={{ duration: 0.5, delay: 0.6, type: "spring", stiffness: 200 }}
               className="absolute -top-2 right-0 md:right-8 inline-flex items-center justify-center"
             >
               <div
-                className="px-4 py-2 md:px-6 md:py-3 border-[3px] border-primary rounded-md text-primary font-bold text-sm md:text-lg uppercase tracking-widest"
+                className="relative px-5 py-3 md:px-7 md:py-4 border-[3px] border-double border-primary rounded-sm text-primary font-bold text-sm md:text-lg uppercase tracking-widest overflow-hidden"
                 style={{
                   fontFamily: "'Courier New', monospace",
-                  textShadow: "0 0 8px hsl(var(--primary) / 0.4)",
+                  textShadow: "0 0 6px hsl(var(--primary) / 0.3)",
                   boxShadow: "inset 0 0 12px hsl(var(--primary) / 0.15), 0 0 20px hsl(var(--primary) / 0.1)",
+                  maskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
+                  WebkitMaskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
                 }}
               >
-                In Your Own<br />Language
+                {/* Distressed overlay */}
+                <div
+                  className="absolute inset-0 opacity-30 mix-blend-multiply pointer-events-none"
+                  style={{
+                    backgroundImage: "radial-gradient(circle at 20% 30%, transparent 40%, hsl(var(--primary) / 0.1) 41%, transparent 42%), radial-gradient(circle at 70% 60%, transparent 30%, hsl(var(--primary) / 0.08) 31%, transparent 33%), radial-gradient(circle at 50% 80%, transparent 50%, hsl(var(--primary) / 0.06) 51%, transparent 53%)",
+                  }}
+                />
+                {/* Inner ring */}
+                <div className="absolute inset-1 border border-primary/40 rounded-sm pointer-events-none" />
+                <span className="relative z-10">In Your Own<br />Language</span>
               </div>
             </motion.div>
           </motion.div>
