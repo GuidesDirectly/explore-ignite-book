@@ -17,6 +17,7 @@ import {
   User,
   Upload,
   Camera,
+  ShieldCheck,
 } from "lucide-react";
 import logoImg from "@/assets/logo.jpg";
 
@@ -72,6 +73,7 @@ const STEPS = [
   { icon: Globe, label: "Languages" },
   { icon: Briefcase, label: "Specialties" },
   { icon: Camera, label: "Photo & Bio" },
+  { icon: ShieldCheck, label: "Credentials" },
 ];
 
 const GuideRegister = () => {
@@ -95,6 +97,15 @@ const GuideRegister = () => {
   const [biography, setBiography] = useState("");
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
+
+  // Credentials state
+  const [insuranceCompany, setInsuranceCompany] = useState("");
+  const [insurancePolicyNumber, setInsurancePolicyNumber] = useState("");
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [licensingAuthority, setLicensingAuthority] = useState("");
+  const [certifications, setCertifications] = useState("");
+  const [licenseDoc, setLicenseDoc] = useState<File | null>(null);
+  const [licenseDocName, setLicenseDocName] = useState<string | null>(null);
 
   // Auth check
   const [authEmail, setAuthEmail] = useState("");
@@ -126,6 +137,11 @@ const GuideRegister = () => {
           setSpecializations(fd.specializations || []);
           setTourTypes(fd.tourTypes || []);
           setBiography(fd.biography || "");
+          setInsuranceCompany(fd.insuranceCompanyName || "");
+          setInsurancePolicyNumber(fd.insurancePolicyNumber || "");
+          setLicenseNumber(fd.licenseNumber || "");
+          setLicensingAuthority(fd.licensingAuthority || "");
+          setCertifications((fd.certifications || []).join(", "));
           setServiceAreas(data.service_areas || []);
           setCurrentStep(data.current_step || 0);
         }
@@ -199,8 +215,23 @@ const GuideRegister = () => {
         return specializations.length > 0;
       case 4:
         return biography.trim().length >= 20;
+      case 5:
+        return (
+          insuranceCompany.trim().length > 0 &&
+          insurancePolicyNumber.trim().length > 0 &&
+          licenseNumber.trim().length > 0 &&
+          licensingAuthority.trim().length > 0
+        );
       default:
         return true;
+    }
+  };
+
+  const handleLicenseDocChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLicenseDoc(file);
+      setLicenseDocName(file.name);
     }
   };
 
@@ -220,6 +251,22 @@ const GuideRegister = () => {
         if (uploadError) console.error("Photo upload error:", uploadError);
       }
 
+      // Upload license doc if provided
+      if (licenseDoc) {
+        const { error: licenseUploadError } = await supabase.storage
+          .from("guide-licenses")
+          .upload(`${user.id}/license-doc${licenseDoc.name.substring(licenseDoc.name.lastIndexOf('.'))}`, licenseDoc, {
+            upsert: true,
+            contentType: licenseDoc.type,
+          });
+        if (licenseUploadError) console.error("License doc upload error:", licenseUploadError);
+      }
+
+      const certList = certifications
+        .split(",")
+        .map((c) => c.trim())
+        .filter(Boolean);
+
       const formData = {
         firstName,
         lastName,
@@ -228,6 +275,12 @@ const GuideRegister = () => {
         specializations,
         tourTypes,
         biography,
+        insurance: true,
+        insuranceCompanyName: insuranceCompany.trim(),
+        insurancePolicyNumber: insurancePolicyNumber.trim(),
+        licenseNumber: licenseNumber.trim(),
+        licensingAuthority: licensingAuthority.trim(),
+        certifications: certList,
       };
 
       if (profileExists) {
@@ -236,7 +289,7 @@ const GuideRegister = () => {
           .update({
             form_data: formData,
             service_areas: serviceAreas,
-            current_step: 5,
+            current_step: 6,
             status: "pending",
           } as any)
           .eq("user_id", user.id);
@@ -245,7 +298,7 @@ const GuideRegister = () => {
           user_id: user.id,
           form_data: formData,
           service_areas: serviceAreas,
-          current_step: 5,
+          current_step: 6,
           status: "pending",
         } as any);
       }
@@ -328,7 +381,7 @@ const GuideRegister = () => {
   }
 
   // Submitted state
-  if (currentStep >= 5) {
+  if (currentStep >= 6) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="max-w-md text-center">
@@ -640,6 +693,113 @@ const GuideRegister = () => {
               </div>
             </div>
           )}
+
+          {/* Step 5: Credentials & Insurance */}
+          {currentStep === 5 && (
+            <div className="space-y-5">
+              <h2 className="font-display text-xl font-bold text-foreground">
+                Credentials & Insurance
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Provide your licensing and insurance details. These are required for verification.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">
+                    Insurance Company *
+                  </label>
+                  <Input
+                    value={insuranceCompany}
+                    onChange={(e) => setInsuranceCompany(e.target.value)}
+                    placeholder="e.g. TourGuard Insurance"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">
+                    Insurance Policy Number *
+                  </label>
+                  <Input
+                    value={insurancePolicyNumber}
+                    onChange={(e) => setInsurancePolicyNumber(e.target.value)}
+                    placeholder="e.g. TG-DC-2026-001"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">
+                    License Number *
+                  </label>
+                  <Input
+                    value={licenseNumber}
+                    onChange={(e) => setLicenseNumber(e.target.value)}
+                    placeholder="e.g. DC-LG-12345"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">
+                    Licensing Authority *
+                  </label>
+                  <Input
+                    value={licensingAuthority}
+                    onChange={(e) => setLicensingAuthority(e.target.value)}
+                    placeholder="e.g. DC Department of Tourism"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  Other Certifications
+                </label>
+                <Input
+                  value={certifications}
+                  onChange={(e) => setCertifications(e.target.value)}
+                  placeholder="CPR Certified, First Aid, etc. (comma-separated)"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Separate multiple certifications with commas
+                </p>
+              </div>
+
+              {/* License document upload */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  License / Insurance Document Upload
+                </label>
+                <div className="flex items-center gap-4">
+                  {licenseDocName ? (
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 text-sm text-foreground">
+                      <ShieldCheck className="w-4 h-4 text-primary" />
+                      <span className="truncate max-w-[200px]">{licenseDocName}</span>
+                    </div>
+                  ) : (
+                    <div className="w-full px-4 py-6 rounded-xl bg-muted/50 flex flex-col items-center justify-center border-2 border-dashed border-border">
+                      <Upload className="w-6 h-6 text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground">Upload supporting document</span>
+                    </div>
+                  )}
+                  <label className="cursor-pointer flex-shrink-0">
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:border-primary/30 transition-colors text-sm text-foreground">
+                      <Upload className="w-4 h-4" />
+                      {licenseDocName ? "Replace" : "Choose File"}
+                    </div>
+                    <input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                      onChange={handleLicenseDocChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  PDF, JPG, PNG, or DOC (max 20MB)
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Navigation buttons */}
@@ -653,7 +813,7 @@ const GuideRegister = () => {
             {t("guideRegister.back")}
           </Button>
 
-          {currentStep < 4 ? (
+          {currentStep < 5 ? (
             <Button
               onClick={() => setCurrentStep(currentStep + 1)}
               disabled={!canProceed()}
