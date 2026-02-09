@@ -88,7 +88,7 @@ const handler = async (req: Request): Promise<Response> => {
       // Also notify admin
       try {
         await resend.emails.send({
-          from: "iGuide Tours <onboarding@resend.dev>",
+          from: "iGuide Tours <noreply@iguidetours.net>",
           to: [NOTIFY_EMAIL],
           subject: `🗺️ Tour Plan Completed for ${customerName}`,
           html: `<h2>Customer Tour Plan Completed</h2><p><strong>${customerName}</strong> (${customerEmail}) has completed their AI tour plan and is satisfied with the result.</p><p style="color:#888;font-size:12px;">Sent from iGuide Tours website</p>`,
@@ -159,7 +159,7 @@ const handler = async (req: Request): Promise<Response> => {
       // Notify admin too
       try {
         await resend.emails.send({
-          from: "iGuide Tours <onboarding@resend.dev>",
+      from: "iGuide Tours <noreply@iguidetours.net>",
           to: [NOTIFY_EMAIL],
           subject: `Guide ${isApproved ? "Approved" : "Rejected"}: ${guideName}`,
           html: `<p>Guide <strong>${guideName}</strong> (${guideEmail}) has been <strong>${status}</strong>.</p>`,
@@ -196,7 +196,7 @@ const handler = async (req: Request): Promise<Response> => {
       // Notify admin about new application
       try {
         await resend.emails.send({
-          from: "iGuide Tours <onboarding@resend.dev>",
+          from: "iGuide Tours <noreply@iguidetours.net>",
           to: [NOTIFY_EMAIL],
           subject: `📋 New Guide Application: ${guideName}`,
           html: `<p>A new guide application has been submitted by <strong>${guideName}</strong> (${guideEmail}). Please review it in the admin dashboard.</p>`,
@@ -209,7 +209,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "iGuide Tours <onboarding@resend.dev>",
+      from: "iGuide Tours <noreply@iguidetours.net>",
       to: toEmails,
       subject,
       html,
