@@ -20,7 +20,7 @@ const services = [
   {
     icon: Globe,
     title: "Multilingual Guides",
-    description: "Our guides speak Russian, Hebrew, English, Polish, German, French, Spanish, Mandarin, and Japanese fluently. Experience every destination in your preferred language.",
+    description: "Our guides speak Russian, English, Polish, German, French, Spanish, Mandarin, and Japanese fluently. Experience every destination in your preferred language.",
   },
 ];
 

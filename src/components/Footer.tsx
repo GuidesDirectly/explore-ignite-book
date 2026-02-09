@@ -10,7 +10,7 @@ const Footer = () => {
               iGuide<span className="text-gradient-gold">Tours</span>
             </h3>
             <p className="text-primary-foreground/60 leading-relaxed">
-              Premium local tour guides across the United States and Canada. Russian, Hebrew, English, Polish, German, French, Spanish, Mandarin & Japanese speaking.
+              Premium local tour guides across the United States and Canada. Russian, English, Polish, German, French, Spanish, Mandarin & Japanese speaking.
             </p>
           </div>
 

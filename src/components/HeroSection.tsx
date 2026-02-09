@@ -3,6 +3,17 @@ import { motion } from "framer-motion";
 import { MapPin, Star, Users } from "lucide-react";
 import heroBg from "@/assets/hero-dc.jpg";
 
+const languages = [
+  { flag: "🇷🇺", name: "Russian" },
+  { flag: "🇬🇧", name: "English" },
+  { flag: "🇵🇱", name: "Polish" },
+  { flag: "🇩🇪", name: "German" },
+  { flag: "🇫🇷", name: "French" },
+  { flag: "🇪🇸", name: "Spanish" },
+  { flag: "🇨🇳", name: "Mandarin" },
+  { flag: "🇯🇵", name: "Japanese" },
+];
+
 const stats = [
   { icon: Star, value: "4.9★", label: "Average Rating" },
   { icon: Users, value: "10,000+", label: "Happy Travelers" },
@@ -20,14 +31,18 @@ const HeroSection = () => {
 
       <div className="relative container mx-auto px-4 pt-24 pb-16">
         <div className="max-w-3xl">
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-primary font-body text-sm uppercase tracking-[0.2em] font-semibold mb-4"
+            className="flex flex-wrap items-center gap-3 mb-4"
           >
-            Russian • Hebrew • English • Polish • German • French • Spanish • Mandarin • Japanese Speaking Guides
-          </motion.p>
+            {languages.map(({ flag, name }) => (
+              <span key={name} className="inline-flex items-center gap-1.5 text-primary font-body text-sm uppercase tracking-[0.15em] font-semibold">
+                <span className="text-lg">{flag}</span>{name}
+              </span>
+            ))}
+          </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
