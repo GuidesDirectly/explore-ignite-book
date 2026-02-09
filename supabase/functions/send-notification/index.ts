@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -12,7 +13,7 @@ const corsHeaders = {
 const NOTIFY_EMAIL = "michael@iguidetours.net";
 
 interface NotificationRequest {
-  type: "inquiry" | "review" | "tour_plan";
+  type: "inquiry" | "review" | "tour_plan" | "guide_status";
   data: Record<string, unknown>;
 }
 
@@ -91,6 +92,77 @@ const handler = async (req: Request): Promise<Response> => {
           to: [NOTIFY_EMAIL],
           subject: `🗺️ Tour Plan Completed for ${customerName}`,
           html: `<h2>Customer Tour Plan Completed</h2><p><strong>${customerName}</strong> (${customerEmail}) has completed their AI tour plan and is satisfied with the result.</p><p style="color:#888;font-size:12px;">Sent from iGuide Tours website</p>`,
+        });
+      } catch (e) {
+        console.error("Failed to notify admin:", e);
+      }
+    } else if (type === "guide_status") {
+      const guideName = data.guideName as string;
+      let guideEmail = data.guideEmail as string | undefined;
+      const guideUserId = data.guideUserId as string | undefined;
+      const status = data.status as string;
+      const isApproved = status === "approved";
+
+      // Look up email from auth.users if not provided
+      if (!guideEmail && guideUserId) {
+        try {
+          const supabaseAdmin = createClient(
+            Deno.env.get("SUPABASE_URL")!,
+            Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+          );
+          const { data: userData } = await supabaseAdmin.auth.admin.getUserById(guideUserId);
+          guideEmail = userData?.user?.email;
+        } catch (e) {
+          console.error("Failed to look up guide email:", e);
+        }
+      }
+
+      if (!guideEmail) {
+        throw new Error("Could not determine guide email");
+      }
+
+      subject = isApproved
+        ? `🎉 Congratulations! Your iGuide Tours Application Has Been Approved`
+        : `📋 Update on Your iGuide Tours Application`;
+
+      html = `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+          <div style="background:#1a1f2e;padding:30px;text-align:center;">
+            <h1 style="color:#d4a843;margin:0;">iGuide Tours</h1>
+          </div>
+          <div style="padding:30px;background:#f9f9f9;">
+            <h2 style="color:#1a1f2e;">Hi ${guideName}! 👋</h2>
+            ${isApproved ? `
+              <p>Great news! Your application to become an iGuide Tours guide has been <strong style="color:#22c55e;">approved</strong>! 🎉</p>
+              <p>Your profile is now live on our website and travelers can find and connect with you directly.</p>
+              <p>Here are some tips to get started:</p>
+              <ul>
+                <li>Make sure your profile photo and biography are up to date</li>
+                <li>Keep your availability current</li>
+                <li>Respond to traveler inquiries promptly</li>
+              </ul>
+              <a href="https://explore-ignite-book.lovable.app" style="display:inline-block;background:#d4a843;color:#1a1f2e;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:bold;margin-top:10px;">Visit iGuide Tours</a>
+            ` : `
+              <p>Thank you for your interest in joining iGuide Tours as a guide.</p>
+              <p>After careful review, we are unable to approve your application at this time.</p>
+              <p>This could be due to a variety of reasons. We encourage you to update your profile and re-apply in the future.</p>
+              <p>If you have any questions, feel free to reach out to us at <a href="mailto:michael@iguidetours.net">michael@iguidetours.net</a>.</p>
+            `}
+          </div>
+          <div style="padding:20px;text-align:center;color:#888;font-size:12px;">
+            <p>iGuide Tours — Premium Private Tours Across North America</p>
+          </div>
+        </div>
+      `;
+      toEmails = [guideEmail];
+
+      // Notify admin too
+      try {
+        await resend.emails.send({
+          from: "iGuide Tours <onboarding@resend.dev>",
+          to: [NOTIFY_EMAIL],
+          subject: `Guide ${isApproved ? "Approved" : "Rejected"}: ${guideName}`,
+          html: `<p>Guide <strong>${guideName}</strong> (${guideEmail}) has been <strong>${status}</strong>.</p>`,
         });
       } catch (e) {
         console.error("Failed to notify admin:", e);

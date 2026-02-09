@@ -150,6 +150,9 @@ const Admin = () => {
   };
 
   const updateGuideStatus = async (id: string, newStatus: "approved" | "rejected") => {
+    const guide = guides.find((g) => g.id === id);
+    if (!guide) return;
+
     const { error } = await supabase
       .from("guide_profiles")
       .update({ status: newStatus } as any)
@@ -157,6 +160,24 @@ const Admin = () => {
     if (error) { toast.error("Failed to update guide status"); return; }
     setGuides((prev) => prev.map((g) => g.id === id ? { ...g, status: newStatus } : g));
     toast.success(`Guide ${newStatus === "approved" ? "approved" : "rejected"} successfully`);
+
+    // Send email notification to the guide
+    try {
+      const fd = guide.form_data;
+      await supabase.functions.invoke("send-notification", {
+        body: {
+          type: "guide_status",
+          data: {
+            guideName: `${fd.firstName} ${fd.lastName}`,
+            guideUserId: guide.user_id,
+            guideEmail: (fd as any).email || undefined,
+            status: newStatus,
+          },
+        },
+      });
+    } catch (e) {
+      console.error("Failed to send guide notification email:", e);
+    }
   };
 
   const pendingGuides = guides.filter((g) => g.status === "pending");
