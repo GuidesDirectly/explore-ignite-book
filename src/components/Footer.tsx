@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail } from "lucide-react";
+import { MapPin, Phone, Mail, Facebook, Instagram } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Footer = () => {
@@ -55,6 +55,14 @@ const Footer = () => {
                 <MapPin className="w-4 h-4 text-primary" />
                 6100 Cheshire Dr, Bethesda, MD 20814
               </p>
+              <div className="flex items-center gap-4 pt-2">
+                <a href="https://www.facebook.com/Toursiguide/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/60 hover:text-primary transition-colors">
+                  <Facebook className="w-5 h-5" />
+                </a>
+                <a href="https://www.instagram.com/iguide_tours" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/60 hover:text-primary transition-colors">
+                  <Instagram className="w-5 h-5" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
