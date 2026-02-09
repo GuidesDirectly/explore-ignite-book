@@ -86,5 +86,16 @@
     "q1": "Beste Reisezeit für Washington?",
     "q2": "3-Tage NYC-Trip planen",
     "q3": "Niagarafälle Touroptionen"
+  },
+  "about": {
+    "label": "Über uns",
+    "title": "Wer wir sind",
+    "p1": "iGuide Tours mit Sitz in Bethesda, Maryland, ist spezialisiert auf private Touren mit professionellen, mehrsprachigen lokalen Guides in den größten Städten der USA und Kanadas.",
+    "p2": "Gegründet von Michael Zlotnitsky, der über 35 Jahre Erfahrung in der Tourismusbranche hat, legt das Unternehmen besonderen Wert auf personalisierte Erlebnisse, die Geschichte, Kultur und Küche jedes Reiseziels präsentieren.",
+    "p3": "Mit dem Fokus auf VIP-Touren bietet iGuide Tours seinen Kunden die Möglichkeit, ikonische Sehenswürdigkeiten und verborgene Schätze zu entdecken — alles in Ihrer bevorzugten Sprache. Ob Familienurlaub, Geschäftsreise oder besonderer Anlass — unser Team gestaltet unvergessliche Reisen nach Ihren Wünschen.",
+    "experience": "35+ Jahre Erfahrung",
+    "cities": "Großstädte in USA & Kanada",
+    "personalized": "Individuelle Routen",
+    "professional": "Professionelle Guides"
   }
 }
