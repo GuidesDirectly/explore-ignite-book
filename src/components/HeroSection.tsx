@@ -103,10 +103,20 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg md:text-xl leading-relaxed mb-8 max-w-xl"
+            className="text-lg md:text-xl leading-relaxed mb-3 max-w-xl"
             style={{ color: "hsl(40, 33%, 90%)" }}
           >
             {t("hero.subtitle")}
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.38 }}
+            className="text-base md:text-lg font-semibold tracking-wide mb-8 max-w-xl"
+            style={{ color: "hsl(45, 80%, 70%)" }}
+          >
+            {t("hero.directBooking")}
           </motion.p>
 
           <motion.div
