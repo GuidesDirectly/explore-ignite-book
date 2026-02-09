@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye, UserCheck, CheckCircle, XCircle, Globe, Briefcase } from "lucide-react";
+import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye, UserCheck, CheckCircle, XCircle, Globe, Briefcase, Map, DollarSign, Clock } from "lucide-react";
 import { toast } from "sonner";
 import logoImg from "@/assets/logo.jpg";
 
@@ -45,17 +45,38 @@ interface GuideApplication {
   };
 }
 
+interface TourPlan {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string | null;
+  destination: string;
+  days: string | null;
+  hours_per_day: string | null;
+  budget: string | null;
+  experiences: string[] | null;
+  guide_description: string | null;
+  ai_plan: string | null;
+  status: string;
+  refinement_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 const Admin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides">("inquiries");
+  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours">("inquiries");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [guides, setGuides] = useState<GuideApplication[]>([]);
+  const [tourPlans, setTourPlans] = useState<TourPlan[]>([]);
   const [expandedGuide, setExpandedGuide] = useState<string | null>(null);
+  const [expandedTour, setExpandedTour] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -108,14 +129,16 @@ const Admin = () => {
   }, [isAdmin]);
 
   const fetchData = async () => {
-    const [inqRes, revRes, guideRes] = await Promise.all([
+    const [inqRes, revRes, guideRes, tourRes] = await Promise.all([
       supabase.from("inquiries").select("*").order("created_at", { ascending: false }),
       supabase.from("reviews").select("*").order("created_at", { ascending: false }),
       supabase.from("guide_profiles").select("*").order("created_at", { ascending: false }),
+      supabase.from("tour_plans").select("*").order("created_at", { ascending: false }),
     ]);
     if (inqRes.data) setInquiries(inqRes.data);
     if (revRes.data) setReviews(revRes.data);
     if (guideRes.data) setGuides(guideRes.data as any);
+    if (tourRes.data) setTourPlans(tourRes.data as any);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -388,7 +411,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Stats */}
-        <div className="grid sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid sm:grid-cols-5 gap-4 mb-8">
           <div className="bg-card rounded-xl border border-border p-6 flex items-center gap-4">
             <div className="bg-primary/10 p-3 rounded-lg">
               <MessageSquare className="w-6 h-6 text-primary" />
@@ -414,6 +437,15 @@ const Admin = () => {
             <div>
               <p className="text-2xl font-bold text-foreground">{pendingGuides.length}</p>
               <p className="text-sm text-muted-foreground">Pending Guides</p>
+            </div>
+          </div>
+          <div className="bg-card rounded-xl border border-border p-6 flex items-center gap-4">
+            <div className="bg-primary/10 p-3 rounded-lg">
+              <Map className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-foreground">{tourPlans.length}</p>
+              <p className="text-sm text-muted-foreground">Tour Plans</p>
             </div>
           </div>
           <div className="bg-card rounded-xl border border-border p-6 flex items-center gap-4">
@@ -449,6 +481,12 @@ const Admin = () => {
             {pendingGuides.length > 0 && (
               <Badge className="ml-2 bg-primary text-secondary text-xs px-1.5 py-0">{pendingGuides.length}</Badge>
             )}
+          </Button>
+          <Button
+            variant={tab === "tours" ? "default" : "outline"}
+            onClick={() => setTab("tours")}
+          >
+            <Map className="w-4 h-4 mr-2" /> Tour Plans ({tourPlans.length})
           </Button>
         </div>
 
@@ -583,6 +621,89 @@ const Admin = () => {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Tour Plans Tab */}
+        {tab === "tours" && (
+          <div className="space-y-4">
+            {tourPlans.length === 0 && (
+              <p className="text-center text-muted-foreground py-12">No tour plans yet.</p>
+            )}
+            {tourPlans.map((plan) => {
+              const isExpanded = expandedTour === plan.id;
+              const statusColor =
+                plan.status === "completed" ? "bg-primary/10 text-primary" :
+                plan.status === "planning" ? "bg-accent text-accent-foreground" :
+                plan.status === "matched" ? "bg-primary/20 text-primary" :
+                "bg-muted text-muted-foreground";
+
+              return (
+                <div key={plan.id} className="bg-card rounded-xl border border-border p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="font-semibold text-foreground text-lg">
+                          {plan.first_name} {plan.last_name}
+                        </h3>
+                        <Badge variant="secondary" className={`text-xs ${statusColor}`}>
+                          {plan.status}
+                        </Badge>
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full flex items-center gap-1">
+                          <MapPin className="w-3 h-3" /> {plan.destination}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                        <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {plan.email}</span>
+                        {plan.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {plan.phone}</span>}
+                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(plan.created_at).toLocaleDateString()}</span>
+                      </div>
+
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                        {plan.days && <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {plan.days} days{plan.hours_per_day ? `, ${plan.hours_per_day}h/day` : ""}</span>}
+                        {plan.budget && <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" /> {plan.budget}</span>}
+                        {plan.refinement_count > 0 && <span className="text-xs">Refinements: {plan.refinement_count}</span>}
+                      </div>
+
+                      {plan.experiences && plan.experiences.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {plan.experiences.map((exp) => (
+                            <Badge key={exp} variant="secondary" className="text-xs">{exp}</Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      {isExpanded && (
+                        <div className="mt-3 space-y-3">
+                          {plan.guide_description && (
+                            <div>
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Guide Preferences</p>
+                              <p className="text-sm text-foreground/80 bg-muted/50 p-3 rounded-lg">{plan.guide_description}</p>
+                            </div>
+                          )}
+                          {plan.ai_plan && (
+                            <div>
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">AI-Generated Plan</p>
+                              <div className="text-sm text-foreground/80 bg-muted/50 p-3 rounded-lg whitespace-pre-wrap max-h-96 overflow-y-auto">
+                                {plan.ai_plan}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => setExpandedTour(isExpanded ? null : plan.id)}
+                        className="text-xs text-primary hover:underline mt-2"
+                      >
+                        {isExpanded ? "Show less" : "Show more"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
