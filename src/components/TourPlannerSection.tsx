@@ -1,34 +1,96 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Loader2, ArrowRight, RotateCcw } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Sparkles, Loader2, ArrowRight, ArrowLeft, RotateCcw, MapPin, Clock, DollarSign, Heart, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
 const PLAN_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/plan-tour`;
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lZ2Z3b21sb2FpaHp3b213eXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDM4NTAsImV4cCI6MjA4NjA3OTg1MH0.ZRn_9BDZZM5uTdqAxaeBcwckzjqXe7HQXUN8OZSbLNM";
 
-const EXAMPLE_PROMPTS = [
-  "A 3-day family trip to Washington DC with kids aged 8 and 12. Budget around $2000. We love history and want a guide who's great with children.",
-  "Romantic weekend in NYC for our anniversary. We want hidden gems, rooftop dining, and a fun, energetic guide. Budget is flexible.",
-  "Group of 6 friends doing Niagara Falls + Toronto over 4 days. We're adventurous, love food tours, and prefer a young, fun guide.",
+const DESTINATIONS = [
+  "Washington DC", "New York City", "Niagara Falls", "Toronto", "Boston", "Chicago", "Other"
+];
+
+const BUDGET_RANGES = [
+  "Under $500", "$500 – $1,000", "$1,000 – $2,500", "$2,500 – $5,000", "$5,000+", "Flexible / No limit"
+];
+
+const EXPERIENCE_OPTIONS = [
+  "Historical & Heritage", "Food & Culinary", "Art & Museums", "Architecture",
+  "Nature & Adventure", "Night Life & Entertainment", "Shopping & Fashion",
+  "Photography", "Family-Friendly", "Romantic / Couples", "VIP / Luxury", "Wine & Vineyard"
+];
+
+interface StepConfig {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+}
+
+const STEPS: StepConfig[] = [
+  { icon: <MapPin className="w-5 h-5" />, title: "Where do you want to go?", subtitle: "Select your dream destination" },
+  { icon: <Clock className="w-5 h-5" />, title: "How long is your trip?", subtitle: "Tell us about your schedule" },
+  { icon: <DollarSign className="w-5 h-5" />, title: "What's your budget range?", subtitle: "Help us tailor the perfect plan" },
+  { icon: <Heart className="w-5 h-5" />, title: "What experiences are you looking for?", subtitle: "Select all that interest you" },
+  { icon: <User className="w-5 h-5" />, title: "What makes your ideal tour guide?", subtitle: "Describe the perfect guide for you" },
 ];
 
 const TourPlannerSection = () => {
-  const { t } = useTranslation();
-  const [description, setDescription] = useState("");
+  const [currentStep, setCurrentStep] = useState(0);
+  const [destination, setDestination] = useState("");
+  const [otherDestination, setOtherDestination] = useState("");
+  const [days, setDays] = useState("");
+  const [hoursPerDay, setHoursPerDay] = useState("");
+  const [budget, setBudget] = useState("");
+  const [experiences, setExperiences] = useState<string[]>([]);
+  const [guideDescription, setGuideDescription] = useState("");
   const [plan, setPlan] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const resultRef = useRef<HTMLDivElement>(null);
 
-  const handleGenerate = async () => {
-    if (description.trim().length < 10) {
-      setError("Please describe your dream tour in more detail.");
-      return;
+  const toggleExperience = (exp: string) => {
+    setExperiences(prev =>
+      prev.includes(exp) ? prev.filter(e => e !== exp) : [...prev, exp]
+    );
+  };
+
+  const canProceed = () => {
+    switch (currentStep) {
+      case 0: return destination !== "" && (destination !== "Other" || otherDestination.trim().length > 0);
+      case 1: return days.trim().length > 0;
+      case 2: return budget !== "";
+      case 3: return experiences.length > 0;
+      case 4: return guideDescription.trim().length > 5;
+      default: return false;
     }
+  };
+
+  const handleNext = () => {
+    if (currentStep < 4) {
+      setCurrentStep(prev => prev + 1);
+      setError("");
+    } else {
+      handleGenerate();
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1);
+      setError("");
+    }
+  };
+
+  const buildDescription = () => {
+    const dest = destination === "Other" ? otherDestination : destination;
+    return `I want to visit ${dest} for ${days} days, spending about ${hoursPerDay || "flexible"} hours per day touring. My budget is ${budget}. I'm interested in: ${experiences.join(", ")}. For my ideal guide: ${guideDescription}`;
+  };
+
+  const handleGenerate = async () => {
     setError("");
     setPlan("");
     setIsGenerating(true);
@@ -40,7 +102,7 @@ const TourPlannerSection = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${ANON_KEY}`,
         },
-        body: JSON.stringify({ description: description.trim() }),
+        body: JSON.stringify({ description: buildDescription() }),
       });
 
       if (!resp.ok || !resp.body) {
@@ -90,8 +152,148 @@ const TourPlannerSection = () => {
 
   const handleReset = () => {
     setPlan("");
-    setDescription("");
+    setCurrentStep(0);
+    setDestination("");
+    setOtherDestination("");
+    setDays("");
+    setHoursPerDay("");
+    setBudget("");
+    setExperiences([]);
+    setGuideDescription("");
     setError("");
+  };
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 0:
+        return (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {DESTINATIONS.map(dest => (
+              <button
+                key={dest}
+                type="button"
+                onClick={() => setDestination(dest)}
+                className={`p-4 rounded-xl border-2 text-left transition-all duration-200 hover:scale-[1.02] ${
+                  destination === dest
+                    ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/20"
+                    : "border-primary/10 bg-secondary/20 hover:border-primary/30"
+                }`}
+                style={{ color: destination === dest ? undefined : "hsl(40, 33%, 80%)" }}
+              >
+                <MapPin className={`w-4 h-4 mb-1 ${destination === dest ? "text-primary" : "text-muted-foreground"}`} />
+                <span className="text-sm font-semibold block">{dest}</span>
+              </button>
+            ))}
+            {destination === "Other" && (
+              <div className="col-span-2 sm:col-span-3 mt-2">
+                <Input
+                  placeholder="Where would you like to go?"
+                  className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                  value={otherDestination}
+                  onChange={(e) => setOtherDestination(e.target.value)}
+                  autoFocus
+                />
+              </div>
+            )}
+          </div>
+        );
+
+      case 1:
+        return (
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>
+                How many days?
+              </label>
+              <Input
+                type="number"
+                min="1"
+                max="30"
+                placeholder="e.g. 3"
+                className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground text-lg"
+                value={days}
+                onChange={(e) => setDays(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>
+                Hours per day (optional)
+              </label>
+              <Input
+                type="number"
+                min="1"
+                max="16"
+                placeholder="e.g. 6"
+                className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground text-lg"
+                value={hoursPerDay}
+                onChange={(e) => setHoursPerDay(e.target.value)}
+              />
+              <p className="text-xs mt-1" style={{ color: "hsl(40, 33%, 60%)" }}>Leave blank for a flexible schedule</p>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="grid grid-cols-2 gap-3">
+            {BUDGET_RANGES.map(range => (
+              <button
+                key={range}
+                type="button"
+                onClick={() => setBudget(range)}
+                className={`p-4 rounded-xl border-2 text-center transition-all duration-200 hover:scale-[1.02] ${
+                  budget === range
+                    ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/20"
+                    : "border-primary/10 bg-secondary/20 hover:border-primary/30"
+                }`}
+                style={{ color: budget === range ? undefined : "hsl(40, 33%, 80%)" }}
+              >
+                <span className="text-sm font-semibold">{range}</span>
+              </button>
+            ))}
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {EXPERIENCE_OPTIONS.map(exp => (
+              <button
+                key={exp}
+                type="button"
+                onClick={() => toggleExperience(exp)}
+                className={`p-3 rounded-xl border-2 text-center transition-all duration-200 hover:scale-[1.02] ${
+                  experiences.includes(exp)
+                    ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/20"
+                    : "border-primary/10 bg-secondary/20 hover:border-primary/30"
+                }`}
+                style={{ color: experiences.includes(exp) ? undefined : "hsl(40, 33%, 80%)" }}
+              >
+                <span className="text-xs sm:text-sm font-semibold">{exp}</span>
+              </button>
+            ))}
+            <p className="col-span-2 sm:col-span-3 text-xs text-center mt-1" style={{ color: "hsl(40, 33%, 60%)" }}>
+              Select as many as you like
+            </p>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div>
+            <Textarea
+              placeholder="e.g. Someone energetic and fun, great with kids, knows hidden gems, speaks Spanish..."
+              rows={5}
+              className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground/60 resize-none text-base leading-relaxed"
+              value={guideDescription}
+              onChange={(e) => setGuideDescription(e.target.value)}
+            />
+          </div>
+        );
+
+      default:
+        return null;
+    }
   };
 
   return (
@@ -119,67 +321,94 @@ const TourPlannerSection = () => {
             <span className="text-gradient-gold">Dream Tour</span>
           </h2>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "hsl(40, 33%, 80%)" }}>
-            Describe your ideal trip — the destination, vibe, budget, and what kind of guide you'd love.
-            Our AI will craft a personalized tour plan and match you with the perfect guide.
+            Answer 5 quick questions and our AI will craft a personalized tour plan and match you with the perfect guide.
           </p>
         </motion.div>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           <AnimatePresence mode="wait">
             {!plan && !isGenerating ? (
               <motion.div
-                key="input"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-6"
+                key={`step-${currentStep}`}
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -40 }}
+                transition={{ duration: 0.3 }}
               >
-                {/* Prompt area */}
                 <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-primary/10">
-                  <label className="block text-sm font-medium mb-3" style={{ color: "hsl(40, 33%, 85%)" }}>
-                    ✨ Describe your dream tour
-                  </label>
-                  <Textarea
-                    placeholder="Tell us everything! Where do you want to go? How many days? What's your budget? What kind of experience are you looking for? What makes your ideal tour guide?"
-                    rows={6}
-                    className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground/60 resize-none text-base leading-relaxed"
-                    value={description}
-                    onChange={(e) => {
-                      setDescription(e.target.value);
-                      setError("");
-                    }}
-                  />
-                  {error && (
-                    <p className="text-red-400 text-sm mt-2">{error}</p>
-                  )}
-                  <Button
-                    variant="hero"
-                    size="lg"
-                    className="w-full text-base py-6 mt-4"
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                  >
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Generate My Tour Plan
-                  </Button>
-                </div>
-
-                {/* Example prompts */}
-                <div>
-                  <p className="text-sm mb-3 text-center" style={{ color: "hsl(40, 33%, 60%)" }}>
-                    Need inspiration? Try one of these:
-                  </p>
-                  <div className="grid gap-3">
-                    {EXAMPLE_PROMPTS.map((prompt, i) => (
-                      <button
+                  {/* Progress bar */}
+                  <div className="flex items-center gap-2 mb-8">
+                    {STEPS.map((_, i) => (
+                      <div
                         key={i}
-                        onClick={() => setDescription(prompt)}
-                        className="text-left text-sm p-4 rounded-xl border border-primary/10 bg-card/5 hover:bg-card/15 transition-colors"
-                        style={{ color: "hsl(40, 33%, 75%)" }}
-                      >
-                        "{prompt}"
-                      </button>
+                        className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
+                          i <= currentStep ? "bg-primary" : "bg-primary/15"
+                        }`}
+                      />
                     ))}
+                  </div>
+
+                  {/* Step indicator */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                      {currentStep + 1} of {STEPS.length}
+                    </span>
+                  </div>
+
+                  {/* Step header */}
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                      {STEPS[currentStep].icon}
+                    </div>
+                    <div>
+                      <h3 className="font-display text-xl font-bold" style={{ color: "hsl(40, 33%, 97%)" }}>
+                        {STEPS[currentStep].title}
+                      </h3>
+                      <p className="text-sm" style={{ color: "hsl(40, 33%, 65%)" }}>
+                        {STEPS[currentStep].subtitle}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step content */}
+                  <div className="mt-6 mb-8">
+                    {renderStepContent()}
+                  </div>
+
+                  {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+
+                  {/* Navigation */}
+                  <div className="flex gap-3">
+                    {currentStep > 0 && (
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="border-primary/30 text-primary hover:bg-primary/10"
+                        onClick={handleBack}
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Back
+                      </Button>
+                    )}
+                    <Button
+                      variant="hero"
+                      size="lg"
+                      className="flex-1 text-base py-6"
+                      onClick={handleNext}
+                      disabled={!canProceed()}
+                    >
+                      {currentStep < 4 ? (
+                        <>
+                          Next
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-5 h-5 mr-2" />
+                          Generate My Tour Plan
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </div>
               </motion.div>
@@ -191,7 +420,6 @@ const TourPlannerSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-6"
               >
-                {/* Generating indicator */}
                 {isGenerating && !plan && (
                   <div className="text-center py-12">
                     <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto mb-4" />
@@ -201,7 +429,6 @@ const TourPlannerSection = () => {
                   </div>
                 )}
 
-                {/* Tour plan output */}
                 {plan && (
                   <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-primary/10">
                     {isGenerating && (
@@ -216,7 +443,6 @@ const TourPlannerSection = () => {
                   </div>
                 )}
 
-                {/* Actions after generation */}
                 {!isGenerating && plan && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
