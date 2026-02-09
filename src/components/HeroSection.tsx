@@ -133,6 +133,9 @@ const HeroSection = () => {
                 <a href="#services">{t("hero.exploreServices")}</a>
               </Button>
             </div>
+            <p className="text-sm md:text-base max-w-lg leading-relaxed" style={{ color: "hsl(40, 33%, 85%)" }}>
+              {t("hero.directBookingDescription")}
+            </p>
             <div className="flex items-center gap-3 bg-secondary/60 backdrop-blur-sm rounded-lg px-4 py-2.5 w-fit border border-primary/20">
               <Handshake className="w-7 h-7 text-yellow-400 flex-shrink-0" />
               <span className="text-sm md:text-base font-semibold tracking-wide" style={{ color: "hsl(40, 33%, 95%)" }}>
