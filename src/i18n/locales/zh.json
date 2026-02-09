@@ -200,6 +200,21 @@
     "badge": "资深当地导游",
     "title": "认识我们的",
     "titleGold": "导游",
-    "subtitle": "精心挑选的当地专家，以热情、知识和难忘的体验让每个目的地焕发生机。"
+    "subtitle": "精心挑选的当地专家，以热情、知识和难忘的体验让每个目的地焕发生机。",
+    "filters": "筛选",
+    "clearFilters": "清除筛选",
+    "filterArea": "地区",
+    "filterLanguage": "语言",
+    "filterSpecialty": "专长",
+    "filterMinReviews": "最少评价",
+    "filterMinRating": "最低评分",
+    "allAreas": "所有地区",
+    "allLanguages": "所有语言",
+    "allSpecialties": "所有专长",
+    "any": "不限",
+    "showing": "显示 {{total}} 位导游中的 {{count}} 位",
+    "noResults": "没有符合条件的导游。请尝试调整筛选条件。",
+    "review": "条评价",
+    "reviews": "条评价"
   }
 }

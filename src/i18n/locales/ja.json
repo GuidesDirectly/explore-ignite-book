@@ -200,6 +200,21 @@
     "badge": "経験豊富な現地ガイド",
     "title": "私たちの",
     "titleGold": "ガイドに会う",
-    "subtitle": "情熱、知識、忘れられない体験で各目的地を生き生きとさせる、厳選された現地の専門家たち。"
+    "subtitle": "情熱、知識、忘れられない体験で各目的地を生き生きとさせる、厳選された現地の専門家たち。",
+    "filters": "フィルター",
+    "clearFilters": "フィルターを解除",
+    "filterArea": "エリア",
+    "filterLanguage": "言語",
+    "filterSpecialty": "専門分野",
+    "filterMinReviews": "最低レビュー数",
+    "filterMinRating": "最低評価",
+    "allAreas": "すべてのエリア",
+    "allLanguages": "すべての言語",
+    "allSpecialties": "すべての専門分野",
+    "any": "すべて",
+    "showing": "{{total}}人中{{count}}人のガイドを表示",
+    "noResults": "フィルターに一致するガイドがいません。条件を調整してください。",
+    "review": "レビュー",
+    "reviews": "レビュー"
   }
 }

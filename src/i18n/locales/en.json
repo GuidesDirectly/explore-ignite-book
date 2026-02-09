@@ -200,6 +200,21 @@
     "badge": "Expert Local Guides",
     "title": "Meet Our",
     "titleGold": "Guides",
-    "subtitle": "Hand-picked local experts who bring every destination to life with passion, knowledge, and unforgettable experiences."
+    "subtitle": "Hand-picked local experts who bring every destination to life with passion, knowledge, and unforgettable experiences.",
+    "filters": "Filters",
+    "clearFilters": "Clear Filters",
+    "filterArea": "Area",
+    "filterLanguage": "Language",
+    "filterSpecialty": "Specialty",
+    "filterMinReviews": "Min Reviews",
+    "filterMinRating": "Min Rating",
+    "allAreas": "All Areas",
+    "allLanguages": "All Languages",
+    "allSpecialties": "All Specialties",
+    "any": "Any",
+    "showing": "Showing {{count}} of {{total}} guides",
+    "noResults": "No guides match your filters. Try adjusting your criteria.",
+    "review": "review",
+    "reviews": "reviews"
   }
 }
