@@ -95,10 +95,12 @@
     "p1": "iGuide Tours z siedzibą w Bethesda w stanie Maryland specjalizuje się w organizowaniu prywatnych wycieczek prowadzonych przez profesjonalnych, wielojęzycznych lokalnych przewodników po największych miastach USA i Kanady.",
     "p2": "Firma została założona przez Michaela Zlotnickiego, który ma ponad 35 lat doświadczenia w branży turystycznej. Firma kładzie nacisk na spersonalizowane doświadczenia, które prezentują historię, kulturę i kuchnię każdego miejsca.",
     "p3": "Z naciskiem na wycieczki VIP, iGuide Tours oferuje klientom możliwość zwiedzania kultowych zabytków i ukrytych perełek — wszystko w preferowanym języku. Niezależnie od tego, czy to wakacje rodzinne, podróż służbowa czy wyjątkowa uroczystość, nasz zespół tworzy niezapomniane podróże dopasowane do Twoich potrzeb.",
+    "p4": "Z iGuide Tours rezerwujesz bezpośrednio u przewodnika — bez pośredników, bez prowizji, bez narzutów. Otrzymujesz najlepszą cenę i autentyczny, osobisty kontakt z przewodnikiem.",
     "experience": "35+ lat doświadczenia",
     "cities": "Główne miasta USA i Kanady",
     "personalized": "Spersonalizowane trasy",
-    "professional": "Profesjonalni przewodnicy"
+    "professional": "Profesjonalni przewodnicy",
+    "directBooking": "Rezerwacja bezpośrednia, bez pośredników"
   },
   "review": {
     "label": "Podziel się wrażeniami",
