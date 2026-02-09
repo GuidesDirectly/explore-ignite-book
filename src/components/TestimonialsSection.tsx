@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Star, Quote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +13,7 @@ interface Review {
   created_at: string;
 }
 
-const TestimonialsSection = () => {
+const TestimonialsSection = ({ showAll = false }: { showAll?: boolean }) => {
   const { t } = useTranslation();
   const [dbReviews, setDbReviews] = useState<Review[]>([]);
 
@@ -85,7 +86,7 @@ const TestimonialsSection = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {allReviews.slice(0, 6).map((item, i) => (
+          {(showAll ? allReviews : allReviews.slice(0, 3)).map((item, i) => (
             <motion.div
               key={`${item.name}-${i}`}
               initial={{ opacity: 0, y: 30 }}
@@ -112,6 +113,17 @@ const TestimonialsSection = () => {
             </motion.div>
           ))}
         </div>
+
+        {!showAll && allReviews.length > 3 && (
+          <div className="text-center mt-12">
+            <Link
+              to="/testimonials"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
+            >
+              {t("testimonials.viewAll", "View All Reviews")}
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
