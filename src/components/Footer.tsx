@@ -10,6 +10,7 @@ const Footer = () => {
     { label: t("nav.destinations"), href: "#destinations" },
     { label: t("nav.testimonials"), href: "#testimonials" },
     { label: t("nav.contact"), href: "#contact" },
+    { label: t("nav.becomeGuide"), href: "/guide-register" },
   ];
 
   return (
