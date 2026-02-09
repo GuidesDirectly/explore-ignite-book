@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { MapPin, Star, Users } from "lucide-react";
 import heroBg from "@/assets/hero-dc.jpg";
+import logo from "@/assets/logo.jpg";
 
 const languages = [
   { flag: "🇷🇺", name: "Russian" },
@@ -28,6 +29,16 @@ const HeroSection = () => {
         <img src={heroBg} alt="Washington DC at golden hour" className="w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: "var(--hero-overlay)" }} />
       </div>
+
+      {/* Logo in top right */}
+      <motion.img
+        src={logo}
+        alt="iGuide Tours"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.7, delay: 0.2 }}
+        className="absolute top-24 right-6 md:right-12 w-28 h-28 md:w-40 md:h-40 rounded-full object-cover shadow-2xl border-2 border-primary/30 z-10"
+      />
 
       <div className="relative container mx-auto px-4 pt-24 pb-16">
         <div className="max-w-3xl">
