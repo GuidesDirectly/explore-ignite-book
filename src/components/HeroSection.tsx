@@ -59,19 +59,40 @@ const HeroSection = () => {
             ))}
           </motion.div>
 
-          <motion.h1
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6"
-            style={{ color: "hsl(40, 33%, 97%)" }}
+            className="relative mb-6"
           >
-            Discover America
-            <br />
-            <span className="italic text-gradient-gold text-4xl md:text-6xl" style={{ display: "inline-block", transform: "rotate(-4deg) translateX(8px)", fontFamily: "'Georgia', serif", letterSpacing: "0.02em" }}>in Your Own Language,</span>
-            <br />
-            <span className="text-gradient-gold">Like a Local</span>
-          </motion.h1>
+            <h1
+              className="font-display text-5xl md:text-7xl font-bold leading-tight"
+              style={{ color: "hsl(40, 33%, 97%)" }}
+            >
+              Discover America
+              <br />
+              <span className="text-gradient-gold">Like a Local</span>
+            </h1>
+
+            {/* Passport stamp */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
+              animate={{ opacity: 0.9, scale: 1, rotate: -12 }}
+              transition={{ duration: 0.5, delay: 0.6, type: "spring", stiffness: 200 }}
+              className="absolute -top-2 right-0 md:right-8 inline-flex items-center justify-center"
+            >
+              <div
+                className="px-4 py-2 md:px-6 md:py-3 border-[3px] border-primary rounded-md text-primary font-bold text-sm md:text-lg uppercase tracking-widest"
+                style={{
+                  fontFamily: "'Courier New', monospace",
+                  textShadow: "0 0 8px hsl(var(--primary) / 0.4)",
+                  boxShadow: "inset 0 0 12px hsl(var(--primary) / 0.15), 0 0 20px hsl(var(--primary) / 0.1)",
+                }}
+              >
+                In Your Own<br />Language
+              </div>
+            </motion.div>
+          </motion.div>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
