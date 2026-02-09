@@ -50,6 +50,9 @@ const Navbar = () => {
             <Phone className="w-4 h-4" />
             (202) 243-8336
           </a>
+          <Button variant="outline" size="sm" asChild className="border-primary/30 text-primary hover:bg-primary/10">
+            <a href="/guide-register">{t("nav.becomeGuide")}</a>
+          </Button>
           <Button variant="hero" size="sm" asChild>
             <a href="#tour-planner">{t("nav.bookTour")}</a>
           </Button>
@@ -95,7 +98,10 @@ const Navbar = () => {
                   <Instagram className="w-5 h-5" />
                 </a>
               </div>
-              <Button variant="hero" size="sm" className="mt-2" asChild>
+              <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10" asChild>
+                <a href="/guide-register" onClick={() => setIsOpen(false)}>{t("nav.becomeGuide")}</a>
+              </Button>
+              <Button variant="hero" size="sm" asChild>
                 <a href="#tour-planner" onClick={() => setIsOpen(false)}>{t("nav.bookTour")}</a>
               </Button>
             </div>
