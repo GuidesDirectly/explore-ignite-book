@@ -42,6 +42,18 @@ const Review = () => {
       return;
     }
     setSubmitted(true);
+    // Send email notification (fire-and-forget)
+    supabase.functions.invoke("send-notification", {
+      body: {
+        type: "review",
+        data: {
+          reviewer_name: name.trim(),
+          reviewer_email: email.trim() || null,
+          rating,
+          comment: comment.trim() || null,
+        },
+      },
+    }).catch(console.error);
   };
 
   if (submitted) {
