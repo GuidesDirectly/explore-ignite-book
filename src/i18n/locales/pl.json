@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "home": "Strona główna",
+    "services": "Usługi",
+    "destinations": "Kierunki",
+    "testimonials": "Opinie",
+    "contact": "Kontakt",
+    "bookTour": "Zarezerwuj wycieczkę"
+  },
+  "hero": {
+    "discoverAmerica": "Odkryj Amerykę",
+    "likeALocal": "Jak miejscowy",
+    "stamp": "W TWOIM\nJĘZYKU",
+    "subtitle": "Prywatni przewodnicy premium po USA i Kanadzie. Indywidualne doświadczenia VIP stworzone specjalnie dla Ciebie — od zabytków po ukryte perełki.",
+    "planTour": "Zaplanuj wycieczkę",
+    "exploreServices": "Nasze usługi",
+    "avgRating": "Średnia ocena",
+    "happyTravelers": "Zadowolonych turystów",
+    "citiesCovered": "Miast"
+  },
+  "services": {
+    "label": "Co oferujemy",
+    "title": "Usługi turystyczne",
+    "subtitle": "Od prywatnych wycieczek VIP po przygody grupowe — tworzymy niezapomniane doświadczenia podróżnicze w Ameryce Północnej.",
+    "vip": "Prywatne wycieczki VIP",
+    "vipDesc": "Ekskluzywne doświadczenia dopasowane do Twoich zainteresowań. Nasi przewodnicy zaprojektują idealną trasę tylko dla Ciebie.",
+    "group": "Wycieczki grupowe",
+    "groupDesc": "Dołącz do podobnie myślących podróżników na organizowanych wycieczkach grupowych.",
+    "custom": "Indywidualne trasy",
+    "customDesc": "Powiedz nam o swoim czasie i zainteresowaniach — stworzymy unikalną trasę obejmującą ukryte perełki i kultowe zabytki.",
+    "multilingual": "Wielojęzyczni przewodnicy",
+    "multilingualDesc": "Nasi przewodnicy biegle mówią po rosyjsku, angielsku, polsku, niemiecku, francusku, hiszpańsku, mandaryńsku i japońsku."
+  },
+  "destinations": {
+    "label": "Popularne kierunki",
+    "title": "Gdzie oprowadzamy",
+    "subtitle": "Lokalni przewodnicy w większości dużych miast w Stanach Zjednoczonych i Kanadzie.",
+    "tours": "wycieczek"
+  },
+  "gallery": {
+    "label": "Chwile z wycieczek",
+    "title": "Szczęśliwi podróżnicy",
+    "subtitle": "Spojrzenie na niezapomniane doświadczenia, które nasi goście cieszą się podczas każdej wycieczki."
+  },
+  "testimonials": {
+    "label": "Opinie",
+    "title": "Co mówią podróżnicy",
+    "t1": "Nasz przewodnik ożywił Waszyngton! Możliwość rozmowy po rosyjsku była ogromnym plusem — zrozumieliśmy każdy szczegół amerykańskiej historii.",
+    "t2": "Wycieczka VIP po Nowym Jorku była niesamowita. Nasz przewodnik zabrał nas do miejsc, których sami nigdy byśmy nie znaleźli!",
+    "t3": "Zarezerwowaliśmy rodzinną wycieczkę po trzech miastach. Dbałość o szczegóły i spersonalizowana trasa przerosły nasze oczekiwania."
+  },
+  "inquiry": {
+    "label": "Rozpocznij podróż",
+    "title": "Zarezerwuj",
+    "titleGold": "Wymarzoną wycieczkę",
+    "subtitle": "Wypełnij formularz, a nasz zespół skontaktuje się z Tobą w ciągu 24 godzin z indywidualną propozycją. Bez zobowiązań!",
+    "fullName": "Imię i nazwisko",
+    "email": "E-mail",
+    "phone": "Telefon",
+    "groupSize": "Wielkość grupy",
+    "selectSize": "Wybierz rozmiar",
+    "people": "osób",
+    "destination": "Kierunek",
+    "chooseDest": "Wybierz kierunek",
+    "message": "Wiadomość",
+    "messagePlaceholder": "Opowiedz o swojej idealnej wycieczce — daty, zainteresowania, specjalne życzenia...",
+    "send": "Wyślij zapytanie",
+    "required": "Proszę wypełnić wszystkie wymagane pola.",
+    "success": "Zapytanie o wycieczkę wysłane! Skontaktujemy się w ciągu 24 godzin.",
+    "thankYou": "Dziękujemy!",
+    "thankYouMsg": "Twoje zapytanie zostało otrzymane. Nasz zespół skontaktuje się z Tobą w ciągu 24 godzin.",
+    "submitAnother": "Wyślij kolejne zapytanie"
+  },
+  "footer": {
+    "description": "Prywatni przewodnicy premium po Stanach Zjednoczonych i Kanadzie. Mówimy po rosyjsku, angielsku, polsku, niemiecku, francusku, hiszpańsku, mandaryńsku i japońsku.",
+    "quickLinks": "Szybkie linki",
+    "contactUs": "Skontaktuj się",
+    "rights": "iGuide Tours. Wszelkie prawa zastrzeżone."
+  },
+  "chat": {
+    "title": "Asystent podróży",
+    "subtitle": "Napędzany AI • Zapytaj o kierunki, wycieczki i więcej",
+    "howCanHelp": "Jak mogę Ci dziś pomóc?",
+    "askAnything": "Zapytaj mnie o nasze kierunki, porady podróżnicze, planowanie tras lub lokalne rekomendacje.",
+    "placeholder": "Zapytaj o kierunki, wycieczki, porady...",
+    "q1": "Kiedy najlepiej odwiedzić Waszyngton?",
+    "q2": "Zaplanuj 3-dniową wycieczkę do NYC",
+    "q3": "Opcje wycieczek na Niagarę"
+  }
+}

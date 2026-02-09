@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "destinations": "Destinations",
+    "testimonials": "Testimonials",
+    "contact": "Contact",
+    "bookTour": "Book a Tour"
+  },
+  "hero": {
+    "discoverAmerica": "Discover America",
+    "likeALocal": "Like a Local",
+    "stamp": "IN YOUR\nOWN\nLANGUAGE",
+    "subtitle": "Premium private tour guides across the USA & Canada. Custom VIP experiences crafted just for you — from historic landmarks to hidden gems.",
+    "planTour": "Plan Your Tour",
+    "exploreServices": "Explore Services",
+    "avgRating": "Average Rating",
+    "happyTravelers": "Happy Travelers",
+    "citiesCovered": "Cities Covered"
+  },
+  "services": {
+    "label": "What We Offer",
+    "title": "Tour Services",
+    "subtitle": "From VIP private tours to group adventures, we create unforgettable travel experiences across North America.",
+    "vip": "VIP Private Tours",
+    "vipDesc": "Exclusive one-on-one experiences tailored to your interests. Our guides design a perfect itinerary just for you.",
+    "group": "Group Tours",
+    "groupDesc": "Join like-minded travelers on curated group experiences. Perfect for social adventurers seeking shared discoveries.",
+    "custom": "Custom Itineraries",
+    "customDesc": "Tell us your time and interests — we'll craft a unique route covering hidden gems and iconic landmarks alike.",
+    "multilingual": "Multilingual Guides",
+    "multilingualDesc": "Our guides speak Russian, English, Polish, German, French, Spanish, Mandarin, and Japanese fluently. Experience every destination in your preferred language."
+  },
+  "destinations": {
+    "label": "Popular Destinations",
+    "title": "Where We Guide",
+    "subtitle": "Local guides in most major cities across the United States and Canada.",
+    "tours": "tours"
+  },
+  "gallery": {
+    "label": "Tour Moments",
+    "title": "Happy Travelers",
+    "subtitle": "A glimpse into the unforgettable experiences our guests enjoy on every tour."
+  },
+  "testimonials": {
+    "label": "Testimonials",
+    "title": "What Travelers Say",
+    "t1": "Our guide made Washington DC come alive! Speaking Russian was a huge plus — we understood every detail of American history like never before.",
+    "t2": "The VIP tour of New York was incredible. Our guide took us to spots we never would have found on our own. Worth every penny!",
+    "t3": "We booked a custom family tour across three cities. The attention to detail and personalized itinerary was beyond our expectations."
+  },
+  "inquiry": {
+    "label": "Start Your Journey",
+    "title": "Book Your",
+    "titleGold": "Dream Tour",
+    "subtitle": "Fill out the form and our team will get back to you within 24 hours with a custom tour proposal. No commitment required — let's start planning!",
+    "fullName": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "groupSize": "Group Size",
+    "selectSize": "Select size",
+    "people": "people",
+    "destination": "Destination",
+    "chooseDest": "Choose a destination",
+    "message": "Message",
+    "messagePlaceholder": "Tell us about your ideal tour — dates, interests, special requests...",
+    "send": "Send Inquiry",
+    "required": "Please fill in all required fields.",
+    "success": "Tour inquiry submitted! We'll be in touch within 24 hours.",
+    "thankYou": "Thank You!",
+    "thankYouMsg": "Your tour inquiry has been received. Our team will reach out within 24 hours to help plan your perfect trip.",
+    "submitAnother": "Submit Another Inquiry"
+  },
+  "footer": {
+    "description": "Premium local tour guides across the United States and Canada. Russian, English, Polish, German, French, Spanish, Mandarin & Japanese speaking.",
+    "quickLinks": "Quick Links",
+    "contactUs": "Contact Us",
+    "rights": "iGuide Tours. All rights reserved."
+  },
+  "chat": {
+    "title": "Travel Assistant",
+    "subtitle": "Powered by AI • Ask about destinations, tours & more",
+    "howCanHelp": "How can I help you today?",
+    "askAnything": "Ask me anything about our tour destinations, travel tips, itinerary planning, or local recommendations.",
+    "placeholder": "Ask about destinations, tours, travel tips…",
+    "q1": "What's the best time to visit DC?",
+    "q2": "Plan a 3-day NYC trip",
+    "q3": "Niagara Falls tour options"
+  }
+}

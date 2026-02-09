@@ -1,30 +1,33 @@
 import { motion } from "framer-motion";
 import { Crown, Users, Compass, Globe } from "lucide-react";
-
-const services = [
-  {
-    icon: Crown,
-    title: "VIP Private Tours",
-    description: "Exclusive one-on-one experiences tailored to your interests. Our guides design a perfect itinerary just for you.",
-  },
-  {
-    icon: Users,
-    title: "Group Tours",
-    description: "Join like-minded travelers on curated group experiences. Perfect for social adventurers seeking shared discoveries.",
-  },
-  {
-    icon: Compass,
-    title: "Custom Itineraries",
-    description: "Tell us your time and interests — we'll craft a unique route covering hidden gems and iconic landmarks alike.",
-  },
-  {
-    icon: Globe,
-    title: "Multilingual Guides",
-    description: "Our guides speak Russian, English, Polish, German, French, Spanish, Mandarin, and Japanese fluently. Experience every destination in your preferred language.",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const ServicesSection = () => {
+  const { t } = useTranslation();
+
+  const services = [
+    {
+      icon: Crown,
+      title: t("services.vip"),
+      description: t("services.vipDesc"),
+    },
+    {
+      icon: Users,
+      title: t("services.group"),
+      description: t("services.groupDesc"),
+    },
+    {
+      icon: Compass,
+      title: t("services.custom"),
+      description: t("services.customDesc"),
+    },
+    {
+      icon: Globe,
+      title: t("services.multilingual"),
+      description: t("services.multilingualDesc"),
+    },
+  ];
+
   return (
     <section id="services" className="py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -36,20 +39,20 @@ const ServicesSection = () => {
           className="text-center mb-16"
         >
           <p className="text-primary font-body text-sm uppercase tracking-[0.2em] font-semibold mb-3">
-            What We Offer
+            {t("services.label")}
           </p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Tour Services
+            {t("services.title")}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            From VIP private tours to group adventures, we create unforgettable travel experiences across North America.
+            {t("services.subtitle")}
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service, i) => (
             <motion.div
-              key={service.title}
+              key={i}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

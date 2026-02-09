@@ -6,8 +6,10 @@ import { Send, Bot, User, ArrowLeft, Loader2 } from "lucide-react";
 import { streamChat, type Msg } from "@/lib/streamChat";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Chat = () => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -62,8 +64,8 @@ const Chat = () => {
         </Link>
         <Bot className="w-6 h-6 text-primary" />
         <div>
-          <h1 className="font-display text-lg font-bold text-primary-foreground">Travel Assistant</h1>
-          <p className="text-xs text-muted-foreground">Powered by AI • Ask about destinations, tours & more</p>
+          <h1 className="font-display text-lg font-bold text-primary-foreground">{t("chat.title")}</h1>
+          <p className="text-xs text-muted-foreground">{t("chat.subtitle")}</p>
         </div>
       </header>
 
@@ -72,12 +74,12 @@ const Chat = () => {
         {messages.length === 0 && (
           <div className="text-center py-16 space-y-4">
             <Bot className="w-12 h-12 text-primary mx-auto opacity-60" />
-            <h2 className="font-display text-xl font-bold text-primary-foreground">How can I help you today?</h2>
+            <h2 className="font-display text-xl font-bold text-primary-foreground">{t("chat.howCanHelp")}</h2>
             <p className="text-muted-foreground max-w-md mx-auto text-sm">
-              Ask me anything about our tour destinations, travel tips, itinerary planning, or local recommendations.
+              {t("chat.askAnything")}
             </p>
             <div className="flex flex-wrap justify-center gap-2 mt-4">
-              {["What's the best time to visit DC?", "Plan a 3-day NYC trip", "Niagara Falls tour options"].map((q) => (
+              {[t("chat.q1"), t("chat.q2"), t("chat.q3")].map((q) => (
                 <button
                   key={q}
                   onClick={() => { setInput(q); }}
@@ -141,7 +143,7 @@ const Chat = () => {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about destinations, tours, travel tips…"
+            placeholder={t("chat.placeholder")}
             className="flex-1 bg-card/20 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
             disabled={isLoading}
           />

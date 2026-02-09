@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "home": "首页",
+    "services": "服务",
+    "destinations": "目的地",
+    "testimonials": "评价",
+    "contact": "联系",
+    "bookTour": "预订旅行"
+  },
+  "hero": {
+    "discoverAmerica": "探索美国",
+    "likeALocal": "像当地人一样",
+    "stamp": "用您的\n母语",
+    "subtitle": "美国和加拿大的高级私人导游。为您量身定制的VIP体验——从历史地标到隐藏的宝藏。",
+    "planTour": "规划旅行",
+    "exploreServices": "探索服务",
+    "avgRating": "平均评分",
+    "happyTravelers": "满意游客",
+    "citiesCovered": "覆盖城市"
+  },
+  "services": {
+    "label": "我们的服务",
+    "title": "旅游服务",
+    "subtitle": "从VIP私人旅游到团体冒险——我们在北美创造难忘的旅行体验。",
+    "vip": "VIP私人旅游",
+    "vipDesc": "根据您的兴趣量身定制的专属体验。我们的导游为您设计完美的行程。",
+    "group": "团体旅游",
+    "groupDesc": "与志同道合的旅行者一起参加精心策划的团体旅行。",
+    "custom": "定制行程",
+    "customDesc": "告诉我们您的时间和兴趣——我们将为您打造独特的路线，涵盖隐藏的宝藏和标志性地标。",
+    "multilingual": "多语种导游",
+    "multilingualDesc": "我们的导游精通俄语、英语、波兰语、德语、法语、西班牙语、普通话和日语。"
+  },
+  "destinations": {
+    "label": "热门目的地",
+    "title": "我们的导览区域",
+    "subtitle": "在美国和加拿大大多数主要城市提供当地导游服务。",
+    "tours": "条旅游路线"
+  },
+  "gallery": {
+    "label": "旅行瞬间",
+    "title": "快乐旅行者",
+    "subtitle": "一窥我们的客人在每次旅行中享受的难忘体验。"
+  },
+  "testimonials": {
+    "label": "评价",
+    "title": "旅行者的评价",
+    "t1": "我们的导游让华盛顿特区变得生动起来！能说俄语是一个巨大的优势——我们前所未有地理解了美国历史的每一个细节。",
+    "t2": "纽约的VIP之旅令人难以置信。我们的导游带我们去了自己永远找不到的地方。物超所值！",
+    "t3": "我们预订了三个城市的家庭定制旅游。对细节的关注和个性化的行程超出了我们的期望。"
+  },
+  "inquiry": {
+    "label": "开始您的旅程",
+    "title": "预订您的",
+    "titleGold": "梦想之旅",
+    "subtitle": "填写表格，我们的团队将在24小时内回复您定制旅游方案。无需承诺——让我们开始规划吧！",
+    "fullName": "全名",
+    "email": "电子邮箱",
+    "phone": "电话",
+    "groupSize": "团队人数",
+    "selectSize": "选择人数",
+    "people": "人",
+    "destination": "目的地",
+    "chooseDest": "选择目的地",
+    "message": "留言",
+    "messagePlaceholder": "告诉我们您理想的旅行——日期、兴趣、特殊要求...",
+    "send": "发送咨询",
+    "required": "请填写所有必填项。",
+    "success": "旅游咨询已提交！我们将在24小时内联系您。",
+    "thankYou": "谢谢！",
+    "thankYouMsg": "您的旅游咨询已收到。我们的团队将在24小时内与您联系。",
+    "submitAnother": "提交另一个咨询"
+  },
+  "footer": {
+    "description": "美国和加拿大的高级当地导游。我们说俄语、英语、波兰语、德语、法语、西班牙语、普通话和日语。",
+    "quickLinks": "快速链接",
+    "contactUs": "联系我们",
+    "rights": "iGuide Tours. 保留所有权利。"
+  },
+  "chat": {
+    "title": "旅行助手",
+    "subtitle": "AI驱动 • 咨询目的地、旅游等",
+    "howCanHelp": "今天我能帮您什么？",
+    "askAnything": "向我咨询我们的旅游目的地、旅行建议、行程规划或当地推荐。",
+    "placeholder": "咨询目的地、旅游、建议…",
+    "q1": "什么时候去华盛顿最好？",
+    "q2": "规划3天纽约之旅",
+    "q3": "尼亚加拉瀑布旅游选择"
+  }
+}
