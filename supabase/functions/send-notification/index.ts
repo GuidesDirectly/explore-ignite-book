@@ -13,7 +13,7 @@ const corsHeaders = {
 const NOTIFY_EMAIL = "michael@iguidetours.net";
 
 interface NotificationRequest {
-  type: "inquiry" | "review" | "tour_plan" | "guide_status";
+  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application";
   data: Record<string, unknown>;
 }
 
@@ -163,6 +163,43 @@ const handler = async (req: Request): Promise<Response> => {
           to: [NOTIFY_EMAIL],
           subject: `Guide ${isApproved ? "Approved" : "Rejected"}: ${guideName}`,
           html: `<p>Guide <strong>${guideName}</strong> (${guideEmail}) has been <strong>${status}</strong>.</p>`,
+        });
+      } catch (e) {
+        console.error("Failed to notify admin:", e);
+      }
+    } else if (type === "guide_application") {
+      const guideName = data.guideName as string;
+      const guideEmail = data.guideEmail as string;
+
+      if (!guideEmail) throw new Error("Guide email is required");
+
+      subject = `✅ Application Received — iGuide Tours`;
+      html = `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+          <div style="background:#1a1f2e;padding:30px;text-align:center;">
+            <h1 style="color:#d4a843;margin:0;">iGuide Tours</h1>
+          </div>
+          <div style="padding:30px;background:#f9f9f9;">
+            <h2 style="color:#1a1f2e;">Hi ${guideName}! 👋</h2>
+            <p>Thank you for submitting your guide application to <strong>iGuide Tours</strong>!</p>
+            <p>We've received your application and our team will review it shortly. You'll receive another email once your application has been reviewed.</p>
+            <p>In the meantime, if you have any questions, feel free to reach out to us at <a href="mailto:michael@iguidetours.net">michael@iguidetours.net</a>.</p>
+            <a href="https://explore-ignite-book.lovable.app" style="display:inline-block;background:#d4a843;color:#1a1f2e;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:bold;margin-top:10px;">Visit iGuide Tours</a>
+          </div>
+          <div style="padding:20px;text-align:center;color:#888;font-size:12px;">
+            <p>iGuide Tours — Premium Private Tours Across North America</p>
+          </div>
+        </div>
+      `;
+      toEmails = [guideEmail];
+
+      // Notify admin about new application
+      try {
+        await resend.emails.send({
+          from: "iGuide Tours <onboarding@resend.dev>",
+          to: [NOTIFY_EMAIL],
+          subject: `📋 New Guide Application: ${guideName}`,
+          html: `<p>A new guide application has been submitted by <strong>${guideName}</strong> (${guideEmail}). Please review it in the admin dashboard.</p>`,
         });
       } catch (e) {
         console.error("Failed to notify admin:", e);
