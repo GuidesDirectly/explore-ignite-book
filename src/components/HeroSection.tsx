@@ -26,7 +26,7 @@ const HeroSection = () => {
             transition={{ duration: 0.6 }}
             className="text-primary font-body text-sm uppercase tracking-[0.2em] font-semibold mb-4"
           >
-            Russian • Hebrew • English Speaking Guides
+            Russian • Hebrew • English • Polish • German • French • Spanish • Mandarin • Japanese Speaking Guides
           </motion.p>
 
           <motion.h1
