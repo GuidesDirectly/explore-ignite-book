@@ -169,5 +169,11 @@
     "exp_romantic": "Romantic / Couples",
     "exp_vip": "VIP / Luxury",
     "exp_wine": "Wine & Vineyard"
+  },
+  "guides": {
+    "badge": "Expert Local Guides",
+    "title": "Meet Our",
+    "titleGold": "Guides",
+    "subtitle": "Hand-picked local experts who bring every destination to life with passion, knowledge, and unforgettable experiences."
   }
 }
