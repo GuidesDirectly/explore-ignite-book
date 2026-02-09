@@ -109,20 +109,10 @@ const HeroSection = () => {
             {t("hero.subtitle")}
           </motion.p>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.38 }}
-            className="text-base md:text-lg font-semibold tracking-wide mb-8 max-w-xl"
-            style={{ color: "hsl(45, 80%, 70%)" }}
-          >
-            {t("hero.directBooking")}
-          </motion.p>
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.45 }}
+            transition={{ duration: 0.6, delay: 0.38 }}
             className="flex flex-col gap-4 mb-16"
           >
             <div className="flex flex-col sm:flex-row gap-4">
@@ -142,6 +132,9 @@ const HeroSection = () => {
                 100% Guide-Paid&nbsp;&nbsp;|&nbsp;&nbsp;0% Commission
               </span>
             </div>
+            <p className="text-base md:text-lg font-semibold tracking-wide" style={{ color: "hsl(45, 80%, 70%)" }}>
+              {t("hero.directBooking")}
+            </p>
           </motion.div>
 
           {/* Stats */}
