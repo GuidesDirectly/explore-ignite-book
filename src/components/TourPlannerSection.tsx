@@ -4,41 +4,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, Loader2, ArrowRight, ArrowLeft, RotateCcw, MapPin, Clock, DollarSign, Heart, User } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
 const PLAN_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/plan-tour`;
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lZ2Z3b21sb2FpaHp3b213eXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDM4NTAsImV4cCI6MjA4NjA3OTg1MH0.ZRn_9BDZZM5uTdqAxaeBcwckzjqXe7HQXUN8OZSbLNM";
 
-const DESTINATIONS = [
-  "Washington DC", "New York City", "Niagara Falls", "Toronto", "Boston", "Chicago", "Other"
-];
+const DEST_KEYS = ["dest_dc", "dest_nyc", "dest_niagara", "dest_toronto", "dest_boston", "dest_chicago"] as const;
+const BUDGET_KEYS = ["budget_under500", "budget_500_1000", "budget_1000_2500", "budget_2500_5000", "budget_5000plus", "budget_flexible"] as const;
+const EXP_KEYS = ["exp_history", "exp_food", "exp_art", "exp_architecture", "exp_nature", "exp_nightlife", "exp_shopping", "exp_photography", "exp_family", "exp_romantic", "exp_vip", "exp_wine"] as const;
 
-const BUDGET_RANGES = [
-  "Under $500", "$500 – $1,000", "$1,000 – $2,500", "$2,500 – $5,000", "$5,000+", "Flexible / No limit"
-];
-
-const EXPERIENCE_OPTIONS = [
-  "Historical & Heritage", "Food & Culinary", "Art & Museums", "Architecture",
-  "Nature & Adventure", "Night Life & Entertainment", "Shopping & Fashion",
-  "Photography", "Family-Friendly", "Romantic / Couples", "VIP / Luxury", "Wine & Vineyard"
-];
-
-interface StepConfig {
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-}
-
-const STEPS: StepConfig[] = [
-  { icon: <MapPin className="w-5 h-5" />, title: "Where do you want to go?", subtitle: "Select your dream destination" },
-  { icon: <Clock className="w-5 h-5" />, title: "How long is your trip?", subtitle: "Tell us about your schedule" },
-  { icon: <DollarSign className="w-5 h-5" />, title: "What's your budget range?", subtitle: "Help us tailor the perfect plan" },
-  { icon: <Heart className="w-5 h-5" />, title: "What experiences are you looking for?", subtitle: "Select all that interest you" },
-  { icon: <User className="w-5 h-5" />, title: "What makes your ideal tour guide?", subtitle: "Describe the perfect guide for you" },
+const STEP_ICONS = [
+  <MapPin className="w-5 h-5" />,
+  <Clock className="w-5 h-5" />,
+  <DollarSign className="w-5 h-5" />,
+  <Heart className="w-5 h-5" />,
+  <User className="w-5 h-5" />,
 ];
 
 const TourPlannerSection = () => {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [destination, setDestination] = useState("");
   const [otherDestination, setOtherDestination] = useState("");
@@ -52,6 +38,14 @@ const TourPlannerSection = () => {
   const [error, setError] = useState("");
   const resultRef = useRef<HTMLDivElement>(null);
 
+  const stepTitles = [
+    { title: t("planner.step1Title"), subtitle: t("planner.step1Subtitle") },
+    { title: t("planner.step2Title"), subtitle: t("planner.step2Subtitle") },
+    { title: t("planner.step3Title"), subtitle: t("planner.step3Subtitle") },
+    { title: t("planner.step4Title"), subtitle: t("planner.step4Subtitle") },
+    { title: t("planner.step5Title"), subtitle: t("planner.step5Subtitle") },
+  ];
+
   const toggleExperience = (exp: string) => {
     setExperiences(prev =>
       prev.includes(exp) ? prev.filter(e => e !== exp) : [...prev, exp]
@@ -60,7 +54,7 @@ const TourPlannerSection = () => {
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: return destination !== "" && (destination !== "Other" || otherDestination.trim().length > 0);
+      case 0: return destination !== "" && (destination !== "other" || otherDestination.trim().length > 0);
       case 1: return days.trim().length > 0;
       case 2: return budget !== "";
       case 3: return experiences.length > 0;
@@ -86,8 +80,10 @@ const TourPlannerSection = () => {
   };
 
   const buildDescription = () => {
-    const dest = destination === "Other" ? otherDestination : destination;
-    return `I want to visit ${dest} for ${days} days, spending about ${hoursPerDay || "flexible"} hours per day touring. My budget is ${budget}. I'm interested in: ${experiences.join(", ")}. For my ideal guide: ${guideDescription}`;
+    const dest = destination === "other" ? otherDestination : t(`planner.${destination}`);
+    const expLabels = experiences.map(key => t(`planner.${key}`)).join(", ");
+    const budgetLabel = t(`planner.${budget}`);
+    return `I want to visit ${dest} for ${days} days, spending about ${hoursPerDay || "flexible"} hours per day touring. My budget is ${budgetLabel}. I'm interested in: ${expLabels}. For my ideal guide: ${guideDescription}`;
   };
 
   const handleGenerate = async () => {
@@ -168,26 +164,39 @@ const TourPlannerSection = () => {
       case 0:
         return (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {DESTINATIONS.map(dest => (
+            {DEST_KEYS.map(key => (
               <button
-                key={dest}
+                key={key}
                 type="button"
-                onClick={() => setDestination(dest)}
+                onClick={() => setDestination(key)}
                 className={`p-4 rounded-xl border-2 text-left transition-all duration-200 hover:scale-[1.02] ${
-                  destination === dest
+                  destination === key
                     ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/20"
                     : "border-primary/10 bg-secondary/20 hover:border-primary/30"
                 }`}
-                style={{ color: destination === dest ? undefined : "hsl(40, 33%, 80%)" }}
+                style={{ color: destination === key ? undefined : "hsl(40, 33%, 80%)" }}
               >
-                <MapPin className={`w-4 h-4 mb-1 ${destination === dest ? "text-primary" : "text-muted-foreground"}`} />
-                <span className="text-sm font-semibold block">{dest}</span>
+                <MapPin className={`w-4 h-4 mb-1 ${destination === key ? "text-primary" : "text-muted-foreground"}`} />
+                <span className="text-sm font-semibold block">{t(`planner.${key}`)}</span>
               </button>
             ))}
-            {destination === "Other" && (
+            <button
+              type="button"
+              onClick={() => setDestination("other")}
+              className={`p-4 rounded-xl border-2 text-left transition-all duration-200 hover:scale-[1.02] ${
+                destination === "other"
+                  ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/20"
+                  : "border-primary/10 bg-secondary/20 hover:border-primary/30"
+              }`}
+              style={{ color: destination === "other" ? undefined : "hsl(40, 33%, 80%)" }}
+            >
+              <MapPin className={`w-4 h-4 mb-1 ${destination === "other" ? "text-primary" : "text-muted-foreground"}`} />
+              <span className="text-sm font-semibold block">{t("planner.other")}</span>
+            </button>
+            {destination === "other" && (
               <div className="col-span-2 sm:col-span-3 mt-2">
                 <Input
-                  placeholder="Where would you like to go?"
+                  placeholder={t("planner.otherPlaceholder")}
                   className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
                   value={otherDestination}
                   onChange={(e) => setOtherDestination(e.target.value)}
@@ -203,7 +212,7 @@ const TourPlannerSection = () => {
           <div className="space-y-5">
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>
-                How many days?
+                {t("planner.howManyDays")}
               </label>
               <Input
                 type="number"
@@ -217,7 +226,7 @@ const TourPlannerSection = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>
-                Hours per day (optional)
+                {t("planner.hoursPerDay")}
               </label>
               <Input
                 type="number"
@@ -228,7 +237,7 @@ const TourPlannerSection = () => {
                 value={hoursPerDay}
                 onChange={(e) => setHoursPerDay(e.target.value)}
               />
-              <p className="text-xs mt-1" style={{ color: "hsl(40, 33%, 60%)" }}>Leave blank for a flexible schedule</p>
+              <p className="text-xs mt-1" style={{ color: "hsl(40, 33%, 60%)" }}>{t("planner.hoursFlexible")}</p>
             </div>
           </div>
         );
@@ -236,19 +245,19 @@ const TourPlannerSection = () => {
       case 2:
         return (
           <div className="grid grid-cols-2 gap-3">
-            {BUDGET_RANGES.map(range => (
+            {BUDGET_KEYS.map(key => (
               <button
-                key={range}
+                key={key}
                 type="button"
-                onClick={() => setBudget(range)}
+                onClick={() => setBudget(key)}
                 className={`p-4 rounded-xl border-2 text-center transition-all duration-200 hover:scale-[1.02] ${
-                  budget === range
+                  budget === key
                     ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/20"
                     : "border-primary/10 bg-secondary/20 hover:border-primary/30"
                 }`}
-                style={{ color: budget === range ? undefined : "hsl(40, 33%, 80%)" }}
+                style={{ color: budget === key ? undefined : "hsl(40, 33%, 80%)" }}
               >
-                <span className="text-sm font-semibold">{range}</span>
+                <span className="text-sm font-semibold">{t(`planner.${key}`)}</span>
               </button>
             ))}
           </div>
@@ -257,23 +266,23 @@ const TourPlannerSection = () => {
       case 3:
         return (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {EXPERIENCE_OPTIONS.map(exp => (
+            {EXP_KEYS.map(key => (
               <button
-                key={exp}
+                key={key}
                 type="button"
-                onClick={() => toggleExperience(exp)}
+                onClick={() => toggleExperience(key)}
                 className={`p-3 rounded-xl border-2 text-center transition-all duration-200 hover:scale-[1.02] ${
-                  experiences.includes(exp)
+                  experiences.includes(key)
                     ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/20"
                     : "border-primary/10 bg-secondary/20 hover:border-primary/30"
                 }`}
-                style={{ color: experiences.includes(exp) ? undefined : "hsl(40, 33%, 80%)" }}
+                style={{ color: experiences.includes(key) ? undefined : "hsl(40, 33%, 80%)" }}
               >
-                <span className="text-xs sm:text-sm font-semibold">{exp}</span>
+                <span className="text-xs sm:text-sm font-semibold">{t(`planner.${key}`)}</span>
               </button>
             ))}
             <p className="col-span-2 sm:col-span-3 text-xs text-center mt-1" style={{ color: "hsl(40, 33%, 60%)" }}>
-              Select as many as you like
+              {t("planner.selectAll")}
             </p>
           </div>
         );
@@ -282,7 +291,7 @@ const TourPlannerSection = () => {
         return (
           <div>
             <Textarea
-              placeholder="e.g. Someone energetic and fun, great with kids, knows hidden gems, speaks Spanish..."
+              placeholder={t("planner.guidePlaceholder")}
               rows={5}
               className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground/60 resize-none text-base leading-relaxed"
               value={guideDescription}
@@ -298,7 +307,6 @@ const TourPlannerSection = () => {
 
   return (
     <section id="tour-planner" className="py-24 bg-gradient-navy relative overflow-hidden">
-      {/* Decorative background */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary rounded-full blur-3xl" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary rounded-full blur-3xl" />
@@ -314,14 +322,14 @@ const TourPlannerSection = () => {
         >
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full border border-primary/20 bg-primary/5">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-primary text-sm font-semibold">AI-Powered Planning</span>
+            <span className="text-primary text-sm font-semibold">{t("planner.badge")}</span>
           </div>
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-4" style={{ color: "hsl(40, 33%, 97%)" }}>
-            Plan Your{" "}
-            <span className="text-gradient-gold">Dream Tour</span>
+            {t("planner.title")}{" "}
+            <span className="text-gradient-gold">{t("planner.titleGold")}</span>
           </h2>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "hsl(40, 33%, 80%)" }}>
-            Answer 5 quick questions and our AI will craft a personalized tour plan and match you with the perfect guide.
+            {t("planner.subtitle")}
           </p>
         </motion.div>
 
@@ -338,7 +346,7 @@ const TourPlannerSection = () => {
                 <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-primary/10">
                   {/* Progress bar */}
                   <div className="flex items-center gap-2 mb-8">
-                    {STEPS.map((_, i) => (
+                    {stepTitles.map((_, i) => (
                       <div
                         key={i}
                         className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
@@ -351,21 +359,21 @@ const TourPlannerSection = () => {
                   {/* Step indicator */}
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                      {currentStep + 1} of {STEPS.length}
+                      {currentStep + 1} / {stepTitles.length}
                     </span>
                   </div>
 
                   {/* Step header */}
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      {STEPS[currentStep].icon}
+                      {STEP_ICONS[currentStep]}
                     </div>
                     <div>
                       <h3 className="font-display text-xl font-bold" style={{ color: "hsl(40, 33%, 97%)" }}>
-                        {STEPS[currentStep].title}
+                        {stepTitles[currentStep].title}
                       </h3>
                       <p className="text-sm" style={{ color: "hsl(40, 33%, 65%)" }}>
-                        {STEPS[currentStep].subtitle}
+                        {stepTitles[currentStep].subtitle}
                       </p>
                     </div>
                   </div>
@@ -387,7 +395,7 @@ const TourPlannerSection = () => {
                         onClick={handleBack}
                       >
                         <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back
+                        {t("planner.back")}
                       </Button>
                     )}
                     <Button
@@ -399,13 +407,13 @@ const TourPlannerSection = () => {
                     >
                       {currentStep < 4 ? (
                         <>
-                          Next
+                          {t("planner.next")}
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </>
                       ) : (
                         <>
                           <Sparkles className="w-5 h-5 mr-2" />
-                          Generate My Tour Plan
+                          {t("planner.generate")}
                         </>
                       )}
                     </Button>
@@ -424,7 +432,7 @@ const TourPlannerSection = () => {
                   <div className="text-center py-12">
                     <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto mb-4" />
                     <p className="text-lg" style={{ color: "hsl(40, 33%, 80%)" }}>
-                      Crafting your personalized tour plan...
+                      {t("planner.generating")}
                     </p>
                   </div>
                 )}
@@ -434,7 +442,7 @@ const TourPlannerSection = () => {
                     {isGenerating && (
                       <div className="flex items-center gap-2 mb-4 text-primary text-sm">
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Still generating...</span>
+                        <span>{t("planner.stillGenerating")}</span>
                       </div>
                     )}
                     <div className="prose prose-invert prose-sm max-w-none prose-headings:text-primary prose-headings:font-display prose-strong:text-primary/90 prose-li:text-[hsl(40,33%,80%)]" style={{ color: "hsl(40, 33%, 80%)" }}>
@@ -454,7 +462,7 @@ const TourPlannerSection = () => {
                       className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-primary text-secondary font-bold text-base hover:opacity-90 transition-opacity"
                     >
                       <ArrowRight className="w-5 h-5" />
-                      Refine This Plan in Chat
+                      {t("planner.refineInChat")}
                     </Link>
                     <Button
                       variant="outline"
@@ -463,7 +471,7 @@ const TourPlannerSection = () => {
                       onClick={handleReset}
                     >
                       <RotateCcw className="w-4 h-4 mr-2" />
-                      Start Over
+                      {t("planner.startOver")}
                     </Button>
                   </motion.div>
                 )}
@@ -472,7 +480,7 @@ const TourPlannerSection = () => {
                   <div className="text-center">
                     <p className="text-red-400 mb-4">{error}</p>
                     <Button variant="outline" onClick={handleReset} className="border-primary/30 text-primary">
-                      Try Again
+                      {t("planner.tryAgain")}
                     </Button>
                   </div>
                 )}
