@@ -35,6 +35,8 @@ interface GuideProfile {
     tourTypes: string[];
     targetAudience: string[];
   };
+  matchScore?: number;
+  matchReasons?: string[];
 }
 
 const STEP_ICONS = [
@@ -302,25 +304,38 @@ const TourPlannerSection = () => {
     if (data) {
       const allGuides = data as unknown as (GuideProfile & { service_areas: string[] | null })[];
 
+      // Max possible score: 10 (destination) + experiences.length * 5 (3+2 per exp)
+      const maxScore = 10 + expLabels.length * 5;
+
       // Score each guide based on destination + specialization match
       const scored = allGuides.map(guide => {
         let score = 0;
+        const reasons: string[] = [];
         const areas = (guide.service_areas || []).map(a => a.toLowerCase());
         const specs = (guide.form_data.specializations || []).map(s => s.toLowerCase());
-        const tourTypes = (guide.form_data.tourTypes || []).map(t => t.toLowerCase());
+        const tourTypes = (guide.form_data.tourTypes || []).map(tt => tt.toLowerCase());
 
         // Destination match (highest weight)
         if (areas.some(area => destLabel.includes(area) || area.includes(destLabel))) {
           score += 10;
+          reasons.push(t("planner.matchArea", "Covers your destination"));
         }
 
         // Specialization & tour type overlap with customer experiences
         expLabels.forEach(exp => {
-          if (specs.some(s => s.includes(exp) || exp.includes(s))) score += 3;
-          if (tourTypes.some(tt => tt.includes(exp) || exp.includes(tt))) score += 2;
+          if (specs.some(s => s.includes(exp) || exp.includes(s))) {
+            score += 3;
+            const label = exp.charAt(0).toUpperCase() + exp.slice(1);
+            if (!reasons.some(r => r.includes(label))) reasons.push(label);
+          }
+          if (tourTypes.some(tt => tt.includes(exp) || exp.includes(tt))) {
+            score += 2;
+          }
         });
 
-        return { guide, score };
+        const pct = maxScore > 0 ? Math.min(100, Math.round((score / maxScore) * 100)) : 0;
+
+        return { guide: { ...guide, matchScore: pct, matchReasons: reasons.slice(0, 3) }, score };
       });
 
       // Sort by score descending, take top matches
@@ -672,6 +687,8 @@ const TourPlannerSection = () => {
                       {guides.map((guide) => {
                         const fd = guide.form_data;
                         const initials = `${fd.firstName?.[0] || ""}${fd.lastName?.[0] || ""}`;
+                        const pct = guide.matchScore;
+                        const reasons = guide.matchReasons || [];
                         return (
                           <div
                             key={guide.id}
@@ -682,13 +699,51 @@ const TourPlannerSection = () => {
                                 {initials}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-display text-lg font-bold" style={{ color: "hsl(40, 33%, 95%)" }}>
-                                  {fd.firstName} {fd.lastName}
-                                </h4>
+                                <div className="flex items-center justify-between gap-2 mb-1">
+                                  <h4 className="font-display text-lg font-bold" style={{ color: "hsl(40, 33%, 95%)" }}>
+                                    {fd.firstName} {fd.lastName}
+                                  </h4>
+                                  {pct != null && pct > 0 && (
+                                    <span
+                                      className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0"
+                                      style={{
+                                        background: pct >= 70
+                                          ? "hsla(142, 71%, 45%, 0.15)"
+                                          : pct >= 40
+                                          ? "hsla(45, 80%, 55%, 0.15)"
+                                          : "hsla(40, 33%, 60%, 0.15)",
+                                        color: pct >= 70
+                                          ? "hsl(142, 71%, 60%)"
+                                          : pct >= 40
+                                          ? "hsl(45, 80%, 70%)"
+                                          : "hsl(40, 33%, 70%)",
+                                      }}
+                                    >
+                                      {pct}% {t("planner.matchLabel", "match")}
+                                    </span>
+                                  )}
+                                </div>
                                 <div className="flex items-center gap-1.5 text-sm mb-2" style={{ color: "hsl(40, 33%, 70%)" }}>
                                   <Globe className="w-3.5 h-3.5 text-primary/70" />
                                   <span>{fd.languages?.join(", ")}</span>
                                 </div>
+                                {reasons.length > 0 && (
+                                  <div className="flex flex-wrap gap-1.5 mb-2">
+                                    {reasons.map((reason) => (
+                                      <span
+                                        key={reason}
+                                        className="inline-flex items-center text-xs px-2 py-0.5 rounded-full border"
+                                        style={{
+                                          borderColor: "hsl(45, 80%, 55%, 0.3)",
+                                          color: "hsl(45, 80%, 70%)",
+                                          background: "hsl(45, 80%, 55%, 0.08)",
+                                        }}
+                                      >
+                                        ✓ {reason}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
                                 {fd.biography && (
                                   <p className="text-sm mb-3" style={{ color: "hsl(40, 33%, 75%)" }}>
                                     {fd.biography.length > 150 ? fd.biography.slice(0, 150) + "…" : fd.biography}
