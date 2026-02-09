@@ -72,37 +72,38 @@ const HeroSection = () => {
               Discover America
             </h1>
 
-            {/* Passport stamp - between title lines */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
-              animate={{ opacity: 1, scale: 1, rotate: -10 }}
-              transition={{ duration: 0.5, delay: 0.6, type: "spring", stiffness: 200 }}
-              className="my-3 md:my-4 inline-flex"
-            >
-              <div
-                className="relative w-32 h-32 md:w-44 md:h-44 rounded-full border-[4px] border-double flex items-center justify-center text-center font-bold text-xs md:text-base uppercase tracking-wider overflow-hidden"
-                style={{
-                  fontFamily: "'Courier New', monospace",
-                  color: "hsl(210, 80%, 60%)",
-                  borderColor: "hsl(210, 80%, 60%)",
-                  textShadow: "0 0 4px hsl(210 80% 60% / 0.5)",
-                  boxShadow: "inset 0 0 15px hsl(210 80% 60% / 0.2), 0 0 25px hsl(210 80% 60% / 0.15)",
-                  maskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
-                  WebkitMaskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
-                }}
+            <div className="flex items-center gap-4 md:gap-6 flex-wrap">
+              <h1
+                className="font-display text-5xl md:text-7xl font-bold leading-tight"
+                style={{ color: "hsl(40, 33%, 97%)" }}
               >
-                {/* Inner ring */}
-                <div className="absolute inset-2 border-2 rounded-full pointer-events-none" style={{ borderColor: "hsl(210, 80%, 60%, 0.5)" }} />
-                <span className="relative z-10 leading-tight px-4">IN YOUR<br />OWN<br />LANGUAGE</span>
-              </div>
-            </motion.div>
+                <span className="text-gradient-gold">Like a Local</span>
+              </h1>
 
-            <h1
-              className="font-display text-5xl md:text-7xl font-bold leading-tight"
-              style={{ color: "hsl(40, 33%, 97%)" }}
-            >
-              <span className="text-gradient-gold">Like a Local</span>
-            </h1>
+              {/* Passport stamp */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
+                animate={{ opacity: 1, scale: 1, rotate: -10 }}
+                transition={{ duration: 0.5, delay: 0.6, type: "spring", stiffness: 200 }}
+                className="inline-flex flex-shrink-0"
+              >
+                <div
+                  className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-[4px] border-double flex items-center justify-center text-center font-extrabold text-[10px] md:text-sm uppercase tracking-wider overflow-hidden"
+                  style={{
+                    fontFamily: "'Courier New', monospace",
+                    color: "hsl(210, 100%, 75%)",
+                    borderColor: "hsl(210, 100%, 75%)",
+                    textShadow: "0 0 8px hsl(210 100% 75% / 0.6), 0 1px 2px rgba(0,0,0,0.5)",
+                    boxShadow: "inset 0 0 15px hsl(210 100% 75% / 0.25), 0 0 25px hsl(210 100% 75% / 0.2)",
+                    maskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
+                    WebkitMaskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
+                  }}
+                >
+                  <div className="absolute inset-2 border-2 rounded-full pointer-events-none" style={{ borderColor: "hsl(210, 100%, 75%, 0.5)" }} />
+                  <span className="relative z-10 leading-tight px-3">IN YOUR<br />OWN<br />LANGUAGE</span>
+                </div>
+              </motion.div>
+            </div>
           </motion.div>
 
           <motion.p
