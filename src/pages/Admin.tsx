@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye, UserCheck, CheckCircle, XCircle, Globe, Briefcase, Map, DollarSign, Clock } from "lucide-react";
+import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye, UserCheck, CheckCircle, XCircle, Globe, Briefcase, Map, DollarSign, Clock, Pencil, Save, X } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import logoImg from "@/assets/logo.jpg";
 
@@ -37,11 +38,18 @@ interface GuideApplication {
   form_data: {
     firstName: string;
     lastName: string;
+    email?: string;
     phone?: string;
+    address?: string;
     biography?: string;
     languages?: string[];
     specializations?: string[];
     tourTypes?: string[];
+    insuranceCompanyName?: string;
+    insurancePolicyNumber?: string;
+    licenseNumber?: string;
+    licensingAuthority?: string;
+    certifications?: string[];
   };
 }
 
@@ -76,6 +84,10 @@ const Admin = () => {
   const [guides, setGuides] = useState<GuideApplication[]>([]);
   const [tourPlans, setTourPlans] = useState<TourPlan[]>([]);
   const [expandedGuide, setExpandedGuide] = useState<string | null>(null);
+  const [editingGuide, setEditingGuide] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState<GuideApplication["form_data"] | null>(null);
+  const [editServiceAreas, setEditServiceAreas] = useState<string[]>([]);
+  const [savingGuide, setSavingGuide] = useState(false);
   const [expandedTour, setExpandedTour] = useState<string | null>(null);
 
   useEffect(() => {
@@ -211,6 +223,36 @@ const Admin = () => {
     toast.success("Guide application deleted");
   };
 
+  const startEditGuide = (guide: GuideApplication) => {
+    setEditingGuide(guide.id);
+    setEditFormData({ ...guide.form_data });
+    setEditServiceAreas([...(guide.service_areas || [])]);
+    setExpandedGuide(guide.id);
+  };
+
+  const cancelEditGuide = () => {
+    setEditingGuide(null);
+    setEditFormData(null);
+    setEditServiceAreas([]);
+  };
+
+  const saveGuideEdit = async (guideId: string) => {
+    if (!editFormData) return;
+    setSavingGuide(true);
+    const { error } = await supabase
+      .from("guide_profiles")
+      .update({ form_data: editFormData as any, service_areas: editServiceAreas } as any)
+      .eq("id", guideId);
+    if (error) { toast.error("Failed to save"); setSavingGuide(false); return; }
+    setGuides((prev) => prev.map((g) => g.id === guideId ? { ...g, form_data: editFormData, service_areas: editServiceAreas } : g));
+    setEditingGuide(null);
+    setEditFormData(null);
+    setSavingGuide(false);
+    toast.success("Guide profile updated");
+  };
+
+  const AREA_OPTIONS = ["Washington DC", "New York City", "Niagara Falls", "Toronto", "Boston", "Chicago"];
+
   const pendingGuides = guides.filter((g) => g.status === "pending");
   const approvedGuides = guides.filter((g) => g.status === "approved");
   const rejectedGuides = guides.filter((g) => g.status === "rejected");
@@ -264,7 +306,10 @@ const Admin = () => {
   const renderGuideCard = (guide: GuideApplication) => {
     const fd = guide.form_data;
     const isExpanded = expandedGuide === guide.id;
+    const isEditing = editingGuide === guide.id;
     const photoUrl = supabase.storage.from("guide-photos").getPublicUrl(`${guide.user_id}/profile.jpg`).data.publicUrl;
+
+    const ef = editFormData; // shorthand for edit fields
 
     return (
       <div key={guide.id} className="bg-card rounded-xl border border-border p-6">
@@ -279,93 +324,191 @@ const Admin = () => {
               }}
             />
             <div className="flex-1 min-w-0">
+              {/* Name & Status */}
               <div className="flex items-center gap-3 flex-wrap mb-1">
-                <h3 className="font-semibold text-foreground text-lg">
-                  {fd.firstName} {fd.lastName}
-                </h3>
-                <Badge
-                  variant="secondary"
-                  className={`text-xs ${
-                    guide.status === "approved"
-                      ? "bg-primary/10 text-primary"
-                      : guide.status === "rejected"
-                      ? "bg-destructive/10 text-destructive"
-                      : "bg-accent text-accent-foreground"
-                  }`}
-                >
+                {isEditing ? (
+                  <div className="flex gap-2">
+                    <Input value={ef?.firstName || ""} onChange={(e) => setEditFormData((p) => p ? { ...p, firstName: e.target.value } : p)} placeholder="First name" className="h-8 text-sm w-32" />
+                    <Input value={ef?.lastName || ""} onChange={(e) => setEditFormData((p) => p ? { ...p, lastName: e.target.value } : p)} placeholder="Last name" className="h-8 text-sm w-32" />
+                  </div>
+                ) : (
+                  <h3 className="font-semibold text-foreground text-lg">{fd.firstName} {fd.lastName}</h3>
+                )}
+                <Badge variant="secondary" className={`text-xs ${guide.status === "approved" ? "bg-primary/10 text-primary" : guide.status === "rejected" ? "bg-destructive/10 text-destructive" : "bg-accent text-accent-foreground"}`}>
                   {guide.status}
                 </Badge>
               </div>
 
+              {/* Contact info */}
               <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap mb-2">
-                {fd.phone && (
-                  <span className="flex items-center gap-1">
-                    <Phone className="w-3 h-3" /> {fd.phone}
-                  </span>
+                {isEditing ? (
+                  <>
+                    <div className="flex items-center gap-1">
+                      <Mail className="w-3 h-3" />
+                      <Input value={ef?.email || ""} onChange={(e) => setEditFormData((p) => p ? { ...p, email: e.target.value } : p)} placeholder="Email" className="h-7 text-xs w-44" />
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Phone className="w-3 h-3" />
+                      <Input value={ef?.phone || ""} onChange={(e) => setEditFormData((p) => p ? { ...p, phone: e.target.value } : p)} placeholder="Phone" className="h-7 text-xs w-36" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {fd.email && <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {fd.email}</span>}
+                    {fd.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {fd.phone}</span>}
+                  </>
                 )}
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> {new Date(guide.created_at).toLocaleDateString()}
-                </span>
+                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(guide.created_at).toLocaleDateString()}</span>
               </div>
 
+              {/* Address (edit or display) */}
+              {isEditing ? (
+                <div className="mb-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Address</label>
+                  <Input value={ef?.address || ""} onChange={(e) => setEditFormData((p) => p ? { ...p, address: e.target.value } : p)} placeholder="Street, City, State, ZIP" className="h-7 text-xs mt-1" />
+                </div>
+              ) : fd.address ? (
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
+                  <MapPin className="w-3.5 h-3.5 text-primary/70" />
+                  <span>{fd.address}</span>
+                </div>
+              ) : null}
+
               {/* Service areas */}
-              {guide.service_areas && guide.service_areas.length > 0 && (
+              {isEditing ? (
+                <div className="mb-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Service Areas</label>
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {AREA_OPTIONS.map((area) => {
+                      const selected = editServiceAreas.includes(area);
+                      return (
+                        <button key={area} type="button" onClick={() => setEditServiceAreas((prev) => selected ? prev.filter((a) => a !== area) : [...prev, area])}
+                          className={`text-xs px-2 py-1 rounded-full border transition-all ${selected ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/30"}`}>
+                          {area}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : guide.service_areas && guide.service_areas.length > 0 ? (
                 <div className="flex items-center gap-1.5 flex-wrap mb-2">
                   <MapPin className="w-3.5 h-3.5 text-primary/70" />
                   {guide.service_areas.map((area) => (
-                    <Badge key={area} variant="secondary" className="text-xs">
-                      {area}
-                    </Badge>
+                    <Badge key={area} variant="secondary" className="text-xs">{area}</Badge>
                   ))}
                 </div>
-              )}
+              ) : null}
 
               {/* Languages */}
-              {fd.languages && fd.languages.length > 0 && (
+              {isEditing ? (
+                <div className="mb-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Languages (comma-separated)</label>
+                  <Input value={(ef?.languages || []).join(", ")} onChange={(e) => setEditFormData((p) => p ? { ...p, languages: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) } : p)} className="h-7 text-xs mt-1" />
+                </div>
+              ) : fd.languages && fd.languages.length > 0 ? (
                 <div className="flex items-center gap-1.5 flex-wrap mb-2">
                   <Globe className="w-3.5 h-3.5 text-primary/70" />
                   <span className="text-sm text-muted-foreground">{fd.languages.join(", ")}</span>
                 </div>
-              )}
+              ) : null}
 
               {/* Expandable details */}
               {isExpanded && (
                 <div className="mt-3 space-y-3">
-                  {fd.specializations && fd.specializations.length > 0 && (
+                  {/* Specializations */}
+                  {isEditing ? (
+                    <div>
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Specializations (comma-separated)</label>
+                      <Input value={(ef?.specializations || []).join(", ")} onChange={(e) => setEditFormData((p) => p ? { ...p, specializations: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) } : p)} className="h-7 text-xs mt-1" />
+                    </div>
+                  ) : fd.specializations && fd.specializations.length > 0 ? (
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Specializations</p>
                       <div className="flex flex-wrap gap-1.5">
                         {fd.specializations.map((spec) => (
-                          <Badge key={spec} variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
-                            {spec}
-                          </Badge>
+                          <Badge key={spec} variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">{spec}</Badge>
                         ))}
                       </div>
                     </div>
-                  )}
-                  {fd.tourTypes && fd.tourTypes.length > 0 && (
+                  ) : null}
+
+                  {/* Tour Types */}
+                  {isEditing ? (
+                    <div>
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Tour Types (comma-separated)</label>
+                      <Input value={(ef?.tourTypes || []).join(", ")} onChange={(e) => setEditFormData((p) => p ? { ...p, tourTypes: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) } : p)} className="h-7 text-xs mt-1" />
+                    </div>
+                  ) : fd.tourTypes && fd.tourTypes.length > 0 ? (
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Tour Types</p>
                       <div className="flex flex-wrap gap-1.5">
-                        {fd.tourTypes.map((tt) => (
-                          <Badge key={tt} variant="secondary" className="text-xs">
-                            {tt}
-                          </Badge>
-                        ))}
+                        {fd.tourTypes.map((tt) => (<Badge key={tt} variant="secondary" className="text-xs">{tt}</Badge>))}
                       </div>
                     </div>
-                  )}
-                  {fd.biography && (
+                  ) : null}
+
+                  {/* Biography */}
+                  {isEditing ? (
+                    <div>
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Biography</label>
+                      <Textarea value={ef?.biography || ""} onChange={(e) => setEditFormData((p) => p ? { ...p, biography: e.target.value } : p)} rows={3} className="text-xs mt-1" />
+                    </div>
+                  ) : fd.biography ? (
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Biography</p>
                       <p className="text-sm text-foreground/80 bg-muted/50 p-3 rounded-lg">{fd.biography}</p>
                     </div>
-                  )}
+                  ) : null}
+
+                  {/* Insurance & License Credentials */}
+                  <div className="border-t border-border/50 pt-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Credentials & Insurance</p>
+                    {isEditing ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-xs text-muted-foreground">Insurance Company</label>
+                          <Input value={ef?.insuranceCompanyName || ""} onChange={(e) => setEditFormData((p) => p ? { ...p, insuranceCompanyName: e.target.value } : p)} className="h-7 text-xs mt-0.5" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground">Policy Number</label>
+                          <Input value={ef?.insurancePolicyNumber || ""} onChange={(e) => setEditFormData((p) => p ? { ...p, insurancePolicyNumber: e.target.value } : p)} className="h-7 text-xs mt-0.5" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground">License Number</label>
+                          <Input value={ef?.licenseNumber || ""} onChange={(e) => setEditFormData((p) => p ? { ...p, licenseNumber: e.target.value } : p)} className="h-7 text-xs mt-0.5" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground">Licensing Authority</label>
+                          <Input value={ef?.licensingAuthority || ""} onChange={(e) => setEditFormData((p) => p ? { ...p, licensingAuthority: e.target.value } : p)} className="h-7 text-xs mt-0.5" />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="text-xs text-muted-foreground">Certifications (comma-separated)</label>
+                          <Input value={(ef?.certifications || []).join(", ")} onChange={(e) => setEditFormData((p) => p ? { ...p, certifications: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) } : p)} className="h-7 text-xs mt-0.5" />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                        {fd.insuranceCompanyName && <div><span className="text-muted-foreground">Insurance:</span> <span className="text-foreground">{fd.insuranceCompanyName}</span></div>}
+                        {fd.insurancePolicyNumber && <div><span className="text-muted-foreground">Policy #:</span> <span className="text-foreground">{fd.insurancePolicyNumber}</span></div>}
+                        {fd.licenseNumber && <div><span className="text-muted-foreground">License #:</span> <span className="text-foreground">{fd.licenseNumber}</span></div>}
+                        {fd.licensingAuthority && <div><span className="text-muted-foreground">Authority:</span> <span className="text-foreground">{fd.licensingAuthority}</span></div>}
+                        {fd.certifications && fd.certifications.length > 0 && (
+                          <div className="sm:col-span-2">
+                            <span className="text-muted-foreground">Certifications:</span>{" "}
+                            <span className="text-foreground">{fd.certifications.join(", ")}</span>
+                          </div>
+                        )}
+                        {!fd.insuranceCompanyName && !fd.licenseNumber && !fd.certifications?.length && (
+                          <p className="text-xs text-muted-foreground italic">No credentials provided</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
               <button
-                onClick={() => setExpandedGuide(isExpanded ? null : guide.id)}
+                onClick={() => { setExpandedGuide(isExpanded ? null : guide.id); if (isEditing && isExpanded) cancelEditGuide(); }}
                 className="text-xs text-primary hover:underline mt-2"
               >
                 {isExpanded ? "Show less" : "Show more"}
@@ -375,34 +518,35 @@ const Admin = () => {
 
           {/* Action buttons */}
           <div className="flex flex-col gap-1.5 flex-shrink-0">
-            {guide.status !== "approved" && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-primary/30 text-primary hover:bg-primary/10"
-                onClick={() => updateGuideStatus(guide.id, "approved")}
-              >
-                <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve
-              </Button>
+            {isEditing ? (
+              <>
+                <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10" onClick={() => saveGuideEdit(guide.id)} disabled={savingGuide}>
+                  <Save className="w-3.5 h-3.5 mr-1" /> {savingGuide ? "Saving…" : "Save"}
+                </Button>
+                <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:bg-muted" onClick={cancelEditGuide}>
+                  <X className="w-3.5 h-3.5 mr-1" /> Cancel
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10" onClick={() => startEditGuide(guide)}>
+                  <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
+                </Button>
+                {guide.status !== "approved" && (
+                  <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10" onClick={() => updateGuideStatus(guide.id, "approved")}>
+                    <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve
+                  </Button>
+                )}
+                {guide.status !== "rejected" && (
+                  <Button variant="outline" size="sm" className="border-destructive/30 text-destructive hover:bg-destructive/10" onClick={() => updateGuideStatus(guide.id, "rejected")}>
+                    <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
+                  </Button>
+                )}
+                <Button variant="outline" size="sm" className="border-destructive/30 text-destructive hover:bg-destructive/10" onClick={() => deleteGuide(guide.id)}>
+                  <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
+                </Button>
+              </>
             )}
-            {guide.status !== "rejected" && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                onClick={() => updateGuideStatus(guide.id, "rejected")}
-              >
-                <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-destructive/30 text-destructive hover:bg-destructive/10"
-              onClick={() => deleteGuide(guide.id)}
-            >
-              <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
-            </Button>
           </div>
         </div>
       </div>
