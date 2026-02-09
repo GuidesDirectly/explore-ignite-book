@@ -68,7 +68,7 @@ const HeroSection = () => {
           >
             Discover America
             <br />
-            <span className="italic font-light text-gradient-gold" style={{ display: "inline-block", transform: "rotate(-2deg)" }}>in Your Own Language,</span>
+            <span className="italic text-gradient-gold text-4xl md:text-6xl" style={{ display: "inline-block", transform: "rotate(-4deg) translateX(8px)", fontFamily: "'Georgia', serif", letterSpacing: "0.02em" }}>in Your Own Language,</span>
             <br />
             <span className="text-gradient-gold">Like a Local</span>
           </motion.h1>
