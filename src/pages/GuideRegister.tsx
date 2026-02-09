@@ -143,7 +143,12 @@ const GuideRegister = () => {
           setLicensingAuthority(fd.licensingAuthority || "");
           setCertifications((fd.certifications || []).join(", "));
           setServiceAreas(data.service_areas || []);
-          setCurrentStep(data.current_step || 0);
+          // Only restore step if still in draft; if already submitted, start fresh for re-editing
+          if (data.status === "draft" && (data.current_step || 0) < 6) {
+            setCurrentStep(data.current_step || 0);
+          } else {
+            setCurrentStep(0);
+          }
         }
       }
       setLoading(false);
