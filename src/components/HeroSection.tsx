@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { MapPin, Star, Users } from "lucide-react";
+import { MapPin, Star, Users, Handshake } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import heroBg from "@/assets/hero-dc.jpg";
 import logo from "@/assets/logo.jpg";
@@ -123,14 +123,22 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.45 }}
-            className="flex flex-col sm:flex-row gap-4 mb-16"
+            className="flex flex-col gap-4 mb-16"
           >
-            <Button variant="hero" size="lg" className="text-base px-8 py-6" asChild>
-              <a href="#tour-planner">{t("hero.planTour")}</a>
-            </Button>
-            <Button variant="heroOutline" size="lg" className="text-base px-8 py-6" asChild>
-              <a href="#services">{t("hero.exploreServices")}</a>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button variant="hero" size="lg" className="text-base px-8 py-6" asChild>
+                <a href="#tour-planner">{t("hero.planTour")}</a>
+              </Button>
+              <Button variant="heroOutline" size="lg" className="text-base px-8 py-6" asChild>
+                <a href="#services">{t("hero.exploreServices")}</a>
+              </Button>
+            </div>
+            <div className="flex items-center gap-3 bg-secondary/60 backdrop-blur-sm rounded-lg px-4 py-2.5 w-fit border border-primary/20">
+              <Handshake className="w-7 h-7 text-yellow-400 flex-shrink-0" />
+              <span className="text-sm md:text-base font-semibold tracking-wide" style={{ color: "hsl(40, 33%, 95%)" }}>
+                100% Guide-Paid&nbsp;&nbsp;|&nbsp;&nbsp;0% Commission
+              </span>
+            </div>
           </motion.div>
 
           {/* Stats */}
