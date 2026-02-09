@@ -169,5 +169,11 @@
     "exp_romantic": "Romantisch / Paare",
     "exp_vip": "VIP / Luxus",
     "exp_wine": "Wein und Weinberge"
+  },
+  "guides": {
+    "badge": "Erfahrene lokale Guides",
+    "title": "Lernen Sie unsere",
+    "titleGold": "Guides kennen",
+    "subtitle": "Handverlesene lokale Experten, die jedes Reiseziel mit Leidenschaft, Wissen und unvergesslichen Erlebnissen zum Leben erwecken."
   }
 }

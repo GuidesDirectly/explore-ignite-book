@@ -169,5 +169,11 @@
     "exp_romantic": "浪漫 / 情侣",
     "exp_vip": "VIP / 豪华",
     "exp_wine": "葡萄酒与酒庄"
+  },
+  "guides": {
+    "badge": "资深当地导游",
+    "title": "认识我们的",
+    "titleGold": "导游",
+    "subtitle": "精心挑选的当地专家，以热情、知识和难忘的体验让每个目的地焕发生机。"
   }
 }

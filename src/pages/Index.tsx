@@ -5,6 +5,7 @@ import ServicesSection from "@/components/ServicesSection";
 import DestinationsSection from "@/components/DestinationsSection";
 import GallerySection from "@/components/GallerySection";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import MeetGuidesSection from "@/components/MeetGuidesSection";
 import TourPlannerSection from "@/components/TourPlannerSection";
 import InquirySection from "@/components/InquirySection";
 import Footer from "@/components/Footer";
@@ -21,6 +22,7 @@ const Index = () => {
       <DestinationsSection />
       <GallerySection />
       <TestimonialsSection />
+      <MeetGuidesSection />
       <TourPlannerSection />
       <InquirySection />
       <Footer />
