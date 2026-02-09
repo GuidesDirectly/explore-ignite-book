@@ -25,9 +25,10 @@ const TestimonialsSection = () => {
 
   useEffect(() => {
     const fetchReviews = async () => {
-      const { data } = await supabase
+      const { data } = await (supabase
         .from("reviews")
         .select("id, reviewer_name, rating, comment, created_at")
+        .eq("hidden", false) as any)
         .order("created_at", { ascending: false })
         .limit(20);
       if (data) setDbReviews(data);
