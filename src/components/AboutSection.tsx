@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Award, Clock, MapPin, Heart } from "lucide-react";
+import { Award, Clock, MapPin, Heart, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const AboutSection = () => {
@@ -10,6 +10,7 @@ const AboutSection = () => {
     { icon: MapPin, label: t("about.cities") },
     { icon: Heart, label: t("about.personalized") },
     { icon: Award, label: t("about.professional") },
+    { icon: ShieldCheck, label: t("about.directBooking") },
   ];
 
   return (
@@ -32,6 +33,7 @@ const AboutSection = () => {
               <p>{t("about.p1")}</p>
               <p>{t("about.p2")}</p>
               <p>{t("about.p3")}</p>
+              <p className="font-semibold text-foreground">{t("about.p4")}</p>
             </div>
           </motion.div>
 
@@ -49,7 +51,7 @@ const AboutSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
-                className="p-6 rounded-2xl bg-background border border-border shadow-card text-center"
+                className={`p-6 rounded-2xl bg-background border border-border shadow-card text-center ${i === highlights.length - 1 ? "col-span-2" : ""}`}
               >
                 <div className="w-12 h-12 rounded-xl bg-gradient-gold flex items-center justify-center mx-auto mb-4">
                   <item.icon className="w-6 h-6 text-secondary" />

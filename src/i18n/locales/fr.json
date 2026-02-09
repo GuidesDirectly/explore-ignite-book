@@ -95,10 +95,12 @@
     "p1": "iGuide Tours, basée à Bethesda dans le Maryland, est spécialisée dans les visites privées menées par des guides locaux professionnels et multilingues dans les grandes villes des États-Unis et du Canada.",
     "p2": "Fondée par Michael Zlotnitsky, qui possède plus de 35 ans d'expérience dans l'industrie du tourisme, l'entreprise met l'accent sur des expériences personnalisées qui mettent en valeur l'histoire, la culture et la gastronomie de chaque destination.",
     "p3": "Avec un focus sur les tours VIP, iGuide Tours offre à ses clients l'opportunité d'explorer des monuments emblématiques et des trésors cachés — le tout dans votre langue préférée. Qu'il s'agisse de vacances en famille, d'un voyage d'affaires ou d'une célébration spéciale, notre équipe crée des voyages inoubliables adaptés à vos besoins.",
+    "p4": "Avec iGuide Tours, vous réservez directement avec le guide — sans intermédiaires, sans commissions, sans surcoûts. Vous obtenez le meilleur prix et un lien authentique et personnel avec votre guide.",
     "experience": "35+ ans d'expérience",
     "cities": "Grandes villes USA & Canada",
     "personalized": "Itinéraires personnalisés",
-    "professional": "Guides professionnels"
+    "professional": "Guides professionnels",
+    "directBooking": "Réservation directe, sans intermédiaires"
   },
   "review": {
     "label": "Partagez votre expérience",
