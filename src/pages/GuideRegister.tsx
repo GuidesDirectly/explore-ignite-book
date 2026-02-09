@@ -106,6 +106,8 @@ const GuideRegister = () => {
   const [certifications, setCertifications] = useState("");
   const [licenseDoc, setLicenseDoc] = useState<File | null>(null);
   const [licenseDocName, setLicenseDocName] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   // Auth check
   const [authEmail, setAuthEmail] = useState("");
@@ -208,10 +210,41 @@ const GuideRegister = () => {
     }
   };
 
+  const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+
+  const formatPhoneNumber = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    if (digits.length === 0) return "";
+    if (digits.length <= 1) return `+${digits}`;
+    if (digits.length <= 4) return `+${digits.slice(0, 1)} (${digits.slice(1)}`;
+    if (digits.length <= 7) return `+${digits.slice(0, 1)} (${digits.slice(1, 4)}) ${digits.slice(4)}`;
+    return `+${digits.slice(0, 1)} (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7, 11)}`;
+  };
+
+  const handlePhoneChange = (value: string) => {
+    const formatted = formatPhoneNumber(value);
+    setPhone(formatted);
+    const digits = value.replace(/\D/g, "");
+    if (digits.length > 0 && digits.length < 10) {
+      setPhoneError("Phone number must be at least 10 digits");
+    } else {
+      setPhoneError("");
+    }
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (value.trim() && !isValidEmail(value.trim())) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  };
+
   const canProceed = () => {
     switch (currentStep) {
       case 0:
-        return firstName.trim() && lastName.trim();
+        return firstName.trim() && lastName.trim() && isValidEmail(email.trim()) && phone.replace(/\D/g, "").length >= 10;
       case 1:
         return serviceAreas.length > 0;
       case 2:
@@ -510,13 +543,32 @@ const GuideRegister = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1.5">
-                  {t("guideRegister.phone")}
+                  {t("guideRegister.email", "Email")} *
+                </label>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  placeholder="john@example.com"
+                  className={emailError ? "border-destructive" : ""}
+                />
+                {emailError && (
+                  <p className="text-xs text-destructive mt-1">{emailError}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  {t("guideRegister.phone")} *
                 </label>
                 <Input
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
                   placeholder="+1 (555) 123-4567"
+                  className={phoneError ? "border-destructive" : ""}
                 />
+                {phoneError && (
+                  <p className="text-xs text-destructive mt-1">{phoneError}</p>
+                )}
               </div>
             </div>
           )}
