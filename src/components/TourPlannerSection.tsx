@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Sparkles, Loader2, ArrowRight, ArrowLeft, RotateCcw,
   MapPin, Clock, DollarSign, Heart, User, Mail, Phone,
-  CheckCircle2, Globe, RefreshCw, Users, Send,
+  CheckCircle2, Globe, RefreshCw, Users, Send, ShieldCheck,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
@@ -34,6 +34,11 @@ interface GuideProfile {
     specializations: string[];
     tourTypes: string[];
     targetAudience: string[];
+    insuranceCompanyName?: string;
+    insurancePolicyNumber?: string;
+    licenseNumber?: string;
+    licensingAuthority?: string;
+    certifications?: string[];
   };
   matchScore?: number;
   matchReasons?: string[];
@@ -760,6 +765,29 @@ const TourPlannerSection = () => {
                                     </Badge>
                                   ))}
                                 </div>
+                                {/* Credentials badges */}
+                                {(fd.insuranceCompanyName || fd.licenseNumber) && (
+                                  <div className="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t border-primary/10">
+                                    {fd.insuranceCompanyName && (
+                                      <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full"
+                                        style={{ background: "hsla(142, 71%, 45%, 0.12)", color: "hsl(142, 71%, 60%)" }}>
+                                        <ShieldCheck className="w-3 h-3" /> Insured
+                                      </span>
+                                    )}
+                                    {fd.licenseNumber && (
+                                      <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full"
+                                        style={{ background: "hsla(210, 70%, 50%, 0.12)", color: "hsl(210, 70%, 65%)" }}>
+                                        <CheckCircle2 className="w-3 h-3" /> Licensed
+                                      </span>
+                                    )}
+                                    {fd.certifications && fd.certifications.length > 0 && (
+                                      <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full"
+                                        style={{ background: "hsla(270, 50%, 55%, 0.12)", color: "hsl(270, 50%, 70%)" }}>
+                                        {fd.certifications.length} cert{fd.certifications.length > 1 ? "s" : ""}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>

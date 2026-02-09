@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Globe, Star, Filter, X } from "lucide-react";
+import { MapPin, Globe, Star, Filter, X, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -18,6 +18,10 @@ interface GuideProfile {
     specializations: string[];
     tourTypes: string[];
     targetAudience: string[];
+    insuranceCompanyName?: string;
+    licenseNumber?: string;
+    licensingAuthority?: string;
+    certifications?: string[];
   };
   reviewCount: number;
   avgRating: number;
@@ -414,6 +418,27 @@ const MeetGuidesSection = () => {
                         </Badge>
                       ))}
                     </div>
+
+                    {/* Credentials badges */}
+                    {(fd.insuranceCompanyName || fd.licenseNumber) && (
+                      <div className="flex flex-wrap items-center gap-1.5 mt-2 pt-2 border-t border-border/30">
+                        {fd.insuranceCompanyName && (
+                          <Badge variant="outline" className="text-xs gap-1 border-green-500/30 text-green-400 bg-green-500/10">
+                            <ShieldCheck className="w-3 h-3" /> Insured
+                          </Badge>
+                        )}
+                        {fd.licenseNumber && (
+                          <Badge variant="outline" className="text-xs gap-1 border-blue-500/30 text-blue-400 bg-blue-500/10">
+                            <CheckCircle2 className="w-3 h-3" /> Licensed
+                          </Badge>
+                        )}
+                        {fd.certifications && fd.certifications.length > 0 && (
+                          <Badge variant="outline" className="text-xs gap-1 border-purple-500/30 text-purple-400 bg-purple-500/10">
+                            {fd.certifications.length} cert{fd.certifications.length > 1 ? "s" : ""}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               );
