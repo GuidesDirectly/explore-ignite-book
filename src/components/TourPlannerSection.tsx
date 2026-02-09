@@ -286,14 +286,52 @@ const TourPlannerSection = () => {
   };
 
   const handleMatchGuides = async () => {
+    // Get the customer's selected destination label
+    const destLabel = destination === "other"
+      ? otherDestination.trim().toLowerCase()
+      : t(`planner.${destination}`).toLowerCase();
+
+    // Map experience keys to their translated labels for matching
+    const expLabels = experiences.map(key => t(`planner.${key}`).toLowerCase());
+
     const { data } = await supabase
       .from("guide_profiles")
-      .select("id, user_id, form_data")
-      .eq("status", "approved")
-      .limit(10);
+      .select("id, user_id, form_data, service_areas")
+      .eq("status", "approved");
 
     if (data) {
-      setGuides(data as unknown as GuideProfile[]);
+      const allGuides = data as unknown as (GuideProfile & { service_areas: string[] | null })[];
+
+      // Score each guide based on destination + specialization match
+      const scored = allGuides.map(guide => {
+        let score = 0;
+        const areas = (guide.service_areas || []).map(a => a.toLowerCase());
+        const specs = (guide.form_data.specializations || []).map(s => s.toLowerCase());
+        const tourTypes = (guide.form_data.tourTypes || []).map(t => t.toLowerCase());
+
+        // Destination match (highest weight)
+        if (areas.some(area => destLabel.includes(area) || area.includes(destLabel))) {
+          score += 10;
+        }
+
+        // Specialization & tour type overlap with customer experiences
+        expLabels.forEach(exp => {
+          if (specs.some(s => s.includes(exp) || exp.includes(s))) score += 3;
+          if (tourTypes.some(tt => tt.includes(exp) || exp.includes(tt))) score += 2;
+        });
+
+        return { guide, score };
+      });
+
+      // Sort by score descending, take top matches
+      scored.sort((a, b) => b.score - a.score);
+      const matched = scored
+        .filter(s => s.score > 0)
+        .slice(0, 6)
+        .map(s => s.guide);
+
+      // If no matches, fall back to all guides
+      setGuides(matched.length > 0 ? matched : allGuides.slice(0, 6));
       setShowGuides(true);
     }
   };
