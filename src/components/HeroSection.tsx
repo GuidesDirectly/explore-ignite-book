@@ -116,7 +116,7 @@ const HeroSection = () => {
             className="flex flex-col sm:flex-row gap-4 mb-16"
           >
             <Button variant="hero" size="lg" className="text-base px-8 py-6" asChild>
-              <a href="#inquiry">{t("hero.planTour")}</a>
+              <a href="#tour-planner">{t("hero.planTour")}</a>
             </Button>
             <Button variant="heroOutline" size="lg" className="text-base px-8 py-6" asChild>
               <a href="#services">{t("hero.exploreServices")}</a>
