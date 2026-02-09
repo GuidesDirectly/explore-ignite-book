@@ -37,7 +37,7 @@ const HeroSection = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.7, delay: 0.2 }}
-        className="absolute top-24 right-6 md:right-12 w-36 md:w-52 h-auto object-contain drop-shadow-2xl z-10"
+        className="absolute top-20 right-4 w-20 sm:w-28 md:w-52 h-auto object-contain drop-shadow-2xl z-10"
       />
 
       <div className="relative container mx-auto px-4 pt-24 pb-16">
