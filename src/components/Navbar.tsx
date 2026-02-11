@@ -21,8 +21,9 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-md border-b border-primary/10">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <a href="#home" className="font-display text-2xl font-bold text-primary-foreground tracking-tight">
-          iGuide<span className="text-gradient-gold">Tours</span>
+        <a href="#home" className="flex items-baseline gap-1.5">
+          <span className="font-display text-2xl font-bold text-primary-foreground tracking-tight">Guides<span className="text-gradient-gold">Directly</span></span>
+          <span className="text-[10px] text-primary-foreground/50 font-medium hidden sm:inline">by iGuide Tours</span>
         </a>
 
         {/* Desktop nav */}

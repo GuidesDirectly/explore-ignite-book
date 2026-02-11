@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { MapPin, Star, Users, Handshake } from "lucide-react";
+import { MapPin, Star, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import heroBg from "@/assets/hero-dc.jpg";
 import logo from "@/assets/logo.jpg";
@@ -44,16 +44,16 @@ const HeroSection = () => {
               className="font-display text-5xl md:text-7xl font-bold leading-tight"
               style={{ color: "hsl(40, 33%, 97%)" }}
             >
-              {t("hero.discoverAmerica")}
+              {t("hero.headline")}
             </h1>
 
             <div className="flex items-center gap-4 md:gap-6 flex-wrap">
-              <h1
-                className="font-display text-5xl md:text-7xl font-bold leading-tight"
-                style={{ color: "hsl(40, 33%, 97%)" }}
+              <p
+                className="font-display text-xl md:text-2xl font-medium tracking-wide"
+                style={{ color: "hsl(45, 80%, 70%)" }}
               >
-                <span className="text-gradient-gold">{t("hero.likeALocal")}</span>
-              </h1>
+                {t("hero.poweredBy")}
+              </p>
 
               {/* Passport stamp */}
               <motion.div
@@ -81,42 +81,49 @@ const HeroSection = () => {
             </div>
           </motion.div>
 
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
+            className="mb-4"
+          >
+            <p className="text-2xl md:text-3xl font-bold tracking-wide" style={{ color: "hsl(45, 80%, 70%)" }}>
+              {t("hero.tagline")}
+            </p>
+          </motion.div>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg md:text-xl leading-relaxed mb-3 max-w-xl"
+            className="text-lg md:text-xl leading-relaxed mb-2 max-w-xl"
             style={{ color: "hsl(40, 33%, 90%)" }}
           >
             {t("hero.subtitle")}
           </motion.p>
 
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            className="text-sm md:text-base max-w-lg leading-relaxed mb-8"
+            style={{ color: "hsl(40, 33%, 80%)" }}
+          >
+            {t("hero.subTagline")}
+          </motion.p>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.38 }}
-            className="flex flex-col gap-4 mb-16"
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-4 mb-16"
           >
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="hero" size="lg" className="text-base px-8 py-6" asChild>
-                <a href="#tour-planner">{t("hero.planTour")}</a>
-              </Button>
-              <Button variant="heroOutline" size="lg" className="text-base px-8 py-6" asChild>
-                <a href="#services">{t("hero.exploreServices")}</a>
-              </Button>
-            </div>
-            <p className="text-sm md:text-base max-w-lg leading-relaxed" style={{ color: "hsl(40, 33%, 85%)" }}>
-              {t("hero.directBookingDescription")}
-            </p>
-            <div className="flex items-center gap-3 bg-secondary/60 backdrop-blur-sm rounded-lg px-4 py-2.5 w-fit border border-primary/20">
-              <Handshake className="w-7 h-7 text-yellow-400 flex-shrink-0" />
-              <span className="text-sm md:text-base font-semibold tracking-wide" style={{ color: "hsl(40, 33%, 95%)" }}>
-                100% Guide-Paid&nbsp;&nbsp;|&nbsp;&nbsp;0% Commission
-              </span>
-            </div>
-            <p className="text-base md:text-lg font-semibold tracking-wide" style={{ color: "hsl(45, 80%, 70%)" }}>
-              {t("hero.directBooking")}
-            </p>
+            <Button variant="hero" size="lg" className="text-base px-8 py-6" asChild>
+              <a href="#tour-planner">{t("hero.bookDirectly")}</a>
+            </Button>
+            <Button variant="heroOutline" size="lg" className="text-base px-8 py-6" asChild>
+              <a href="#why-commission-free">{t("hero.whyCommissionFree")}</a>
+            </Button>
           </motion.div>
 
           {/* Stats */}

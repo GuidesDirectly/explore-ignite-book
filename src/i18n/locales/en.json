@@ -5,21 +5,47 @@
     "destinations": "Destinations",
     "testimonials": "Testimonials",
     "contact": "Contact",
-    "bookTour": "Plan Your Tour",
+    "bookTour": "Book Directly",
     "becomeGuide": "Become a Guide"
   },
   "hero": {
-    "discoverAmerica": "Discover America",
-    "likeALocal": "Like a Local",
+    "headline": "GUIDES DIRECTLY",
+    "poweredBy": "Powered by iGuide Tours",
+    "tagline": "No Commissions. No Markups. No Middlemen.",
     "stamp": "IN YOUR\nOWN\nLANGUAGE",
-    "subtitle": "Book directly with licensed local guides across the USA & Canada. Custom VIP experiences crafted just for you — from historic landmarks to hidden gems.",
-    "directBooking": "No middlemen. No commissions. No markups.",
-    "directBookingDescription": "iGuide Tours connects you directly with professional tour guides. We don't take a percentage of your tour price.",
-    "planTour": "Plan Your Tour",
-    "exploreServices": "Explore Services",
+    "subtitle": "Connect directly with licensed local tour guides for authentic, unforgettable experiences across the USA and Canada.",
+    "subTagline": "Travel experiences created by guides, priced by guides — you pay only what your guide sets.",
+    "bookDirectly": "Book Directly With a Guide",
+    "whyCommissionFree": "Why Commission-Free Matters",
     "avgRating": "Average Rating",
     "happyTravelers": "Happy Travelers",
     "citiesCovered": "Cities Covered"
+  },
+  "valueProp": {
+    "label": "Why We're Different",
+    "title": "Why Guides Directly is Different",
+    "card1Title": "Zero Commissions. Ever.",
+    "card1Desc": "No markups or hidden fees — what you see is what you pay.",
+    "card2Title": "Direct Guide Relationships",
+    "card2Desc": "Book and chat with guides without intermediaries.",
+    "card3Title": "Authentic Experiences",
+    "card3Desc": "Real local guides designing real local experiences.",
+    "compareTitle": "How We Compare",
+    "feature": "Feature",
+    "guidesDirect": "Guides Directly",
+    "typicalOta": "Typical OTA",
+    "commission": "Commission",
+    "commissionUs": "None",
+    "commissionOta": "20–50%",
+    "directChat": "Direct chat with guides",
+    "directChatUs": "Yes",
+    "directChatOta": "Limited",
+    "transparentPricing": "Transparent pricing",
+    "transparentPricingUs": "Yes",
+    "transparentPricingOta": "Often no",
+    "guidesKeepEarnings": "Guides keep earnings",
+    "guidesKeepEarningsUs": "Yes",
+    "guidesKeepEarningsOta": "Often no"
   },
   "services": {
     "label": "What We Offer",
@@ -32,7 +58,12 @@
     "custom": "Custom Itineraries",
     "customDesc": "Tell us your time and interests — we'll craft a unique route covering hidden gems and iconic landmarks alike.",
     "multilingual": "Multilingual Guides",
-    "multilingualDesc": "Our guides speak Russian, English, Polish, German, French, Spanish, Mandarin, and Japanese fluently. Experience every destination in your preferred language."
+    "multilingualDesc": "Our guides speak Russian, English, Polish, German, French, Spanish, Mandarin, and Japanese fluently. Experience every destination in your preferred language.",
+    "directBookingTitle": "Book Directly — Your Guide Sets the Price",
+    "step1": "Browse guides and tours",
+    "step2": "Contact the guide directly",
+    "step3": "Agree on pricing and itinerary",
+    "step4": "Pay with no platform commission"
   },
   "destinations": {
     "label": "Popular Destinations",
@@ -49,14 +80,16 @@
     "label": "Testimonials",
     "title": "What Travelers Say",
     "t1": "Our guide made Washington DC come alive! Speaking Russian was a huge plus — we understood every detail of American history like never before.",
-    "t2": "The VIP tour of New York was incredible. Our guide took us to spots we never would have found on our own. Worth every penny!",
-    "t3": "We booked a custom family tour across three cities. The attention to detail and personalized itinerary was beyond our expectations."
+    "t2": "I paid less and got more — direct, honest pricing. The VIP tour of New York was incredible. Our guide took us to spots we never would have found on our own.",
+    "t3": "Booking direct with my guide felt personal and fair. We booked a custom family tour across three cities and the personalized itinerary was beyond our expectations."
   },
   "inquiry": {
     "label": "Start Your Journey",
     "title": "Book Your",
     "titleGold": "Dream Tour",
     "subtitle": "Fill out the form and our team will get back to you within 24 hours with a custom tour proposal. No commitment required — let's start planning!",
+    "commissionFreeNote": "Have questions about commission-free booking? Contact us — Guides Directly ensures direct contact with no hidden costs.",
+    "directContact": "Text or call to speak with a guide directly — no commissions, no agents.",
     "fullName": "Full Name",
     "email": "Email",
     "phone": "Phone",
@@ -75,10 +108,25 @@
     "submitAnother": "Submit Another Inquiry"
   },
   "footer": {
-    "description": "Premium local tour guides across the United States and Canada. Russian, English, Polish, German, French, Spanish, Mandarin & Japanese speaking.",
+    "brand": "Guides Directly",
+    "poweredBy": "powered by iGuide Tours",
+    "description": "Commission-free tour bookings with local guides across the United States and Canada. Direct guide relationships, guide-priced tours — no middlemen.",
     "quickLinks": "Quick Links",
     "contactUs": "Contact Us",
-    "rights": "iGuide Tours. All rights reserved."
+    "rights": "Guides Directly / iGuide Tours. All rights reserved."
+  },
+  "about": {
+    "label": "About Us",
+    "title": "Who We Are",
+    "p1": "iGuide Tours — now part of Guides Directly, a commission-free platform connecting you directly with guides. Based in Bethesda, Maryland, we specialize in private tours led by professional and multilingual local guides across major cities in the United States and Canada.",
+    "p2": "Founded by Michael Zlotnitsky, who has over 35 years of experience in the tourism industry, the company emphasizes personalized experiences that showcase the history, culture, and cuisine of each destination.",
+    "p3": "With a focus on VIP tours, we offer clients the opportunity to explore iconic landmarks and hidden gems alike — all in their preferred language. Whether it's a family vacation, a business trip, or a special celebration, our team crafts unforgettable journeys tailored to your needs.",
+    "p4": "Guides Directly powered by iGuide Tours charges zero commissions, no markups, and no middlemen between you and your guide. You connect directly with local licensed guides, agree on pricing, and experience authentic travel designed by humans, not algorithms.",
+    "experience": "35+ Years Experience",
+    "cities": "Major US & Canada Cities",
+    "personalized": "Personalized Itineraries",
+    "professional": "Professional Guides",
+    "directBooking": "Direct Booking, No Middlemen"
   },
   "chat": {
     "title": "Travel Assistant",
@@ -89,19 +137,6 @@
     "q1": "What's the best time to visit DC?",
     "q2": "Plan a 3-day NYC trip",
     "q3": "Niagara Falls tour options"
-  },
-  "about": {
-    "label": "About Us",
-    "title": "Who We Are",
-    "p1": "iGuide Tours, based in Bethesda, Maryland, specializes in providing private tours led by professional and multilingual local guides across major cities in the United States and Canada.",
-    "p2": "Founded by Michael Zlotnitsky, who has over 35 years of experience in the tourism industry, the company emphasizes personalized experiences that showcase the history, culture, and cuisine of each destination.",
-    "p3": "With a focus on VIP tours, iGuide Tours offers clients the opportunity to explore iconic landmarks and hidden gems alike — all in their preferred language. Whether it's a family vacation, a business trip, or a special celebration, our team crafts unforgettable journeys tailored to your needs.",
-    "p4": "When you book with iGuide Tours, you book directly with the guide — no middlemen, no commissions, no markups. You get the best price and a genuine, personal connection with your guide.",
-    "experience": "35+ Years Experience",
-    "cities": "Major US & Canada Cities",
-    "personalized": "Personalized Itineraries",
-    "professional": "Professional Guides",
-    "directBooking": "Direct Booking, No Middlemen"
   },
   "review": {
     "label": "Share Your Experience",
