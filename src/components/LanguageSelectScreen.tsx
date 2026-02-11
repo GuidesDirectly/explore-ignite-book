@@ -14,8 +14,10 @@ const LanguageSelectScreen = ({ onLanguageSelected }: LanguageSelectScreenProps)
   const handleSelect = (code: string) => {
     i18n.changeLanguage(code);
     localStorage.setItem("languageSelected", "true");
-    window.scrollTo(0, 0);
     onLanguageSelected();
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    });
   };
 
   return (
