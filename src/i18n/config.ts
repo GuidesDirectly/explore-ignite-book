@@ -12,7 +12,7 @@ import zh from "./locales/zh.json";
 import ja from "./locales/ja.json";
 
 export const languages = [
-  { code: "en", name: "English", flag: "gb" },
+  { code: "en", name: "English", flag: "us" },
   { code: "ru", name: "Русский", flag: "ru" },
   { code: "pl", name: "Polski", flag: "pl" },
   { code: "de", name: "Deutsch", flag: "de" },
