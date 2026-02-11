@@ -256,7 +256,11 @@
     "showing": "显示 {{total}} 位导游中的 {{count}} 位",
     "noResults": "没有符合条件的导游。请尝试调整筛选条件。",
     "review": "条评价",
-    "reviews": "条评价"
+    "reviews": "条评价",
+    "insured": "已投保",
+    "licensed": "持证",
+    "certs": "{{count}} 项认证",
+    "certs_plural": "{{count}} 项认证"
   },
   "guideRegister": {
     "title": "成为导游",

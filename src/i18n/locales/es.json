@@ -256,7 +256,11 @@
     "showing": "Mostrando {{count}} de {{total}} guías",
     "noResults": "Ningún guía coincide con tus filtros. Intenta ajustar tus criterios.",
     "review": "reseña",
-    "reviews": "reseñas"
+    "reviews": "reseñas",
+    "insured": "Asegurado",
+    "licensed": "Licenciado",
+    "certs": "{{count}} certificación",
+    "certs_plural": "{{count}} certificaciones"
   },
   "guideRegister": {
     "title": "Conviértete en guía",

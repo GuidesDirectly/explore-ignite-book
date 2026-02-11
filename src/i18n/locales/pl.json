@@ -256,7 +256,11 @@
     "showing": "Wyświetlanie {{count}} z {{total}} przewodników",
     "noResults": "Żaden przewodnik nie pasuje do Twoich filtrów. Spróbuj zmienić kryteria.",
     "review": "recenzja",
-    "reviews": "recenzje"
+    "reviews": "recenzje",
+    "insured": "Ubezpieczony",
+    "licensed": "Licencjonowany",
+    "certs": "{{count}} certyfikat",
+    "certs_plural": "{{count}} certyfikatów"
   },
   "guideRegister": {
     "title": "Zostań przewodnikiem",
