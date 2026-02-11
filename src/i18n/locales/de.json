@@ -58,7 +58,12 @@
     "custom": "Individuelle Routen",
     "customDesc": "Erzählen Sie uns von Ihrer Zeit und Ihren Interessen — wir erstellen eine einzigartige Route mit verborgenen Schätzen und ikonischen Sehenswürdigkeiten.",
     "multilingual": "Mehrsprachige Guides",
-    "multilingualDesc": "Unsere Guides sprechen fließend Russisch, Englisch, Polnisch, Deutsch, Französisch, Spanisch, Mandarin und Japanisch."
+    "multilingualDesc": "Unsere Guides sprechen fließend Russisch, Englisch, Polnisch, Deutsch, Französisch, Spanisch, Mandarin und Japanisch.",
+    "directBookingTitle": "Direkt buchen — Ihr Guide bestimmt den Preis",
+    "step1": "Guides und Touren durchsuchen",
+    "step2": "Den Guide direkt kontaktieren",
+    "step3": "Preis und Route vereinbaren",
+    "step4": "Ohne Plattform-Provision bezahlen"
   },
   "destinations": {
     "label": "Beliebte Reiseziele",
