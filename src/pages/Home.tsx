@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import ValuePropositionSection from "@/components/ValuePropositionSection";
 import AboutSection from "@/components/AboutSection";
 import ServicesSection from "@/components/ServicesSection";
 import DestinationsSection from "@/components/DestinationsSection";
@@ -17,6 +18,7 @@ const Home = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
+      <ValuePropositionSection />
       <AboutSection />
       <ServicesSection />
       <DestinationsSection />

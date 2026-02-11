@@ -103,13 +103,21 @@ const InquirySection = () => {
               <br />
               <span className="text-gradient-gold">{t("inquiry.titleGold")}</span>
             </h2>
-            <p className="text-lg leading-relaxed mb-8" style={{ color: "hsl(40, 33%, 80%)" }}>
+            <p className="text-lg leading-relaxed mb-6" style={{ color: "hsl(40, 33%, 80%)" }}>
               {t("inquiry.subtitle")}
             </p>
+            <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 mb-6">
+              <p className="text-sm font-medium" style={{ color: "hsl(40, 33%, 90%)" }}>
+                {t("inquiry.commissionFreeNote")}
+              </p>
+            </div>
             <div className="space-y-4" style={{ color: "hsl(40, 33%, 75%)" }}>
               <p className="flex items-center gap-2">📧 michael@iguidetours.net</p>
               <p className="flex items-center gap-2">📞 +1 (202) 243-8336</p>
               <p className="flex items-center gap-2">📍 6100 Cheshire Dr, Bethesda, MD 20814, USA</p>
+              <p className="text-xs italic mt-2" style={{ color: "hsl(40, 33%, 65%)" }}>
+                {t("inquiry.directContact")}
+              </p>
             </div>
           </motion.div>
 

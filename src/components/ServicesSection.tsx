@@ -1,31 +1,22 @@
 import { motion } from "framer-motion";
-import { Crown, Users, Compass, Globe } from "lucide-react";
+import { Crown, Users, Compass, Globe, Search, MessageCircle, Handshake, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const ServicesSection = () => {
   const { t } = useTranslation();
 
   const services = [
-    {
-      icon: Crown,
-      title: t("services.vip"),
-      description: t("services.vipDesc"),
-    },
-    {
-      icon: Users,
-      title: t("services.group"),
-      description: t("services.groupDesc"),
-    },
-    {
-      icon: Compass,
-      title: t("services.custom"),
-      description: t("services.customDesc"),
-    },
-    {
-      icon: Globe,
-      title: t("services.multilingual"),
-      description: t("services.multilingualDesc"),
-    },
+    { icon: Crown, title: t("services.vip"), description: t("services.vipDesc") },
+    { icon: Users, title: t("services.group"), description: t("services.groupDesc") },
+    { icon: Compass, title: t("services.custom"), description: t("services.customDesc") },
+    { icon: Globe, title: t("services.multilingual"), description: t("services.multilingualDesc") },
+  ];
+
+  const steps = [
+    { icon: Search, text: t("services.step1") },
+    { icon: MessageCircle, text: t("services.step2") },
+    { icon: Handshake, text: t("services.step3") },
+    { icon: CreditCard, text: t("services.step4") },
   ];
 
   return (
@@ -49,7 +40,7 @@ const ServicesSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           {services.map((service, i) => (
             <motion.div
               key={i}
@@ -71,6 +62,39 @@ const ServicesSection = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Direct Booking Steps */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="max-w-3xl mx-auto"
+        >
+          <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-10">
+            {t("services.directBookingTitle")}
+          </h3>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {steps.map((step, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="flex flex-col items-center text-center gap-3"
+              >
+                <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center relative">
+                  <step.icon className="w-6 h-6 text-primary" />
+                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-secondary text-xs font-bold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                </div>
+                <p className="text-foreground font-medium text-sm">{step.text}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
   );

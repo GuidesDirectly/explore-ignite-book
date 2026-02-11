@@ -18,9 +18,10 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-12 mb-12">
           <div>
-            <h3 className="font-display text-2xl font-bold text-primary-foreground mb-4">
-              iGuide<span className="text-gradient-gold">Tours</span>
+            <h3 className="font-display text-2xl font-bold text-primary-foreground mb-1">
+              Guides<span className="text-gradient-gold">Directly</span>
             </h3>
+            <p className="text-xs text-primary-foreground/40 mb-4">{t("footer.poweredBy")}</p>
             <p className="text-primary-foreground/60 leading-relaxed">
               {t("footer.description")}
             </p>

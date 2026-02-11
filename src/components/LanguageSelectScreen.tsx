@@ -46,9 +46,10 @@ const LanguageSelectScreen = ({ onLanguageSelected }: LanguageSelectScreenProps)
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-center"
         >
-          <h1 className="font-display text-3xl md:text-5xl font-bold text-primary-foreground mb-2">
-            iGuide Tours
+          <h1 className="font-display text-3xl md:text-5xl font-bold text-primary-foreground mb-1">
+            Guides Directly
           </h1>
+          <p className="text-primary/80 text-sm md:text-base font-medium mb-2">Powered by iGuide Tours</p>
           <p className="text-muted text-sm md:text-base tracking-wide">
             Select your language · Выберите язык
           </p>
