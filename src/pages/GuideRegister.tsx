@@ -324,8 +324,10 @@ const GuideRegister = () => {
         certifications: certList,
       };
 
+      let profileId: string | null = null;
+
       if (profileExists) {
-        await supabase
+        const { data: updatedProfile } = await supabase
           .from("guide_profiles")
           .update({
             form_data: formData,
@@ -333,15 +335,30 @@ const GuideRegister = () => {
             current_step: 6,
             status: "pending",
           } as any)
-          .eq("user_id", user.id);
+          .eq("user_id", user.id)
+          .select("id")
+          .single();
+        profileId = updatedProfile?.id || null;
       } else {
-        await supabase.from("guide_profiles").insert({
+        const { data: newProfile } = await supabase.from("guide_profiles").insert({
           user_id: user.id,
           form_data: formData,
           service_areas: serviceAreas,
           current_step: 6,
           status: "pending",
-        } as any);
+        } as any).select("id").single();
+        profileId = newProfile?.id || null;
+      }
+
+      // Fire-and-forget: translate guide bio and name
+      if (profileId && formData.biography) {
+        supabase.functions.invoke("translate-content", {
+          body: {
+            table: "guide_profiles",
+            record_id: profileId,
+            fields: ["form_data.biography"],
+          },
+        }).catch(console.error);
       }
 
       // Send confirmation email to the guide

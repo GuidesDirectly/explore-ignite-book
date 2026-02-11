@@ -51,19 +51,20 @@ const Review = () => {
     setLoading(true);
     // Map 1-10 score to 1-5 star rating for DB
     const starRating = Math.max(1, Math.round(score! / 2));
-    const { error } = await supabase.from("reviews").insert({
+    const { data: insertedData, error } = await supabase.from("reviews").insert({
       reviewer_name: name.trim(),
       reviewer_email: email.trim() || null,
       rating: starRating,
       comment: comment.trim() || null,
       guide_user_id: GUIDE_USER_ID,
-    });
+    }).select("id").single();
     setLoading(false);
     if (error) {
       toast.error("Something went wrong. Please try again.");
       return;
     }
     setStep("submitted");
+    // Fire-and-forget: send notification
     supabase.functions.invoke("send-notification", {
       body: {
         type: "review",
@@ -75,6 +76,16 @@ const Review = () => {
         },
       },
     }).catch(console.error);
+    // Fire-and-forget: translate review content
+    if (insertedData?.id && comment.trim()) {
+      supabase.functions.invoke("translate-content", {
+        body: {
+          table: "reviews",
+          record_id: insertedData.id,
+          fields: ["comment", "reviewer_name"],
+        },
+      }).catch(console.error);
+    }
   };
 
   const getScoreLabel = (value: number) => {

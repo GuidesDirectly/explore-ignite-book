@@ -130,6 +130,7 @@ export type Database = {
           id: string
           service_areas: string[] | null
           status: string
+          translations: Json | null
           updated_at: string
           user_id: string
         }
@@ -140,6 +141,7 @@ export type Database = {
           id?: string
           service_areas?: string[] | null
           status?: string
+          translations?: Json | null
           updated_at?: string
           user_id: string
         }
@@ -150,6 +152,7 @@ export type Database = {
           id?: string
           service_areas?: string[] | null
           status?: string
+          translations?: Json | null
           updated_at?: string
           user_id?: string
         }
@@ -267,6 +270,7 @@ export type Database = {
           rating: number
           reviewer_email: string | null
           reviewer_name: string
+          translations: Json | null
         }
         Insert: {
           booking_id?: string | null
@@ -278,6 +282,7 @@ export type Database = {
           rating: number
           reviewer_email?: string | null
           reviewer_name: string
+          translations?: Json | null
         }
         Update: {
           booking_id?: string | null
@@ -289,6 +294,7 @@ export type Database = {
           rating?: number
           reviewer_email?: string | null
           reviewer_name?: string
+          translations?: Json | null
         }
         Relationships: [
           {
