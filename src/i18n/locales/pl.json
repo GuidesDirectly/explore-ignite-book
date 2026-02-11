@@ -58,7 +58,12 @@
     "custom": "Indywidualne trasy",
     "customDesc": "Powiedz nam o swoim czasie i zainteresowaniach — stworzymy unikalną trasę obejmującą ukryte perełki i kultowe zabytki.",
     "multilingual": "Wielojęzyczni przewodnicy",
-    "multilingualDesc": "Nasi przewodnicy biegle mówią po rosyjsku, angielsku, polsku, niemiecku, francusku, hiszpańsku, mandaryńsku i japońsku."
+    "multilingualDesc": "Nasi przewodnicy biegle mówią po rosyjsku, angielsku, polsku, niemiecku, francusku, hiszpańsku, mandaryńsku i japońsku.",
+    "directBookingTitle": "Rezerwuj bezpośrednio — cenę ustala przewodnik",
+    "step1": "Przeglądaj przewodników i wycieczki",
+    "step2": "Skontaktuj się z przewodnikiem bezpośrednio",
+    "step3": "Uzgodnij cenę i trasę",
+    "step4": "Zapłać bez prowizji platformy"
   },
   "destinations": {
     "label": "Popularne kierunki",

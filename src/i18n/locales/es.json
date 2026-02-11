@@ -58,7 +58,12 @@
     "custom": "Itinerarios personalizados",
     "customDesc": "Cuéntanos tu tiempo e intereses — crearemos una ruta única cubriendo joyas ocultas y monumentos icónicos.",
     "multilingual": "Guías multilingües",
-    "multilingualDesc": "Nuestros guías hablan ruso, inglés, polaco, alemán, francés, español, mandarín y japonés con fluidez."
+    "multilingualDesc": "Nuestros guías hablan ruso, inglés, polaco, alemán, francés, español, mandarín y japonés con fluidez.",
+    "directBookingTitle": "Reserva directamente — tu guía fija el precio",
+    "step1": "Explora guías y tours",
+    "step2": "Contacta al guía directamente",
+    "step3": "Acuerda precio e itinerario",
+    "step4": "Paga sin comisión de plataforma"
   },
   "destinations": {
     "label": "Destinos populares",
