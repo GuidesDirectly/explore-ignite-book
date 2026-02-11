@@ -12,6 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
+import { translateOption, translateOptions } from "@/lib/translationHelpers";
 
 const PLAN_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/plan-tour`;
 const NOTIFY_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/send-notification`;
@@ -730,7 +731,7 @@ const TourPlannerSection = () => {
                                 </div>
                                 <div className="flex items-center gap-1.5 text-sm mb-2" style={{ color: "hsl(40, 33%, 70%)" }}>
                                   <Globe className="w-3.5 h-3.5 text-primary/70" />
-                                  <span>{fd.languages?.join(", ")}</span>
+                                  <span>{translateOptions(t, fd.languages || []).join(", ")}</span>
                                 </div>
                                 {reasons.length > 0 && (
                                   <div className="flex flex-wrap gap-1.5 mb-2">
@@ -761,7 +762,7 @@ const TourPlannerSection = () => {
                                       variant="secondary"
                                       className="text-xs bg-primary/10 text-primary border-primary/20"
                                     >
-                                      {spec}
+                                      {translateOption(t, spec)}
                                     </Badge>
                                   ))}
                                 </div>
@@ -771,13 +772,13 @@ const TourPlannerSection = () => {
                                     {fd.insuranceCompanyName && (
                                       <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full"
                                         style={{ background: "hsla(142, 71%, 45%, 0.12)", color: "hsl(142, 71%, 60%)" }}>
-                                        <ShieldCheck className="w-3 h-3" /> Insured
-                                      </span>
+                                      <ShieldCheck className="w-3 h-3" /> {t("guides.insured")}
+                                    </span>
                                     )}
                                     {fd.licenseNumber && (
                                       <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full"
                                         style={{ background: "hsla(210, 70%, 50%, 0.12)", color: "hsl(210, 70%, 65%)" }}>
-                                        <CheckCircle2 className="w-3 h-3" /> Licensed
+                                        <CheckCircle2 className="w-3 h-3" /> {t("guides.licensed")}
                                       </span>
                                     )}
                                     {fd.certifications && fd.certifications.length > 0 && (

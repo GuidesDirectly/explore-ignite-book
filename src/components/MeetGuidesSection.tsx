@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Globe, Star, Filter, X, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { translateOption, translateOptions } from "@/lib/translationHelpers";
 
 interface GuideProfile {
   id: string;
@@ -233,7 +234,7 @@ const MeetGuidesSection = () => {
                   >
                     <option value="">{t("guides.allAreas")}</option>
                     {AREA_OPTIONS.map(area => (
-                      <option key={area} value={area}>{area}</option>
+                      <option key={area} value={area}>{translateOption(t, area)}</option>
                     ))}
                   </select>
                 </div>
@@ -250,7 +251,7 @@ const MeetGuidesSection = () => {
                   >
                     <option value="">{t("guides.allLanguages")}</option>
                     {allLanguages.map(lang => (
-                      <option key={lang} value={lang}>{lang}</option>
+                      <option key={lang} value={lang}>{translateOption(t, lang)}</option>
                     ))}
                   </select>
                 </div>
@@ -267,7 +268,7 @@ const MeetGuidesSection = () => {
                   >
                     <option value="">{t("guides.allSpecialties")}</option>
                     {allSpecialties.map(spec => (
-                      <option key={spec} value={spec}>{spec}</option>
+                      <option key={spec} value={spec}>{translateOption(t, spec)}</option>
                     ))}
                   </select>
                 </div>
@@ -372,7 +373,7 @@ const MeetGuidesSection = () => {
                       <div className="absolute top-3 right-3">
                         <Badge variant="secondary" className="text-xs bg-background/80 backdrop-blur-sm border-border/50">
                           <MapPin className="w-3 h-3 mr-1" />
-                          {guide.service_areas[0]}
+                          {translateOption(t, guide.service_areas[0])}
                         </Badge>
                       </div>
                     )}
@@ -387,7 +388,7 @@ const MeetGuidesSection = () => {
                     <div className="flex items-center gap-3 mb-2">
                       <div className="flex items-center gap-1 text-muted-foreground text-sm">
                         <Globe className="w-3.5 h-3.5 text-primary/70" />
-                        <span>{fd.languages?.join(", ")}</span>
+                        <span>{translateOptions(t, fd.languages || []).join(", ")}</span>
                       </div>
                     </div>
 
@@ -417,7 +418,7 @@ const MeetGuidesSection = () => {
                           variant="secondary"
                           className="text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/15"
                         >
-                          {spec}
+                          {translateOption(t, spec)}
                         </Badge>
                       ))}
                     </div>
