@@ -23,6 +23,7 @@ interface GuideProfile {
     licensingAuthority?: string;
     certifications?: string[];
   };
+  translations: Record<string, Record<string, string>> | null;
   reviewCount: number;
   avgRating: number;
   photoUrl: string | null;
@@ -37,7 +38,7 @@ interface ReviewStats {
 const AREA_OPTIONS = ["Washington DC", "New York City", "Niagara Falls", "Toronto", "Boston", "Chicago"];
 
 const MeetGuidesSection = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [guides, setGuides] = useState<GuideProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
@@ -53,7 +54,7 @@ const MeetGuidesSection = () => {
     const fetchGuides = async () => {
       const { data: guideData, error } = await supabase
         .from("guide_profiles")
-        .select("id, user_id, form_data, service_areas")
+        .select("id, user_id, form_data, service_areas, translations")
         .eq("status", "approved");
 
       if (error || !guideData) {
@@ -330,10 +331,12 @@ const MeetGuidesSection = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredGuides.map((guide, index) => {
               const fd = guide.form_data;
+              const currentLang = i18n.language?.split("-")[0] || "en";
+              const translatedBio = guide.translations?.[currentLang]?.["form_data.biography"] || fd.biography;
               const initials = `${fd.firstName?.[0] || ""}${fd.lastName?.[0] || ""}`;
-              const shortBio = fd.biography?.length > 120
-                ? fd.biography.slice(0, 120) + "…"
-                : fd.biography;
+              const shortBio = translatedBio?.length > 120
+                ? translatedBio.slice(0, 120) + "…"
+                : translatedBio;
 
               return (
                 <motion.div

@@ -11,10 +11,11 @@ interface Review {
   rating: number;
   comment: string | null;
   created_at: string;
+  translations: Record<string, Record<string, string>> | null;
 }
 
 const TestimonialsSection = ({ showAll = false }: { showAll?: boolean }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [dbReviews, setDbReviews] = useState<Review[]>([]);
 
   // Hardcoded fallback testimonials
@@ -28,7 +29,7 @@ const TestimonialsSection = ({ showAll = false }: { showAll?: boolean }) => {
     const fetchReviews = async () => {
       const { data } = await (supabase
         .from("reviews")
-        .select("id, reviewer_name, rating, comment, created_at")
+        .select("id, reviewer_name, rating, comment, created_at, translations")
         .eq("hidden", false) as any)
         .order("created_at", { ascending: false })
         .limit(20);
@@ -38,14 +39,18 @@ const TestimonialsSection = ({ showAll = false }: { showAll?: boolean }) => {
   }, []);
 
   // Combine: show DB reviews first, then fallbacks
+  const currentLang = i18n.language?.split("-")[0] || "en";
   const allReviews = [
-    ...dbReviews.map((r) => ({
-      name: r.reviewer_name,
-      location: "",
-      text: r.comment || "",
-      rating: r.rating,
-      fromDb: true,
-    })),
+    ...dbReviews.map((r) => {
+      const translated = r.translations?.[currentLang];
+      return {
+        name: translated?.reviewer_name || r.reviewer_name,
+        location: "",
+        text: translated?.comment || r.comment || "",
+        rating: r.rating,
+        fromDb: true,
+      };
+    }),
     ...fallbackTestimonials.map((f) => ({ ...f, fromDb: false })),
   ].filter((r) => r.text); // only show reviews with text
 
