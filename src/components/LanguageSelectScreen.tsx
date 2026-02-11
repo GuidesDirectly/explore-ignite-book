@@ -14,6 +14,7 @@ const LanguageSelectScreen = ({ onLanguageSelected }: LanguageSelectScreenProps)
   const handleSelect = (code: string) => {
     i18n.changeLanguage(code);
     localStorage.setItem("languageSelected", "true");
+    window.scrollTo(0, 0);
     onLanguageSelected();
   };
 
