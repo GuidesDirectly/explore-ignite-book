@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
@@ -9,10 +10,19 @@ import MeetGuidesSection from "@/components/MeetGuidesSection";
 import TourPlannerSection from "@/components/TourPlannerSection";
 import InquirySection from "@/components/InquirySection";
 import Footer from "@/components/Footer";
+import LanguageSelectScreen from "@/components/LanguageSelectScreen";
 import { Link } from "react-router-dom";
 import { MessageCircle } from "lucide-react";
 
 const Index = () => {
+  const [languageSelected, setLanguageSelected] = useState(
+    () => localStorage.getItem("languageSelected") === "true"
+  );
+
+  if (!languageSelected) {
+    return <LanguageSelectScreen onLanguageSelected={() => setLanguageSelected(true)} />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />

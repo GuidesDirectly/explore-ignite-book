@@ -4,7 +4,6 @@ import { MapPin, Star, Users, Handshake } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import heroBg from "@/assets/hero-dc.jpg";
 import logo from "@/assets/logo.jpg";
-import { languages } from "@/i18n/config";
 
 const HeroSection = () => {
   const { t } = useTranslation();
@@ -35,23 +34,6 @@ const HeroSection = () => {
 
       <div className="relative container mx-auto px-4 pt-24 pb-16">
         <div className="max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-wrap items-center gap-3 mb-4"
-          >
-            {languages.map(({ flag, name }) => (
-              <img
-                key={flag}
-                src={`https://flagcdn.com/w80/${flag}.png`}
-                alt={name}
-                title={name}
-                className="w-10 h-7 md:w-12 md:h-8 rounded-sm object-cover shadow-md"
-              />
-            ))}
-          </motion.div>
-
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
