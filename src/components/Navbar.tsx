@@ -3,11 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, Facebook, Instagram } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const navLinks = [
     { label: t("nav.home"), href: "#home" },
@@ -17,6 +20,13 @@ const Navbar = () => {
     { label: t("nav.testimonials"), href: "#testimonials" },
     { label: t("nav.contact"), href: "#contact" },
   ];
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (location.pathname !== "/home") {
+      e.preventDefault();
+      navigate(`/home${href}`);
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-md border-b border-primary/10">
@@ -32,6 +42,7 @@ const Navbar = () => {
             <a
               key={link.href}
               href={link.href}
+              onClick={(e) => handleNavClick(e, link.href)}
               className="text-sm font-medium text-primary-foreground/70 hover:text-primary transition-colors duration-200"
             >
               {link.label}
@@ -85,7 +96,7 @@ const Navbar = () => {
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => { handleNavClick(e, link.href); setIsOpen(false); }}
                   className="text-sm font-medium text-primary-foreground/70 hover:text-primary transition-colors py-2"
                 >
                   {link.label}
