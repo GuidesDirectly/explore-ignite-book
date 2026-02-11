@@ -20,6 +20,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import logoImg from "@/assets/logo.jpg";
+import { translateOption, translateOptions } from "@/lib/translationHelpers";
 
 const AREA_OPTIONS = [
   "Washington DC",
@@ -628,7 +629,7 @@ const GuideRegister = () => {
                       }`}
                     >
                       <MapPin className="w-4 h-4 flex-shrink-0" />
-                      {area}
+                      {translateOption(t, area)}
                     </button>
                   );
                 })}
@@ -659,7 +660,7 @@ const GuideRegister = () => {
                           : "border-border text-foreground hover:border-primary/30"
                       }`}
                     >
-                      {lang}
+                      {translateOption(t, lang)}
                     </button>
                   );
                 })}
@@ -693,7 +694,7 @@ const GuideRegister = () => {
                       }`}
                     >
                       <Briefcase className="w-4 h-4 flex-shrink-0" />
-                      {spec}
+                      {translateOption(t, spec)}
                     </button>
                   );
                 })}
@@ -716,7 +717,7 @@ const GuideRegister = () => {
                             : "border-border text-foreground hover:border-primary/30"
                         }`}
                       >
-                        {tt}
+                         {translateOption(t, tt)}
                       </button>
                     );
                   })}
@@ -790,12 +791,12 @@ const GuideRegister = () => {
                   <span className="text-muted-foreground">{t("guideRegister.firstName")}:</span>
                   <span className="text-foreground">{firstName} {lastName}</span>
                   <span className="text-muted-foreground">{t("guideRegister.serviceAreasTitle")}:</span>
-                  <span className="text-foreground">{serviceAreas.join(", ") || "—"}</span>
+                  <span className="text-foreground">{translateOptions(t, serviceAreas).join(", ") || "—"}</span>
                   <span className="text-muted-foreground">{t("guideRegister.languagesTitle")}:</span>
-                  <span className="text-foreground">{languages.join(", ")}</span>
+                  <span className="text-foreground">{translateOptions(t, languages).join(", ")}</span>
                   <span className="text-muted-foreground">{t("guideRegister.specialtiesTitle")}:</span>
                   <span className="text-foreground">
-                    {specializations.join(", ") || "—"}
+                    {translateOptions(t, specializations).join(", ") || "—"}
                   </span>
                 </div>
               </div>
