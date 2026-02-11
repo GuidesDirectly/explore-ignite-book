@@ -427,17 +427,17 @@ const MeetGuidesSection = () => {
                       <div className="flex flex-wrap items-center gap-1.5 mt-2 pt-2 border-t border-border/30">
                         {fd.insuranceCompanyName && (
                           <Badge variant="outline" className="text-xs gap-1 border-green-500/30 text-green-400 bg-green-500/10">
-                            <ShieldCheck className="w-3 h-3" /> Insured
+                            <ShieldCheck className="w-3 h-3" /> {t("guides.insured")}
                           </Badge>
                         )}
                         {fd.licenseNumber && (
                           <Badge variant="outline" className="text-xs gap-1 border-blue-500/30 text-blue-400 bg-blue-500/10">
-                            <CheckCircle2 className="w-3 h-3" /> Licensed
+                            <CheckCircle2 className="w-3 h-3" /> {t("guides.licensed")}
                           </Badge>
                         )}
                         {fd.certifications && fd.certifications.length > 0 && (
                           <Badge variant="outline" className="text-xs gap-1 border-purple-500/30 text-purple-400 bg-purple-500/10">
-                            {fd.certifications.length} cert{fd.certifications.length > 1 ? "s" : ""}
+                            {t(fd.certifications.length > 1 ? "guides.certs_plural" : "guides.certs", { count: fd.certifications.length })}
                           </Badge>
                         )}
                       </div>

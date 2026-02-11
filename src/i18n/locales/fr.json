@@ -256,7 +256,11 @@
     "showing": "{{count}} sur {{total}} guides affichés",
     "noResults": "Aucun guide ne correspond à vos filtres. Essayez d'ajuster vos critères.",
     "review": "avis",
-    "reviews": "avis"
+    "reviews": "avis",
+    "insured": "Assuré",
+    "licensed": "Agréé",
+    "certs": "{{count}} certificat",
+    "certs_plural": "{{count}} certificats"
   },
   "guideRegister": {
     "title": "Devenir guide",

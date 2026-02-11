@@ -256,7 +256,11 @@
     "showing": "{{total}}人中{{count}}人のガイドを表示",
     "noResults": "フィルターに一致するガイドがいません。条件を調整してください。",
     "review": "レビュー",
-    "reviews": "レビュー"
+    "reviews": "レビュー",
+    "insured": "保険加入済",
+    "licensed": "資格保有",
+    "certs": "{{count}} 認定",
+    "certs_plural": "{{count}} 認定"
   },
   "guideRegister": {
     "title": "ガイドになる",

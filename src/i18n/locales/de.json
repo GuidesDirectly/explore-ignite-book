@@ -256,7 +256,11 @@
     "showing": "{{count}} von {{total}} Guides angezeigt",
     "noResults": "Keine Guides entsprechen Ihren Filtern. Versuchen Sie, Ihre Kriterien anzupassen.",
     "review": "Bewertung",
-    "reviews": "Bewertungen"
+    "reviews": "Bewertungen",
+    "insured": "Versichert",
+    "licensed": "Lizenziert",
+    "certs": "{{count}} Zertifikat",
+    "certs_plural": "{{count}} Zertifikate"
   },
   "guideRegister": {
     "title": "Guide werden",

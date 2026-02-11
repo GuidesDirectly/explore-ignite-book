@@ -255,7 +255,11 @@
     "showing": "Showing {{count}} of {{total}} guides",
     "noResults": "No guides match your filters. Try adjusting your criteria.",
     "review": "review",
-    "reviews": "reviews"
+    "reviews": "reviews",
+    "insured": "Insured",
+    "licensed": "Licensed",
+    "certs": "{{count}} cert",
+    "certs_plural": "{{count}} certs"
   },
   "guideRegister": {
     "title": "Become a Guide",
