@@ -3,21 +3,21 @@ import { ArrowRight, CheckCircle2, Globe, MapPin, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const expansionCities = [
-  { name: "New York City", abbr: "NYC", silhouette: "M10,60 L10,30 L15,30 L15,20 L20,20 L20,15 L25,15 L25,20 L30,20 L30,10 L35,10 L35,20 L40,20 L40,25 L45,25 L45,30 L50,30 L50,60 Z" },
-  { name: "Philadelphia", abbr: "PHL", silhouette: "M10,60 L10,35 L18,35 L18,28 L22,28 L22,22 L26,22 L26,18 L30,18 L30,22 L34,22 L34,28 L38,28 L38,35 L46,35 L46,60 Z" },
-  { name: "Chicago", abbr: "CHI", silhouette: "M8,60 L8,32 L14,32 L14,22 L19,22 L19,16 L24,16 L24,12 L29,12 L29,16 L34,16 L34,22 L39,22 L39,32 L45,32 L45,60 Z" },
-  { name: "Boston", abbr: "BOS", silhouette: "M10,60 L10,38 L16,38 L16,30 L20,30 L20,24 L25,24 L25,28 L30,28 L30,22 L35,22 L35,28 L40,28 L40,38 L45,38 L45,60 Z" },
-  { name: "Phoenix", abbr: "PHX", silhouette: "M8,60 L8,42 L16,42 L16,36 L22,36 L22,30 L28,30 L28,36 L34,36 L34,30 L40,30 L40,36 L46,36 L46,42 L52,42 L52,60 Z" },
-  { name: "Los Angeles", abbr: "LAX", silhouette: "M6,60 L6,40 L12,40 L12,34 L18,34 L18,28 L24,28 L24,22 L30,22 L30,28 L36,28 L36,22 L42,22 L42,28 L48,28 L48,34 L54,34 L54,60 Z" },
-  { name: "San Francisco", abbr: "SFO", silhouette: "M10,60 L10,44 L15,44 L15,36 L20,36 L20,28 L25,28 L25,20 L30,20 L30,14 L35,14 L35,20 L40,20 L40,28 L45,28 L45,36 L50,36 L50,44 L55,44 L55,60 Z" },
-  { name: "San Diego", abbr: "SAN", silhouette: "M10,60 L10,40 L16,40 L16,34 L22,34 L22,26 L28,26 L28,34 L34,34 L34,26 L40,26 L40,34 L46,34 L46,40 L52,40 L52,60 Z" },
-  { name: "Denver", abbr: "DEN", silhouette: "M8,60 L8,38 L14,38 L14,30 L20,30 L20,22 L26,22 L26,18 L30,18 L30,22 L36,22 L36,30 L42,30 L42,38 L48,38 L48,60 Z" },
-  { name: "Las Vegas", abbr: "LAS", silhouette: "M10,60 L10,36 L16,36 L16,26 L20,26 L20,20 L24,20 L24,14 L28,14 L28,10 L32,10 L32,14 L36,14 L36,20 L40,20 L40,26 L44,26 L44,36 L50,36 L50,60 Z" },
-  { name: "Houston", abbr: "HOU", silhouette: "M8,60 L8,44 L16,44 L16,36 L22,36 L22,30 L30,30 L30,36 L38,36 L38,30 L46,30 L46,36 L52,36 L52,44 L60,44 L60,60 Z" },
-  { name: "San Antonio", abbr: "SAT", silhouette: "M10,60 L10,42 L16,42 L16,34 L22,34 L22,28 L28,28 L28,22 L34,22 L34,28 L40,28 L40,34 L46,34 L46,42 L52,42 L52,60 Z" },
-  { name: "Miami", abbr: "MIA", silhouette: "M12,60 L12,42 L18,42 L18,34 L22,34 L22,26 L28,26 L28,20 L34,20 L34,26 L40,26 L40,34 L44,34 L44,42 L50,42 L50,60 Z" },
-  { name: "Toronto", abbr: "YYZ", silhouette: "M8,60 L8,36 L14,36 L14,28 L20,28 L20,20 L26,20 L26,14 L30,14 L30,10 L34,10 L34,14 L38,14 L38,20 L44,20 L44,28 L50,28 L50,36 L56,36 L56,60 Z" },
-  { name: "Montreal", abbr: "YUL", silhouette: "M10,60 L10,38 L16,38 L16,30 L22,30 L22,22 L28,22 L28,16 L34,16 L34,22 L40,22 L40,30 L46,30 L46,38 L52,38 L52,60 Z" },
+  { name: "New York City", abbr: "NYC", silhouette: "M10,60 L10,30 L15,30 L15,20 L20,20 L20,15 L25,15 L25,20 L30,20 L30,10 L35,10 L35,20 L40,20 L40,25 L45,25 L45,30 L50,30 L50,60 Z", gradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)", accent: "#e94560" },
+  { name: "Philadelphia", abbr: "PHL", silhouette: "M10,60 L10,35 L18,35 L18,28 L22,28 L22,22 L26,22 L26,18 L30,18 L30,22 L34,22 L34,28 L38,28 L38,35 L46,35 L46,60 Z", gradient: "linear-gradient(135deg, #1b2838 0%, #2d4a22 50%, #1b4332 100%)", accent: "#52b788" },
+  { name: "Chicago", abbr: "CHI", silhouette: "M8,60 L8,32 L14,32 L14,22 L19,22 L19,16 L24,16 L24,12 L29,12 L29,16 L34,16 L34,22 L39,22 L39,32 L45,32 L45,60 Z", gradient: "linear-gradient(135deg, #0d1b2a 0%, #1b4f72 50%, #154360 100%)", accent: "#5dade2" },
+  { name: "Boston", abbr: "BOS", silhouette: "M10,60 L10,38 L16,38 L16,30 L20,30 L20,24 L25,24 L25,28 L30,28 L30,22 L35,22 L35,28 L40,28 L40,38 L45,38 L45,60 Z", gradient: "linear-gradient(135deg, #2c0e0e 0%, #7b1d1d 50%, #922b21 100%)", accent: "#f1948a" },
+  { name: "Phoenix", abbr: "PHX", silhouette: "M8,60 L8,42 L16,42 L16,36 L22,36 L22,30 L28,30 L28,36 L34,36 L34,30 L40,30 L40,36 L46,36 L46,42 L52,42 L52,60 Z", gradient: "linear-gradient(135deg, #3d1a00 0%, #a04000 50%, #c0392b 100%)", accent: "#f39c12" },
+  { name: "Los Angeles", abbr: "LAX", silhouette: "M6,60 L6,40 L12,40 L12,34 L18,34 L18,28 L24,28 L24,22 L30,22 L30,28 L36,28 L36,22 L42,22 L42,28 L48,28 L48,34 L54,34 L54,60 Z", gradient: "linear-gradient(135deg, #1a0a2e 0%, #6a0572 50%, #c0392b 100%)", accent: "#ff6b9d" },
+  { name: "San Francisco", abbr: "SFO", silhouette: "M10,60 L10,44 L15,44 L15,36 L20,36 L20,28 L25,28 L25,20 L30,20 L30,14 L35,14 L35,20 L40,20 L40,28 L45,28 L45,36 L50,36 L50,44 L55,44 L55,60 Z", gradient: "linear-gradient(135deg, #0a1628 0%, #c0392b 50%, #e67e22 100%)", accent: "#f39c12" },
+  { name: "San Diego", abbr: "SAN", silhouette: "M10,60 L10,40 L16,40 L16,34 L22,34 L22,26 L28,26 L28,34 L34,34 L34,26 L40,26 L40,34 L46,34 L46,40 L52,40 L52,60 Z", gradient: "linear-gradient(135deg, #003366 0%, #0077b6 50%, #00b4d8 100%)", accent: "#90e0ef" },
+  { name: "Denver", abbr: "DEN", silhouette: "M8,60 L8,38 L14,38 L14,30 L20,30 L20,22 L26,22 L26,18 L30,18 L30,22 L36,22 L36,30 L42,30 L42,38 L48,38 L48,60 Z", gradient: "linear-gradient(135deg, #1a2f1a 0%, #2e7d32 50%, #558b2f 100%)", accent: "#a5d6a7" },
+  { name: "Las Vegas", abbr: "LAS", silhouette: "M10,60 L10,36 L16,36 L16,26 L20,26 L20,20 L24,20 L24,14 L28,14 L28,10 L32,10 L32,14 L36,14 L36,20 L40,20 L40,26 L44,26 L44,36 L50,36 L50,60 Z", gradient: "linear-gradient(135deg, #1a0033 0%, #4a0080 50%, #7b00d4 100%)", accent: "#ffd700" },
+  { name: "Houston", abbr: "HOU", silhouette: "M8,60 L8,44 L16,44 L16,36 L22,36 L22,30 L30,30 L30,36 L38,36 L38,30 L46,30 L46,36 L52,36 L52,44 L60,44 L60,60 Z", gradient: "linear-gradient(135deg, #1c1000 0%, #6d4c00 50%, #b8860b 100%)", accent: "#ffd966" },
+  { name: "San Antonio", abbr: "SAT", silhouette: "M10,60 L10,42 L16,42 L16,34 L22,34 L22,28 L28,28 L28,22 L34,22 L34,28 L40,28 L40,34 L46,34 L46,42 L52,42 L52,60 Z", gradient: "linear-gradient(135deg, #1a0a00 0%, #7b3f00 50%, #a04000 100%)", accent: "#e8a87c" },
+  { name: "Miami", abbr: "MIA", silhouette: "M12,60 L12,42 L18,42 L18,34 L22,34 L22,26 L28,26 L28,20 L34,20 L34,26 L40,26 L40,34 L44,34 L44,42 L50,42 L50,60 Z", gradient: "linear-gradient(135deg, #003333 0%, #00796b 50%, #00bcd4 100%)", accent: "#80deea" },
+  { name: "Toronto", abbr: "YYZ", silhouette: "M8,60 L8,36 L14,36 L14,28 L20,28 L20,20 L26,20 L26,14 L30,14 L30,10 L34,10 L34,14 L38,14 L38,20 L44,20 L44,28 L50,28 L50,36 L56,36 L56,60 Z", gradient: "linear-gradient(135deg, #1a0000 0%, #8b0000 50%, #c0392b 100%)", accent: "#ff8a80" },
+  { name: "Montreal", abbr: "YUL", silhouette: "M10,60 L10,38 L16,38 L16,30 L22,30 L22,22 L28,22 L28,16 L34,16 L34,22 L40,22 L40,30 L46,30 L46,38 L52,38 L52,60 Z", gradient: "linear-gradient(135deg, #0d0d2b 0%, #1a237e 50%, #283593 100%)", accent: "#7986cb" },
 ];
 
 const pulsePoints = [
@@ -136,30 +136,39 @@ const DestinationsSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.04 }}
-                className="group relative bg-background border border-border rounded-xl p-4 cursor-pointer hover:border-primary hover:shadow-lg transition-all duration-300 overflow-hidden"
+                className="group relative rounded-xl cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300 overflow-hidden"
+                style={{ background: city.gradient }}
               >
-                {/* Silhouette SVG */}
-                <div className="flex justify-center mb-3 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
-                  <svg viewBox="0 0 70 65" className="w-12 h-10 fill-foreground group-hover:fill-primary transition-colors duration-300">
-                    <path d={city.silhouette} />
-                  </svg>
+                {/* Glow blob */}
+                <div
+                  className="absolute -bottom-4 -right-4 w-20 h-20 rounded-full opacity-30 blur-xl group-hover:opacity-60 transition-opacity duration-300"
+                  style={{ background: city.accent }}
+                />
+
+                <div className="relative z-10 p-4">
+                  {/* Silhouette SVG */}
+                  <div className="flex justify-center mb-3">
+                    <svg viewBox="0 0 70 65" className="w-12 h-10 transition-transform duration-300 group-hover:scale-110" style={{ fill: city.accent, opacity: 0.7 }}>
+                      <path d={city.silhouette} />
+                    </svg>
+                  </div>
+
+                  <p className="font-display font-bold text-white text-sm text-center leading-tight">
+                    {city.name}
+                  </p>
+                  <p className="text-xs text-center mt-0.5 font-mono opacity-60" style={{ color: city.accent }}>{city.abbr}</p>
                 </div>
 
-                <p className="font-display font-bold text-foreground text-sm text-center leading-tight group-hover:text-primary transition-colors duration-300">
-                  {city.name}
-                </p>
-                <p className="text-muted-foreground text-xs text-center mt-0.5 font-mono">{city.abbr}</p>
-
-                {/* Tooltip */}
-                <div className="absolute inset-0 bg-secondary/95 rounded-xl flex flex-col items-center justify-center p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                  <p className="font-display text-secondary-foreground font-bold text-xs text-center mb-2 leading-tight">
-                    Experience the<br />Guides Directly Playbook
+                {/* Hover overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl" style={{ background: `${city.gradient}ee` }}>
+                  <p className="font-display text-white font-bold text-xs text-center mb-2 leading-tight">
+                    Guides Directly<br />Playbook
                   </p>
                   <div className="space-y-1">
                     {["Verified Guides", "Zero Commissions"].map((item) => (
                       <div key={item} className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3 h-3 text-primary flex-shrink-0" />
-                        <span className="text-primary text-[10px] font-semibold">{item}</span>
+                        <CheckCircle2 className="w-3 h-3 flex-shrink-0" style={{ color: city.accent }} />
+                        <span className="text-[10px] font-semibold" style={{ color: city.accent }}>{item}</span>
                       </div>
                     ))}
                   </div>
