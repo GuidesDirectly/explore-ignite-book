@@ -12,6 +12,7 @@ import Admin from "./pages/Admin";
 import Testimonials from "./pages/Testimonials";
 import GuideRegister from "./pages/GuideRegister";
 import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 import NotFound from "./pages/NotFound";
 
 const ScrollToTop = () => {
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/guide-register" element={<GuideRegister />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
