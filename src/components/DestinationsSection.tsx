@@ -124,7 +124,7 @@ const DestinationsSection = () => {
               City After City.
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Following the success of our D.C. pilot, we're systematically deploying our playbook across North America's most iconic destinations.
+              After achieving a full success of our D.C. pilot, we'll begin systematically deploying our playbook across North America's most iconic destinations.
             </p>
           </motion.div>
 
