@@ -1,6 +1,8 @@
 export type Msg = { role: "user" | "assistant"; content: string };
 
-const CHAT_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/chat`;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const CHAT_URL = `${SUPABASE_URL}/functions/v1/chat`;
 
 export async function streamChat({
   messages,
@@ -15,7 +17,7 @@ export async function streamChat({
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lZ2Z3b21sb2FpaHp3b213eXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDM4NTAsImV4cCI6MjA4NjA3OTg1MH0.ZRn_9BDZZM5uTdqAxaeBcwckzjqXe7HQXUN8OZSbLNM`,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
     },
     body: JSON.stringify({ messages }),
   });
