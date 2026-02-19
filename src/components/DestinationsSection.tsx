@@ -303,7 +303,7 @@ const DestinationsSection = () => {
                 </div>
               </div>
               <a
-                href="#inquiry"
+                href="#services"
                 className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3.5 rounded-full hover:opacity-90 transition-opacity duration-200 w-full text-center"
               >
                 {t("dest.travelerCTA")}
