@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, Globe, MapPin, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import WorldMap from "@/components/WorldMap";
 
 import nycImg from "@/assets/city-cards/nyc.jpg";
@@ -37,6 +38,7 @@ const expansionCities = [
 ];
 
 const DestinationsSection = () => {
+  const { t } = useTranslation();
   return (
     <section id="destinations" className="bg-background overflow-hidden">
 
@@ -57,17 +59,17 @@ const DestinationsSection = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm font-semibold uppercase tracking-widest mb-8">
               <MapPin className="w-3.5 h-3.5" />
-              Where We Started
+              {t("dest.whereWeStarted")}
             </div>
 
             <h2 className="font-display text-4xl md:text-6xl font-bold text-secondary-foreground mb-6 leading-tight">
-              From the USA Capital<br />
-              <span className="text-primary italic">to the Continent.</span>
+              {t("dest.originTitle")}<br />
+              <span className="text-primary italic">{t("dest.originTitleGold")}</span>
             </h2>
 
             <p className="text-secondary-foreground/70 text-lg md:text-xl leading-relaxed mb-8 max-w-3xl mx-auto">
-              We are working hard to perfect our <span className="text-primary font-semibold">"Direct Connection"</span> model through our rigorous pilot launch in Washington D.C. Through testing every variable in the U.S. capital, we are developing the{" "}
-              <span className="text-primary font-semibold">Launch-City Playbook</span>—a blueprint for transparent, commission-free travel.
+              {t("dest.originDesc1")} <span className="text-primary font-semibold">"{t("dest.directConnection")}"</span> {t("dest.originDesc2")}{" "}
+              <span className="text-primary font-semibold">{t("dest.launchCityPlaybook")}</span>{t("dest.originDesc3")}
             </p>
 
             <motion.blockquote
@@ -79,15 +81,15 @@ const DestinationsSection = () => {
             >
               <div className="font-display text-3xl text-primary/30 absolute -top-2 -left-1">"</div>
               <p className="font-display text-lg md:text-xl italic text-secondary-foreground/80 leading-relaxed">
-                D.C. isn't just our first city; it is our laboratory in which we'll prove that travelers prefer direct access — and guides deserve 100% of their earnings.
+                {t("dest.quote")}
               </p>
             </motion.blockquote>
 
             <div className="grid grid-cols-3 gap-6 mt-14 max-w-xl mx-auto">
               {[
-                { value: "25+",  label: "Verified Guides" },
-                { value: "100%", label: "Direct Earnings" },
-                { value: "$0",   label: "Commission Taken" },
+                { value: "25+",  label: t("dest.stat1") },
+                { value: "100%", label: t("dest.stat2") },
+                { value: "$0",   label: t("dest.stat3") },
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -118,13 +120,13 @@ const DestinationsSection = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm font-semibold uppercase tracking-widest mb-6">
               <Zap className="w-3.5 h-3.5" />
-              Scaling Excellence
+              {t("dest.scalingLabel")}
             </div>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-              City After City.
+              {t("dest.scalingTitle")}
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              After achieving a full success of our D.C. pilot, we'll begin systematically deploying our playbook across North America's most iconic destinations.
+              {t("dest.scalingDesc")}
             </p>
           </motion.div>
 
@@ -152,10 +154,10 @@ const DestinationsSection = () => {
                 </div>
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl bg-black/75 backdrop-blur-sm z-20">
                   <p className="font-display text-white font-bold text-xs text-center mb-2 leading-tight">
-                    Guides Directly<br />Playbook
+                    Guides Directly<br />{t("dest.playbook")}
                   </p>
                   <div className="space-y-1">
-                    {["Verified Guides", "Zero Commissions"].map((item) => (
+                    {[t("dest.verifiedGuides"), t("dest.zeroCommissions")].map((item) => (
                       <div key={item} className="flex items-center gap-1.5">
                         <CheckCircle2 className="w-3 h-3 flex-shrink-0" style={{ color: city.accent }} />
                         <span className="text-[10px] font-semibold" style={{ color: city.accent }}>{item}</span>
@@ -181,13 +183,13 @@ const DestinationsSection = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm font-semibold uppercase tracking-widest mb-6">
               <Globe className="w-3.5 h-3.5" />
-              The Global Horizon
+              {t("dest.globalLabel")}
             </div>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-secondary-foreground mb-4">
-              The World is Next.
+              {t("dest.globalTitle")}
             </h2>
             <p className="text-secondary-foreground/70 text-lg max-w-2xl mx-auto">
-              Our infrastructure is built for every border. We are currently identifying local leaders to adapt our Launch-City Playbook for international markets.
+              {t("dest.globalDesc")}
             </p>
           </motion.div>
 
@@ -204,11 +206,11 @@ const DestinationsSection = () => {
             <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-sm text-secondary-foreground/60">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-white border-2 border-primary" />
-                <span>Washington D.C. — Launch City</span>
+                <span>{t("dest.launchCity")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-primary/80" />
-                <span>Expansion Horizon</span>
+                <span>{t("dest.expansionHorizon")}</span>
               </div>
             </div>
           </motion.div>
@@ -221,13 +223,13 @@ const DestinationsSection = () => {
             className="text-center mt-10"
           >
             <p className="text-secondary-foreground/60 text-sm max-w-xl mx-auto mb-6">
-              Our infrastructure is built for every border. We are currently identifying local leaders to adapt our Launch-City Playbook for international markets.
+              {t("dest.globalDesc")}
             </p>
             <a
               href="#inquiry"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity duration-200 text-base"
             >
-              View Our Global Expansion Roadmap
+              {t("dest.globalCta")}
               <ArrowRight className="w-4 h-4" />
             </a>
           </motion.div>
@@ -249,15 +251,15 @@ const DestinationsSection = () => {
             >
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div>
-                <div className="text-primary text-xs font-semibold uppercase tracking-widest mb-4">For Professionals</div>
+                <div className="text-primary text-xs font-semibold uppercase tracking-widest mb-4">{t("dest.forProfessionals")}</div>
                 <h3 className="font-display text-3xl font-bold text-secondary-foreground mb-4">
-                  Own Your<br />Business.
+                  {t("dest.guideCTATitle")}
                 </h3>
                 <p className="text-secondary-foreground/70 leading-relaxed mb-8">
-                  Are you a local expert in a city we haven't reached yet? We provide the platform and the playbook; you provide the expertise. Join the world's only commission-free professional network.
+                  {t("dest.guideCTADesc")}
                 </p>
                 <div className="space-y-2 mb-8">
-                  {["Zero commissions — ever", "Global traveler audience", "Direct traveler relationships"].map((item) => (
+                  {[t("dest.feat1"), t("dest.feat2"), t("dest.feat3")].map((item) => (
                     <div key={item} className="flex items-center gap-3">
                       <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
                       <span className="text-secondary-foreground/70 text-sm">{item}</span>
@@ -269,7 +271,7 @@ const DestinationsSection = () => {
                 href="#guide-register"
                 className="inline-flex items-center justify-center gap-2 border-2 border-primary text-primary font-semibold px-6 py-3.5 rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-200 w-full text-center"
               >
-                Apply to Pilot Your City
+                {t("dest.guideCTA")}
                 <ArrowRight className="w-4 h-4" />
               </a>
             </motion.div>
@@ -284,15 +286,15 @@ const DestinationsSection = () => {
             >
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div>
-                <div className="text-primary text-xs font-semibold uppercase tracking-widest mb-4">For Explorers</div>
+                <div className="text-primary text-xs font-semibold uppercase tracking-widest mb-4">{t("dest.forExplorers")}</div>
                 <h3 className="font-display text-3xl font-bold text-foreground mb-4">
-                  Travel Without<br />the Middleman.
+                  {t("dest.travelerCTATitle")}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed mb-8">
-                  Stop paying 20–30% markups to booking platforms. Connect directly with the people who know the city best. Worldwide expansion is underway — see where we're landing next.
+                  {t("dest.travelerCTADesc")}
                 </p>
                 <div className="space-y-2 mb-8">
-                  {["No booking fees", "Real local experts", "Custom flexible tours"].map((item) => (
+                  {[t("dest.tfeat1"), t("dest.tfeat2"), t("dest.tfeat3")].map((item) => (
                     <div key={item} className="flex items-center gap-3">
                       <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
                       <span className="text-muted-foreground text-sm">{item}</span>
@@ -304,7 +306,7 @@ const DestinationsSection = () => {
                 href="#inquiry"
                 className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3.5 rounded-full hover:opacity-90 transition-opacity duration-200 w-full text-center"
               >
-                Explore Commission-Free Tours
+                {t("dest.travelerCTA")}
                 <ArrowRight className="w-4 h-4" />
               </a>
             </motion.div>
@@ -323,15 +325,15 @@ const DestinationsSection = () => {
         >
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-10 text-primary-foreground text-center">
             <div>
-              <span className="font-display text-xs uppercase tracking-[0.25em] opacity-70 block">The Guides Directly Promise</span>
+              <span className="font-display text-xs uppercase tracking-[0.25em] opacity-70 block">{t("dest.ribbonLabel")}</span>
             </div>
             <div className="hidden sm:block w-px h-8 bg-primary-foreground/30" />
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-8 items-center font-semibold text-sm">
-              <span>$0 Booking Fees</span>
+              <span>{t("dest.ribbon1")}</span>
               <span className="hidden sm:inline opacity-40">·</span>
-              <span>100% Direct to Guides</span>
+              <span>{t("dest.ribbon2")}</span>
               <span className="hidden sm:inline opacity-40">·</span>
-              <span>100% Authentic for Travelers</span>
+              <span>{t("dest.ribbon3")}</span>
             </div>
           </div>
         </motion.div>
