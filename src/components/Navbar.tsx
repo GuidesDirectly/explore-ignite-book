@@ -13,10 +13,10 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const navLinks = [
-    { label: t("nav.home"), href: "#home" },
-    { label: t("about.label"), href: "#about" },
-    { label: t("nav.services"), href: "#services" },
     { label: t("nav.destinations"), href: "#destinations" },
+    { label: t("nav.forTravelers"), href: "#how-it-works" },
+    { label: t("nav.forGuides"), href: "#for-guides" },
+    { label: t("about.label"), href: "#about" },
     { label: t("nav.testimonials"), href: "#testimonials" },
     { label: t("nav.contact"), href: "#contact" },
   ];
@@ -66,7 +66,7 @@ const Navbar = () => {
             <a href="/guide-register">{t("nav.becomeGuide")}</a>
           </Button>
           <Button variant="hero" size="sm" asChild>
-            <a href="#tour-planner">{t("nav.bookTour")}</a>
+            <a href="#guides">{t("nav.findGuide")}</a>
           </Button>
         </div>
 
@@ -114,7 +114,7 @@ const Navbar = () => {
                 <a href="/guide-register" onClick={() => setIsOpen(false)}>{t("nav.becomeGuide")}</a>
               </Button>
               <Button variant="hero" size="sm" asChild>
-                <a href="#tour-planner" onClick={() => setIsOpen(false)}>{t("nav.bookTour")}</a>
+                <a href="#guides" onClick={() => setIsOpen(false)}>{t("nav.findGuide")}</a>
               </Button>
             </div>
           </motion.div>

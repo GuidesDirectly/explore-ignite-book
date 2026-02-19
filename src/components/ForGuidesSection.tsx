@@ -1,0 +1,61 @@
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { DollarSign, Globe, Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+const ForGuidesSection = () => {
+  const { t } = useTranslation();
+
+  return (
+    <section id="for-guides" className="py-24 bg-gradient-navy">
+      <div className="container mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="max-w-4xl mx-auto text-center"
+        >
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] mb-4" style={{ color: "hsl(45, 80%, 65%)" }}>
+            {t("forGuides.label")}
+          </p>
+          <h2 className="font-display text-4xl md:text-6xl font-bold mb-6" style={{ color: "hsl(40, 33%, 97%)" }}>
+            {t("forGuides.title")}
+          </h2>
+          <p className="text-xl mb-12 max-w-2xl mx-auto" style={{ color: "hsl(40, 33%, 80%)" }}>
+            {t("forGuides.subtitle")}
+          </p>
+
+          <div className="grid sm:grid-cols-3 gap-6 mb-12">
+            {[
+              { icon: DollarSign, text: "Zero commissions — ever" },
+              { icon: Globe, text: "Global traveler audience" },
+              { icon: Users, text: "Direct traveler relationships" },
+            ].map(({ icon: Icon, text }, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="flex flex-col items-center gap-3 p-6 rounded-xl border"
+                style={{ borderColor: "hsla(45, 80%, 65%, 0.2)", background: "hsla(220, 30%, 10%, 0.4)" }}
+              >
+                <div className="w-12 h-12 rounded-xl bg-gradient-gold flex items-center justify-center">
+                  <Icon className="w-6 h-6 text-secondary" />
+                </div>
+                <p className="font-medium" style={{ color: "hsl(40, 33%, 90%)" }}>{text}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <Button variant="hero" size="lg" className="text-base px-10 py-6" asChild>
+            <a href="/guide-register">{t("forGuides.cta")}</a>
+          </Button>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default ForGuidesSection;
