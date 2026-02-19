@@ -62,6 +62,8 @@ const handler = async (req: Request): Promise<Response> => {
     );
   }
 
+  const userId = (claimsData.claims as Record<string, unknown>).sub as string;
+
   try {
     const body = await req.json();
 
@@ -87,6 +89,47 @@ const handler = async (req: Request): Promise<Response> => {
         JSON.stringify({ error: "data must be an object." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Authorization: guide_status requires admin role
+    if (type === "guide_status") {
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      const { data: roleData } = await supabaseAdmin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (!roleData) {
+        return new Response(
+          JSON.stringify({ error: "Forbidden: admin access required" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // Authorization: guide_application must match authenticated user
+    if (type === "guide_application") {
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      const { data: profile } = await supabaseAdmin
+        .from("guide_profiles")
+        .select("user_id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (!profile) {
+        return new Response(
+          JSON.stringify({ error: "Forbidden: no guide profile found" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     let subject: string;
