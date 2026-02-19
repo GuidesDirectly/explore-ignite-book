@@ -1,12 +1,15 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import TrustSection from "@/components/TrustSection";
+import LaunchStripSection from "@/components/LaunchStripSection";
+import WhatIsPlatformSection from "@/components/WhatIsPlatformSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import DestinationsSection from "@/components/DestinationsSection";
 import MeetGuidesSection from "@/components/MeetGuidesSection";
 import WhyDirectSection from "@/components/WhyDirectSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import ForGuidesSection from "@/components/ForGuidesSection";
+import TrustSection from "@/components/TrustSection";
+import MonetizationSection from "@/components/MonetizationSection";
 import AboutSection from "@/components/AboutSection";
 import FAQSection from "@/components/FAQSection";
 import FinalCtaSection from "@/components/FinalCtaSection";
@@ -23,34 +26,43 @@ const Home = () => {
       {/* Section 1 — Hero */}
       <HeroSection />
 
-      {/* Section 2 — How It Works */}
+      {/* Section 2 — Launch Strip */}
+      <LaunchStripSection />
+
+      {/* Section 3 — What Is This Platform */}
+      <WhatIsPlatformSection />
+
+      {/* Section 4 — How It Works */}
       <HowItWorksSection />
 
-      {/* Section 3 — Featured Destinations */}
+      {/* Section 5 — Featured Destinations */}
       <DestinationsSection />
 
-      {/* Section 4 — Featured Guides */}
+      {/* Section 6 — Featured Guides */}
       <MeetGuidesSection />
 
-      {/* Section 5 — Why Direct Booking Is Better */}
+      {/* Section 7 — Why Direct Booking Is Better */}
       <WhyDirectSection />
 
-      {/* Section 6 — Testimonials */}
+      {/* Section 8 — Testimonials */}
       <TestimonialsSection />
 
-      {/* Section 7 — For Guides CTA Banner */}
+      {/* Section 9 — For Guides CTA Banner */}
       <ForGuidesSection />
 
-      {/* Section 8 — Trust / Transparency */}
+      {/* Section 10 — Trust / Transparency */}
       <TrustSection />
 
-      {/* Section 9 — About */}
+      {/* Section 11 — How We Make Money (Monetization Infographic) */}
+      <MonetizationSection />
+
+      {/* Section 12 — About */}
       <AboutSection />
 
-      {/* Section 10 — FAQ */}
+      {/* Section 13 — FAQ */}
       <FAQSection />
 
-      {/* Section 11 — Final CTA */}
+      {/* Section 14 — Final CTA */}
       <FinalCtaSection />
 
       {/* Contact/Inquiry */}

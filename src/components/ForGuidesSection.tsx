@@ -1,10 +1,16 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Globe, Users } from "lucide-react";
+import { DollarSign, Globe, Users, Star, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const ForGuidesSection = () => {
   const { t } = useTranslation();
+
+  const earlyBenefits = [
+    { icon: Star, text: t("forGuides.early1") },
+    { icon: Users, text: t("forGuides.early2") },
+    { icon: Shield, text: t("forGuides.early3") },
+  ];
 
   return (
     <section id="for-guides" className="py-24 bg-gradient-navy">
@@ -19,14 +25,17 @@ const ForGuidesSection = () => {
           <p className="text-sm font-semibold uppercase tracking-[0.2em] mb-4" style={{ color: "hsl(45, 80%, 65%)" }}>
             {t("forGuides.label")}
           </p>
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-6" style={{ color: "hsl(40, 33%, 97%)" }}>
+          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4" style={{ color: "hsl(40, 33%, 97%)" }}>
             {t("forGuides.title")}
           </h2>
-          <p className="text-xl mb-12 max-w-2xl mx-auto" style={{ color: "hsl(40, 33%, 80%)" }}>
+          <p className="text-xl mb-4 max-w-2xl mx-auto" style={{ color: "hsl(40, 33%, 80%)" }}>
             {t("forGuides.subtitle")}
           </p>
+          <p className="text-base mb-12 max-w-2xl mx-auto font-semibold" style={{ color: "hsl(45, 80%, 70%)" }}>
+            {t("forGuides.costNote")}
+          </p>
 
-          <div className="grid sm:grid-cols-3 gap-6 mb-12">
+          <div className="grid sm:grid-cols-3 gap-6 mb-8">
             {[
               { icon: DollarSign, text: t("forGuides.feat1") },
               { icon: Globe, text: t("forGuides.feat2") },
@@ -48,6 +57,26 @@ const ForGuidesSection = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Why join early */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="rounded-xl border p-6 mb-10 max-w-2xl mx-auto"
+            style={{ borderColor: "hsla(45, 80%, 65%, 0.2)", background: "hsla(220, 30%, 10%, 0.4)" }}
+          >
+            <p className="font-semibold mb-4" style={{ color: "hsl(45, 80%, 70%)" }}>{t("forGuides.whyEarlyTitle")}</p>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {earlyBenefits.map(({ icon: Icon, text }, i) => (
+                <div key={i} className="flex flex-col items-center gap-2">
+                  <Icon className="w-5 h-5" style={{ color: "hsl(45, 80%, 65%)" }} />
+                  <span className="text-sm text-center" style={{ color: "hsl(40, 33%, 80%)" }}>{text}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
 
           <Button variant="hero" size="lg" className="text-base px-10 py-6" asChild>
             <a href="/guide-register">{t("forGuides.cta")}</a>

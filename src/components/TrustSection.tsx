@@ -12,6 +12,9 @@ const TrustSection = () => {
     { icon: DollarSign, title: t("trust.item4Title"), desc: t("trust.item4Desc") },
   ];
 
+  const coreStatement = t("trust.coreStatement");
+  const alignmentLine = t("trust.alignmentLine");
+
   return (
     <section id="trust" className="py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -20,17 +23,20 @@ const TrustSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-8"
         >
           <p className="text-primary font-body text-sm uppercase tracking-[0.2em] font-semibold mb-3">
             {t("trust.label")}
           </p>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground">
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
             {t("trust.title")}
           </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            {coreStatement}
+          </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-10">
           {items.map((item, i) => (
             <motion.div
               key={i}
@@ -48,6 +54,19 @@ const TrustSection = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Alignment statement */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="text-center"
+        >
+          <div className="inline-block bg-primary/10 border border-primary/20 rounded-full px-8 py-3">
+            <p className="text-primary font-display font-bold text-lg">{alignmentLine}</p>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
