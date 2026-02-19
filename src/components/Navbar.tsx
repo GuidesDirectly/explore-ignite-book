@@ -14,11 +14,10 @@ const Navbar = () => {
 
   const navLinks = [
     { label: t("nav.destinations"), href: "#destinations" },
-    { label: t("nav.forTravelers"), href: "#how-it-works" },
+    { label: t("nav.forTravelers"), href: "#guides" },
+    { label: t("nav.services"), href: "#how-it-works" },
     { label: t("nav.forGuides"), href: "#for-guides" },
-    { label: t("about.label"), href: "#about" },
-    { label: t("nav.testimonials"), href: "#testimonials" },
-    { label: t("nav.contact"), href: "#contact" },
+    { label: t("nav.contact"), href: "#about" },
   ];
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -66,7 +65,7 @@ const Navbar = () => {
             <a href="/guide-register">{t("nav.becomeGuide")}</a>
           </Button>
           <Button variant="hero" size="sm" asChild>
-            <a href="#guides">{t("nav.findGuide")}</a>
+            <a href="#guides">{t("nav.forTravelers")}</a>
           </Button>
         </div>
 

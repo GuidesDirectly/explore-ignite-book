@@ -28,9 +28,9 @@ const ForGuidesSection = () => {
 
           <div className="grid sm:grid-cols-3 gap-6 mb-12">
             {[
-              { icon: DollarSign, text: "Zero commissions — ever" },
-              { icon: Globe, text: "Global traveler audience" },
-              { icon: Users, text: "Direct traveler relationships" },
+              { icon: DollarSign, text: t("forGuides.feat1") },
+              { icon: Globe, text: t("forGuides.feat2") },
+              { icon: Users, text: t("forGuides.feat3") },
             ].map(({ icon: Icon, text }, i) => (
               <motion.div
                 key={i}
