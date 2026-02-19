@@ -17,13 +17,63 @@ interface NotificationRequest {
   data: Record<string, unknown>;
 }
 
+const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application"]);
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // --- Authentication: require a valid Supabase JWT ---
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  const token = authHeader.replace("Bearer ", "");
+  const supabaseAuth = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: authHeader } } }
+  );
+
+  const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+  if (claimsError || !claimsData?.claims) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
   try {
-    const { type, data }: NotificationRequest = await req.json();
+    const body = await req.json();
+
+    if (!body || typeof body !== "object") {
+      return new Response(
+        JSON.stringify({ error: "Invalid request body." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { type, data }: NotificationRequest = body;
+
+    // Validate notification type
+    if (!type || !VALID_TYPES.has(type)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid notification type." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      return new Response(
+        JSON.stringify({ error: "data must be an object." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     let subject: string;
     let html: string;
@@ -58,7 +108,6 @@ const handler = async (req: Request): Promise<Response> => {
         <p style="margin-top:16px;color:#888;font-size:12px;">Sent from iGuide Tours website</p>
       `;
     } else if (type === "tour_plan") {
-      // Send to customer
       const customerEmail = data.customerEmail as string;
       const customerName = data.customerName as string;
       const plan = data.plan as string;
@@ -85,7 +134,6 @@ const handler = async (req: Request): Promise<Response> => {
       `;
       toEmails = [customerEmail];
 
-      // Also notify admin
       try {
         await resend.emails.send({
           from: "iGuide Tours <noreply@iguidetours.net>",
@@ -103,7 +151,6 @@ const handler = async (req: Request): Promise<Response> => {
       const status = data.status as string;
       const isApproved = status === "approved";
 
-      // Look up email from auth.users if not provided
       if (!guideEmail && guideUserId) {
         try {
           const supabaseAdmin = createClient(
@@ -141,26 +188,10 @@ const handler = async (req: Request): Promise<Response> => {
               <p style="color:#333;line-height:1.8;font-size:15px;">Your profile is now <strong>live</strong> on our platform, and travelers from around the world can discover and connect with you. This is the beginning of something truly special.</p>
               <h3 style="color:#1a1f2e;font-size:16px;margin:25px 0 12px;">Here's how to make the most of your journey with us:</h3>
               <table style="width:100%;border-collapse:collapse;">
-                <tr>
-                  <td style="padding:10px 15px;border-bottom:1px solid #e8e0d0;">
-                    <strong style="color:#d4a843;">✦</strong> <span style="color:#333;font-size:14px;">Ensure your profile photo and biography truly reflect your unique expertise</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding:10px 15px;border-bottom:1px solid #e8e0d0;">
-                    <strong style="color:#d4a843;">✦</strong> <span style="color:#333;font-size:14px;">Keep your availability updated so travelers can book seamlessly</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding:10px 15px;border-bottom:1px solid #e8e0d0;">
-                    <strong style="color:#d4a843;">✦</strong> <span style="color:#333;font-size:14px;">Respond promptly to inquiries — first impressions matter</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding:10px 15px;">
-                    <strong style="color:#d4a843;">✦</strong> <span style="color:#333;font-size:14px;">Deliver exceptional experiences and watch your reviews grow</span>
-                  </td>
-                </tr>
+                <tr><td style="padding:10px 15px;border-bottom:1px solid #e8e0d0;"><strong style="color:#d4a843;">✦</strong> <span style="color:#333;font-size:14px;">Ensure your profile photo and biography truly reflect your unique expertise</span></td></tr>
+                <tr><td style="padding:10px 15px;border-bottom:1px solid #e8e0d0;"><strong style="color:#d4a843;">✦</strong> <span style="color:#333;font-size:14px;">Keep your availability updated so travelers can book seamlessly</span></td></tr>
+                <tr><td style="padding:10px 15px;border-bottom:1px solid #e8e0d0;"><strong style="color:#d4a843;">✦</strong> <span style="color:#333;font-size:14px;">Respond promptly to inquiries — first impressions matter</span></td></tr>
+                <tr><td style="padding:10px 15px;"><strong style="color:#d4a843;">✦</strong> <span style="color:#333;font-size:14px;">Deliver exceptional experiences and watch your reviews grow</span></td></tr>
               </table>
               <div style="text-align:center;margin:30px 0 10px;">
                 <a href="https://explore-ignite-book.lovable.app" style="display:inline-block;background:linear-gradient(135deg,#d4a843,#c49a3a);color:#1a1f2e;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;letter-spacing:0.5px;box-shadow:0 4px 12px rgba(212,168,67,0.3);">View Your Profile</a>
@@ -182,10 +213,9 @@ const handler = async (req: Request): Promise<Response> => {
       `;
       toEmails = [guideEmail];
 
-      // Notify admin too
       try {
         await resend.emails.send({
-      from: "iGuide Tours <noreply@iguidetours.net>",
+          from: "iGuide Tours <noreply@iguidetours.net>",
           to: [NOTIFY_EMAIL],
           subject: `Guide ${isApproved ? "Approved" : "Rejected"}: ${guideName}`,
           html: `<p>Guide <strong>${guideName}</strong> (${guideEmail}) has been <strong>${status}</strong>.</p>`,
@@ -219,7 +249,6 @@ const handler = async (req: Request): Promise<Response> => {
       `;
       toEmails = [guideEmail];
 
-      // Notify admin about new application
       try {
         await resend.emails.send({
           from: "iGuide Tours <noreply@iguidetours.net>",
@@ -250,7 +279,7 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error sending notification:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "An unexpected error occurred." }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
