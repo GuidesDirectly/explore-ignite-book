@@ -53,10 +53,9 @@ const MeetGuidesSection = () => {
 
   useEffect(() => {
     const fetchGuides = async () => {
-      const { data: guideData, error } = await supabase
-        .from("guide_profiles")
-        .select("id, user_id, form_data, service_areas, translations")
-        .eq("status", "approved");
+      const { data: guideData, error } = await (supabase
+        .from("guide_profiles_public" as any)
+        .select("id, user_id, form_data, service_areas, translations") as any);
 
       if (error || !guideData) {
         setLoading(false);

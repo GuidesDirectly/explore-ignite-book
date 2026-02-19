@@ -302,10 +302,9 @@ const TourPlannerSection = () => {
     // Map experience keys to their translated labels for matching
     const expLabels = experiences.map(key => t(`planner.${key}`).toLowerCase());
 
-    const { data } = await supabase
-      .from("guide_profiles")
-      .select("id, user_id, form_data, service_areas")
-      .eq("status", "approved");
+    const { data } = await (supabase
+      .from("guide_profiles_public" as any)
+      .select("id, user_id, form_data, service_areas") as any);
 
     if (data) {
       const allGuides = data as unknown as (GuideProfile & { service_areas: string[] | null })[];

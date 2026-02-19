@@ -437,6 +437,36 @@ export type Database = {
       }
     }
     Views: {
+      guide_profiles_public: {
+        Row: {
+          created_at: string | null
+          form_data: Json | null
+          id: string | null
+          service_areas: string[] | null
+          status: string | null
+          translations: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          form_data?: never
+          id?: string | null
+          service_areas?: string[] | null
+          status?: string | null
+          translations?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          form_data?: never
+          id?: string | null
+          service_areas?: string[] | null
+          status?: string | null
+          translations?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       reviews_public: {
         Row: {
           booking_id: string | null

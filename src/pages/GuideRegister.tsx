@@ -364,15 +364,11 @@ const GuideRegister = () => {
 
       // Send confirmation email to the guide
       try {
-        const NOTIFY_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-notification`;
-        const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-        await fetch(NOTIFY_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "apikey": ANON_KEY, "Authorization": `Bearer ${ANON_KEY}` },
-          body: JSON.stringify({
+        await supabase.functions.invoke("send-notification", {
+          body: {
             type: "guide_application",
             data: { guideName: `${firstName} ${lastName}`, guideEmail: user.email },
-          }),
+          },
         });
       } catch (e) {
         console.error("Failed to send confirmation email:", e);
