@@ -5,12 +5,12 @@ const Footer = () => {
   const { t } = useTranslation();
 
   const navLinks = [
-    { label: t("nav.home"), href: "#home" },
-    { label: t("nav.services"), href: "#services" },
-    { label: t("nav.destinations"), href: "#destinations" },
-    { label: t("nav.testimonials"), href: "#testimonials" },
-    { label: t("nav.contact"), href: "#contact" },
-    { label: t("nav.becomeGuide"), href: "/guide-register" },
+    { label: "About", href: "#about" },
+    { label: "Safety", href: "#trust" },
+    { label: "Terms", href: "#" },
+    { label: "Privacy", href: "#" },
+    { label: "Contact", href: "#contact" },
+    { label: "Partnerships", href: "#for-guides" },
   ];
 
   return (
