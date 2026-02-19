@@ -226,7 +226,7 @@ const DestinationsSection = () => {
               {t("dest.globalDesc")}
             </p>
             <a
-              href="#inquiry"
+              href="#launch-roadmap"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity duration-200 text-base"
             >
               {t("dest.globalCta")}
