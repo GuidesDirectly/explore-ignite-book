@@ -13,8 +13,9 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const navLinks = [
-    { label: t("nav.destinations"), href: "#destinations" },
+    { label: t("nav.home"), href: "#home" },
     { label: t("nav.forTravelers"), href: "#guides" },
+    { label: t("nav.destinations"), href: "#destinations" },
     { label: t("nav.services"), href: "#how-it-works" },
     { label: t("nav.forGuides"), href: "#for-guides" },
     { label: t("nav.contact"), href: "#about" },

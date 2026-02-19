@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ShieldCheck, MessageCircle, Map, DollarSign } from "lucide-react";
+import { ShieldCheck, MessageCircle, Leaf, DollarSign } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import heroBg from "@/assets/hero-dc.jpg";
 import logo from "@/assets/logo.jpg";
@@ -11,7 +11,7 @@ const HeroSection = () => {
   const trustItems = [
     { icon: ShieldCheck, label: t("hero.trust1") },
     { icon: MessageCircle, label: t("hero.trust2") },
-    { icon: Map, label: t("hero.trust3") },
+    { icon: Leaf, label: t("hero.trust3") },
     { icon: DollarSign, label: t("hero.trust4") },
   ];
 
@@ -60,10 +60,20 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
-            className="text-xl md:text-2xl leading-relaxed mb-8 max-w-2xl"
+            className="text-xl md:text-2xl leading-relaxed mb-4 max-w-2xl"
             style={{ color: "hsl(40, 33%, 88%)" }}
           >
             {t("hero.subtitle")}
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-base leading-relaxed mb-8 max-w-xl"
+            style={{ color: "hsl(40, 33%, 72%)" }}
+          >
+            {t("hero.noMiddlemen")}
           </motion.p>
 
           {/* CTAs */}
