@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, Globe, MapPin, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import WorldMap from "@/components/WorldMap";
 
 import nycImg from "@/assets/city-cards/nyc.jpg";
@@ -267,13 +268,13 @@ const DestinationsSection = () => {
                   ))}
                 </div>
               </div>
-              <a
-                href="/apply-city-pilot"
+              <Link
+                to="/apply-city-pilot"
                 className="inline-flex items-center justify-center gap-2 border-2 border-primary text-primary font-semibold px-6 py-3.5 rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-200 w-full text-center"
               >
                 {t("dest.guideCTA")}
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </Link>
             </motion.div>
 
             {/* Traveler CTA */}
@@ -302,13 +303,13 @@ const DestinationsSection = () => {
                   ))}
                 </div>
               </div>
-              <a
-                href="/explore"
+              <Link
+                to="/explore"
                 className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3.5 rounded-full hover:opacity-90 transition-opacity duration-200 w-full text-center"
               >
                 {t("dest.travelerCTA")}
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </Link>
             </motion.div>
           </div>
         </div>
