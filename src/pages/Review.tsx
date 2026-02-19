@@ -9,10 +9,9 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import logoImg from "@/assets/logo.jpg";
+import { reviewSchema } from "@/lib/formSchemas";
 
 const GUIDE_USER_ID = "26477b85-de16-4946-935a-f6e238a0fd8d";
-
-// Replace this with your actual Google review URL
 const GOOGLE_REVIEW_URL = "https://g.page/r/CdOtbvUwpEGLEBI/review";
 
 type Step = "rating" | "google-redirect" | "review-form" | "submitted";
@@ -25,6 +24,7 @@ const Review = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [comment, setComment] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleScoreSelect = (value: number) => {
     setScore(value);
@@ -44,18 +44,26 @@ const Review = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) {
+    setErrors({});
+
+    const result = reviewSchema.safeParse({ name, email, comment, score });
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
+      setErrors(fieldErrors);
       toast.error(t("review.required", "Please fill in required fields"));
       return;
     }
+
     setLoading(true);
-    // Map 1-10 score to 1-5 star rating for DB
-    const starRating = Math.max(1, Math.round(score! / 2));
+    const starRating = Math.max(1, Math.round(result.data.score / 2));
     const { data: insertedData, error } = await supabase.from("reviews").insert({
-      reviewer_name: name.trim(),
-      reviewer_email: email.trim() || null,
+      reviewer_name: result.data.name,
+      reviewer_email: result.data.email || null,
       rating: starRating,
-      comment: comment.trim() || null,
+      comment: result.data.comment || null,
       guide_user_id: GUIDE_USER_ID,
     }).select("id").single();
     setLoading(false);
@@ -64,20 +72,18 @@ const Review = () => {
       return;
     }
     setStep("submitted");
-    // Fire-and-forget: send notification
     supabase.functions.invoke("send-notification", {
       body: {
         type: "review",
         data: {
-          reviewer_name: name.trim(),
-          reviewer_email: email.trim() || null,
+          reviewer_name: result.data.name,
+          reviewer_email: result.data.email || null,
           rating: starRating,
-          comment: comment.trim() || null,
+          comment: result.data.comment || null,
         },
       },
     }).catch(console.error);
-    // Fire-and-forget: translate review content
-    if (insertedData?.id && comment.trim()) {
+    if (insertedData?.id && result.data.comment) {
       supabase.functions.invoke("translate-content", {
         body: {
           table: "reviews",
@@ -88,6 +94,7 @@ const Review = () => {
     }
   };
 
+  // ... keep existing code (getScoreLabel, getScoreColor functions)
   const getScoreLabel = (value: number) => {
     if (value <= 2) return "😞";
     if (value <= 4) return "😐";
@@ -105,9 +112,11 @@ const Review = () => {
     return "border-primary bg-primary/20 text-primary ring-2 ring-primary/30";
   };
 
+  const fieldError = (field: string) =>
+    errors[field] ? <p className="text-red-400 text-xs mt-1">{errors[field]}</p> : null;
+
   return (
     <div className="min-h-screen bg-gradient-navy">
-      {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <a href="/" className="flex items-center gap-3">
           <img src={logoImg} alt="iGuide Tours" className="h-10 w-10 rounded-full object-cover" />
@@ -118,7 +127,6 @@ const Review = () => {
 
       <div className="container mx-auto px-4 py-12 max-w-lg">
         <AnimatePresence mode="wait">
-          {/* Step 1: NPS Score */}
           {step === "rating" && (
             <motion.div
               key="rating"
@@ -141,7 +149,6 @@ const Review = () => {
               </div>
 
               <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-primary/10">
-                {/* 1-10 Scale */}
                 <div className="grid grid-cols-5 gap-3 mb-6">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
                     <button
@@ -155,7 +162,6 @@ const Review = () => {
                   ))}
                 </div>
 
-                {/* Labels */}
                 <div className="flex justify-between px-1 mb-6">
                   <span className="text-xs" style={{ color: "hsl(40, 33%, 60%)" }}>
                     {t("review.notLikely", "Not great")}
@@ -165,7 +171,6 @@ const Review = () => {
                   </span>
                 </div>
 
-                {/* Selected feedback */}
                 {score !== null && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
@@ -192,7 +197,6 @@ const Review = () => {
             </motion.div>
           )}
 
-          {/* Step 2a: Google Redirect (score 9-10) */}
           {step === "google-redirect" && (
             <motion.div
               key="google"
@@ -232,7 +236,6 @@ const Review = () => {
             </motion.div>
           )}
 
-          {/* Step 2b: Review Form (score 1-8) */}
           {step === "review-form" && (
             <motion.div
               key="form"
@@ -276,7 +279,9 @@ const Review = () => {
                     className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    maxLength={100}
                   />
+                  {fieldError("name")}
                 </div>
 
                 {/* Email */}
@@ -290,7 +295,9 @@ const Review = () => {
                     className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    maxLength={255}
                   />
+                  {fieldError("email")}
                 </div>
 
                 {/* Comment */}
@@ -304,7 +311,9 @@ const Review = () => {
                     className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground resize-none"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
+                    maxLength={2000}
                   />
+                  {fieldError("comment")}
                 </div>
 
                 <Button variant="hero" size="lg" className="w-full text-base py-6" type="submit" disabled={loading}>
@@ -315,7 +324,6 @@ const Review = () => {
             </motion.div>
           )}
 
-          {/* Step 3: Thank You */}
           {step === "submitted" && (
             <motion.div
               key="thanks"

@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
+import { tourPlannerContactSchema } from "@/lib/formSchemas";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -91,6 +92,7 @@ const TourPlannerSection = () => {
   const [showGuides, setShowGuides] = useState(false);
   const [guides, setGuides] = useState<GuideProfile[]>([]);
   const [emailSent, setEmailSent] = useState(false);
+  const [contactErrors, setContactErrors] = useState<Record<string, string>>({});
 
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -126,6 +128,18 @@ const TourPlannerSection = () => {
   };
 
   const handleNext = () => {
+    if (currentStep === 0) {
+      const result = tourPlannerContactSchema.safeParse({ firstName, lastName, email, phone });
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.errors.forEach((err) => {
+          if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+        });
+        setContactErrors(fieldErrors);
+        return;
+      }
+      setContactErrors({});
+    }
     if (currentStep < totalSteps - 1) {
       setCurrentStep(prev => prev + 1);
       setError("");
@@ -444,7 +458,9 @@ const TourPlannerSection = () => {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   autoFocus
+                  maxLength={50}
                 />
+                {contactErrors.firstName && <p className="text-red-400 text-xs mt-1">{contactErrors.firstName}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1.5" style={{ color: "hsl(40, 33%, 85%)" }}>
@@ -455,7 +471,9 @@ const TourPlannerSection = () => {
                   className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
+                  maxLength={50}
                 />
+                {contactErrors.lastName && <p className="text-red-400 text-xs mt-1">{contactErrors.lastName}</p>}
               </div>
             </div>
             <div>
@@ -470,8 +488,10 @@ const TourPlannerSection = () => {
                   className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground pl-10"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  maxLength={255}
                 />
               </div>
+              {contactErrors.email && <p className="text-red-400 text-xs mt-1">{contactErrors.email}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1.5" style={{ color: "hsl(40, 33%, 85%)" }}>
@@ -485,8 +505,10 @@ const TourPlannerSection = () => {
                   className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground pl-10"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  maxLength={30}
                 />
               </div>
+              {contactErrors.phone && <p className="text-red-400 text-xs mt-1">{contactErrors.phone}</p>}
               <p className="text-xs mt-1" style={{ color: "hsl(40, 33%, 60%)" }}>{t("planner.phoneOptional")}</p>
             </div>
           </div>

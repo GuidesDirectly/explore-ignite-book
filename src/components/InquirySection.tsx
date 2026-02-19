@@ -8,11 +8,13 @@ import { Send, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { inquirySchema } from "@/lib/formSchemas";
 
 const InquirySection = () => {
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,18 +26,28 @@ const InquirySection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.destination) {
+    setErrors({});
+
+    const result = inquirySchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
+      setErrors(fieldErrors);
       toast.error(t("inquiry.required"));
       return;
     }
+
     setLoading(true);
+    const validated = result.data;
     const { error } = await supabase.from("inquiries").insert({
-      name: formData.name.trim(),
-      email: formData.email.trim(),
-      phone: formData.phone.trim() || null,
-      destination: formData.destination,
-      group_size: formData.groupSize || null,
-      message: formData.message.trim() || null,
+      name: validated.name,
+      email: validated.email,
+      phone: validated.phone || null,
+      destination: validated.destination,
+      group_size: validated.groupSize || null,
+      message: validated.message || null,
     });
     setLoading(false);
     if (error) {
@@ -44,17 +56,16 @@ const InquirySection = () => {
     }
     setSubmitted(true);
     toast.success(t("inquiry.success"));
-    // Send email notification (fire-and-forget)
     supabase.functions.invoke("send-notification", {
       body: {
         type: "inquiry",
         data: {
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          phone: formData.phone.trim() || null,
-          destination: formData.destination,
-          group_size: formData.groupSize || null,
-          message: formData.message.trim() || null,
+          name: validated.name,
+          email: validated.email,
+          phone: validated.phone || null,
+          destination: validated.destination,
+          group_size: validated.groupSize || null,
+          message: validated.message || null,
         },
       },
     }).catch(console.error);
@@ -84,6 +95,9 @@ const InquirySection = () => {
       </section>
     );
   }
+
+  const fieldError = (field: string) =>
+    errors[field] ? <p className="text-red-400 text-xs mt-1">{errors[field]}</p> : null;
 
   return (
     <section id="inquiry" className="py-24 bg-gradient-navy">
@@ -137,7 +151,9 @@ const InquirySection = () => {
                   className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  maxLength={100}
                 />
+                {fieldError("name")}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>{t("inquiry.email")} *</label>
@@ -147,7 +163,9 @@ const InquirySection = () => {
                   className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  maxLength={255}
                 />
+                {fieldError("email")}
               </div>
             </div>
 
@@ -159,7 +177,9 @@ const InquirySection = () => {
                   className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  maxLength={30}
                 />
+                {fieldError("phone")}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>{t("inquiry.groupSize")}</label>
@@ -193,6 +213,7 @@ const InquirySection = () => {
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
+              {fieldError("destination")}
             </div>
 
             <div>
@@ -203,7 +224,9 @@ const InquirySection = () => {
                 className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground resize-none"
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                maxLength={2000}
               />
+              {fieldError("message")}
             </div>
 
             <Button variant="hero" size="lg" className="w-full text-base py-6" type="submit" disabled={loading}>
