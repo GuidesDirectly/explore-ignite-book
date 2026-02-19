@@ -1,13 +1,15 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import ValuePropositionSection from "@/components/ValuePropositionSection";
-import AboutSection from "@/components/AboutSection";
-import ServicesSection from "@/components/ServicesSection";
+import TrustSection from "@/components/TrustSection";
+import HowItWorksSection from "@/components/HowItWorksSection";
 import DestinationsSection from "@/components/DestinationsSection";
-import GallerySection from "@/components/GallerySection";
-import TestimonialsSection from "@/components/TestimonialsSection";
 import MeetGuidesSection from "@/components/MeetGuidesSection";
-import TourPlannerSection from "@/components/TourPlannerSection";
+import WhyDirectSection from "@/components/WhyDirectSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import ForGuidesSection from "@/components/ForGuidesSection";
+import AboutSection from "@/components/AboutSection";
+import FAQSection from "@/components/FAQSection";
+import FinalCtaSection from "@/components/FinalCtaSection";
 import InquirySection from "@/components/InquirySection";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
@@ -17,16 +19,43 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+
+      {/* Section 1 — Hero */}
       <HeroSection />
-      <ValuePropositionSection />
-      <AboutSection />
-      <ServicesSection />
+
+      {/* Section 2 — How It Works */}
+      <HowItWorksSection />
+
+      {/* Section 3 — Featured Destinations */}
       <DestinationsSection />
-      <GallerySection />
-      <TestimonialsSection />
+
+      {/* Section 4 — Featured Guides */}
       <MeetGuidesSection />
-      <TourPlannerSection />
+
+      {/* Section 5 — Why Direct Booking Is Better */}
+      <WhyDirectSection />
+
+      {/* Section 6 — Testimonials */}
+      <TestimonialsSection />
+
+      {/* Section 7 — For Guides CTA Banner */}
+      <ForGuidesSection />
+
+      {/* Section 8 — Trust / Transparency */}
+      <TrustSection />
+
+      {/* Section 9 — About */}
+      <AboutSection />
+
+      {/* Section 10 — FAQ */}
+      <FAQSection />
+
+      {/* Section 11 — Final CTA */}
+      <FinalCtaSection />
+
+      {/* Contact/Inquiry */}
       <InquirySection />
+
       <Footer />
 
       <Link

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { MapPin, Star, Users } from "lucide-react";
+import { ShieldCheck, MessageCircle, Map, DollarSign } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import heroBg from "@/assets/hero-dc.jpg";
 import logo from "@/assets/logo.jpg";
@@ -8,10 +8,11 @@ import logo from "@/assets/logo.jpg";
 const HeroSection = () => {
   const { t } = useTranslation();
 
-  const stats = [
-    { icon: Star, value: "4.9★", label: t("hero.avgRating") },
-    { icon: Users, value: "10,000+", label: t("hero.happyTravelers") },
-    { icon: MapPin, value: "50+", label: t("hero.citiesCovered") },
+  const trustItems = [
+    { icon: ShieldCheck, label: t("hero.trust1") },
+    { icon: MessageCircle, label: t("hero.trust2") },
+    { icon: Map, label: t("hero.trust3") },
+    { icon: DollarSign, label: t("hero.trust4") },
   ];
 
   return (
@@ -29,119 +30,68 @@ const HeroSection = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.7, delay: 0.2 }}
-        className="absolute top-20 right-4 w-20 sm:w-28 md:w-52 h-auto object-contain drop-shadow-2xl z-10"
+        className="absolute top-20 right-4 w-20 sm:w-28 md:w-44 h-auto object-contain drop-shadow-2xl z-10"
       />
 
-      <div className="relative container mx-auto px-4 pt-24 pb-16">
+      <div className="relative container mx-auto px-4 pt-24 pb-20">
         <div className="max-w-3xl">
-          <motion.div
+          {/* Eyebrow */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05 }}
+            className="text-sm font-semibold uppercase tracking-[0.2em] mb-4"
+            style={{ color: "hsl(45, 80%, 70%)" }}
+          >
+            {t("hero.poweredBy")}
+          </motion.p>
+
+          <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="relative mb-6"
+            className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6"
+            style={{ color: "hsl(40, 33%, 97%)" }}
           >
-            <h1
-              className="font-display text-5xl md:text-7xl font-bold leading-tight"
-              style={{ color: "hsl(40, 33%, 97%)" }}
-            >
-              {t("hero.headline")}
-            </h1>
-
-            <div className="flex items-center gap-4 md:gap-6 flex-wrap">
-              <p
-                className="font-display text-xl md:text-2xl font-medium tracking-wide"
-                style={{ color: "hsl(45, 80%, 70%)" }}
-              >
-                {t("hero.poweredBy")}
-              </p>
-
-              {/* Passport stamp */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
-                animate={{ opacity: 1, scale: 1, rotate: -10 }}
-                transition={{ duration: 0.5, delay: 0.6, type: "spring", stiffness: 200 }}
-                className="inline-flex flex-shrink-0"
-              >
-                <div
-                  className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-[4px] border-double flex items-center justify-center text-center font-extrabold text-[10px] md:text-sm uppercase tracking-wider overflow-hidden"
-                  style={{
-                    fontFamily: "'Courier New', monospace",
-                    color: "white",
-                    borderColor: "white",
-                    textShadow: "0 0 2px rgba(255,255,255,0.8), 0 1px 3px rgba(0,0,0,0.4)",
-                    boxShadow: "inset 0 0 10px rgba(255,255,255,0.15), 0 0 20px rgba(255,255,255,0.1)",
-                    maskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
-                    WebkitMaskImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
-                  }}
-                >
-                  <div className="absolute inset-2 border-2 rounded-full pointer-events-none" style={{ borderColor: "rgba(255,255,255,0.5)" }} />
-                  <span className="relative z-10 leading-tight px-3 whitespace-pre-line">{t("hero.stamp")}</span>
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
-            className="mb-4"
-          >
-            <p className="text-2xl md:text-3xl font-bold tracking-wide" style={{ color: "hsl(45, 80%, 70%)" }}>
-              {t("hero.tagline")}
-            </p>
-          </motion.div>
+            {t("hero.headline")}
+          </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg md:text-xl leading-relaxed mb-2 max-w-xl"
-            style={{ color: "hsl(40, 33%, 90%)" }}
+            transition={{ duration: 0.6, delay: 0.25 }}
+            className="text-xl md:text-2xl leading-relaxed mb-8 max-w-2xl"
+            style={{ color: "hsl(40, 33%, 88%)" }}
           >
             {t("hero.subtitle")}
           </motion.p>
 
-          <motion.p
+          {/* CTAs */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            className="text-sm md:text-base max-w-lg leading-relaxed mb-8"
-            style={{ color: "hsl(40, 33%, 80%)" }}
-          >
-            {t("hero.subTagline")}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 mb-16"
+            className="flex flex-col sm:flex-row gap-4 mb-12"
           >
             <Button variant="hero" size="lg" className="text-base px-8 py-6" asChild>
-              <a href="#tour-planner">{t("hero.bookDirectly")}</a>
+              <a href="#guides">{t("hero.cta1")}</a>
             </Button>
             <Button variant="heroOutline" size="lg" className="text-base px-8 py-6" asChild>
-              <a href="#why-commission-free">{t("hero.whyCommissionFree")}</a>
+              <a href="/guide-register">{t("hero.cta2")}</a>
             </Button>
           </motion.div>
 
-          {/* Stats */}
+          {/* Trust strip */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex flex-wrap gap-8"
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="flex flex-wrap gap-x-6 gap-y-3"
           >
-            {stats.map(({ icon: Icon, value, label }) => (
-              <div key={label} className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-display text-xl font-bold" style={{ color: "hsl(40, 33%, 97%)" }}>{value}</p>
-                  <p className="text-xs" style={{ color: "hsl(40, 33%, 75%)" }}>{label}</p>
-                </div>
+            {trustItems.map(({ icon: Icon, label }) => (
+              <div key={label} className="flex items-center gap-2">
+                <Icon className="w-4 h-4 flex-shrink-0" style={{ color: "hsl(45, 80%, 65%)" }} />
+                <span className="text-sm font-medium" style={{ color: "hsl(40, 33%, 85%)" }}>{label}</span>
               </div>
             ))}
           </motion.div>
