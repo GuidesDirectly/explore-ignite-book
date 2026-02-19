@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Facebook, Instagram } from "lucide-react";
+import { MapPin, Phone, Mail, Facebook, Instagram, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Footer = () => {
@@ -83,6 +83,17 @@ const Footer = () => {
                 </a>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Security & Trust */}
+        <div className="border-t border-primary-foreground/10 pt-8 mb-8">
+          <div className="flex items-start gap-3 max-w-2xl mx-auto text-center sm:text-left">
+            <ShieldCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 hidden sm:block" />
+            <p className="text-xs text-primary-foreground/50 leading-relaxed">
+              <span className="font-semibold text-primary-foreground/70">{t("footer.securityTitle", "Security & Trust")}</span>{" — "}
+              {t("footer.securityNote", "We prioritize your data. Guides Directly utilizes real-time breach monitoring and encrypted connections to ensure that your business and travel details remain private.")}
+            </p>
           </div>
         </div>
 
