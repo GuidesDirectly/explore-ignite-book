@@ -18,13 +18,63 @@ const LANGUAGES = [
   { code: "ja", name: "Japanese" },
 ];
 
+// Allowed tables and their permitted fields for translation
+const ALLOWED_TABLES: Record<string, Set<string>> = {
+  reviews: new Set(["comment", "reviewer_name"]),
+  guide_profiles: new Set([
+    "form_data.biography",
+    "form_data.specialties",
+    "form_data.name",
+    "form_data.locations",
+    "form_data.languages",
+  ]),
+};
+
+// UUID v4 format validation
+function isValidUUID(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // --- Authentication: require a valid Supabase JWT ---
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  const token = authHeader.replace("Bearer ", "");
+  const supabaseAuth = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: authHeader } } }
+  );
+
+  const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+  if (claimsError || !claimsData?.claims) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
   try {
-    const { table, record_id, fields } = await req.json();
+    const body = await req.json();
+
+    if (!body || typeof body !== "object") {
+      return new Response(
+        JSON.stringify({ error: "Invalid request body." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { table, record_id, fields } = body;
 
     if (!table || !record_id || !fields || !Array.isArray(fields)) {
       return new Response(
@@ -34,11 +84,37 @@ serve(async (req) => {
     }
 
     // Only allow specific tables
-    if (!["reviews", "guide_profiles"].includes(table)) {
+    if (!ALLOWED_TABLES[table]) {
       return new Response(
         JSON.stringify({ error: "Invalid table" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Validate record_id is a proper UUID
+    if (typeof record_id !== "string" || !isValidUUID(record_id)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid record_id format." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate fields against allowlist
+    const allowedFields = ALLOWED_TABLES[table];
+    if (!Array.isArray(fields) || fields.length === 0 || fields.length > 10) {
+      return new Response(
+        JSON.stringify({ error: "fields must be a non-empty array of up to 10 items." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    for (const field of fields) {
+      if (typeof field !== "string" || !allowedFields.has(field)) {
+        return new Response(
+          JSON.stringify({ error: `Field '${field}' is not allowed for table '${table}'.` }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -71,14 +147,13 @@ serve(async (req) => {
     for (const field of fields) {
       let value: string | null = null;
       if (field.includes(".")) {
-        // Nested field like form_data.biography
         const [parent, child] = field.split(".");
         value = record[parent]?.[child] || null;
       } else {
         value = record[field] || null;
       }
       if (value && typeof value === "string" && value.trim()) {
-        textsToTranslate[field] = value;
+        textsToTranslate[field] = value.slice(0, 3000); // cap per-field content
       }
     }
 
@@ -89,7 +164,6 @@ serve(async (req) => {
       );
     }
 
-    // Build the prompt
     const fieldEntries = Object.entries(textsToTranslate)
       .map(([key, val]) => `"${key}": "${val.replace(/"/g, '\\"')}"`)
       .join(",\n");
@@ -139,7 +213,7 @@ Return ONLY the JSON object, no markdown, no explanation.`;
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error("AI gateway error:", aiResponse.status, errorText);
-      
+
       if (aiResponse.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limited, will retry later" }),
@@ -162,7 +236,6 @@ Return ONLY the JSON object, no markdown, no explanation.`;
       throw new Error("No content in AI response");
     }
 
-    // Parse the JSON response (strip markdown code fences if present)
     let translations: Record<string, Record<string, string>>;
     try {
       const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
@@ -172,7 +245,6 @@ Return ONLY the JSON object, no markdown, no explanation.`;
       throw new Error("Failed to parse translation response");
     }
 
-    // Update the record with translations
     const { error: updateError } = await supabase
       .from(table)
       .update({ translations })
@@ -192,7 +264,7 @@ Return ONLY the JSON object, no markdown, no explanation.`;
   } catch (e) {
     console.error("translate-content error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      JSON.stringify({ error: "An unexpected error occurred." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
