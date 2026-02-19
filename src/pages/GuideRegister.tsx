@@ -364,8 +364,8 @@ const GuideRegister = () => {
 
       // Send confirmation email to the guide
       try {
-        const NOTIFY_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/send-notification`;
-        const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lZ2Z3b21sb2FpaHp3b213eXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDM4NTAsImV4cCI6MjA4NjA3OTg1MH0.ZRn_9BDZZM5uTdqAxaeBcwckzjqXe7HQXUN8OZSbLNM";
+        const NOTIFY_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-notification`;
+        const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
         await fetch(NOTIFY_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json", "apikey": ANON_KEY, "Authorization": `Bearer ${ANON_KEY}` },

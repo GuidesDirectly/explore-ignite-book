@@ -14,9 +14,10 @@ import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
 
-const PLAN_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/plan-tour`;
-const NOTIFY_URL = `https://oegfwomloaihzwomwypx.supabase.co/functions/v1/send-notification`;
-const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lZ2Z3b21sb2FpaHp3b213eXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDM4NTAsImV4cCI6MjA4NjA3OTg1MH0.ZRn_9BDZZM5uTdqAxaeBcwckzjqXe7HQXUN8OZSbLNM";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const PLAN_URL = `${SUPABASE_URL}/functions/v1/plan-tour`;
+const NOTIFY_URL = `${SUPABASE_URL}/functions/v1/send-notification`;
 
 const DEST_KEYS = ["dest_dc", "dest_nyc", "dest_niagara", "dest_toronto", "dest_boston", "dest_chicago"] as const;
 const BUDGET_KEYS = ["budget_under500", "budget_500_1000", "budget_1000_2500", "budget_2500_5000", "budget_5000plus", "budget_flexible"] as const;
@@ -204,9 +205,8 @@ const TourPlannerSection = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${ANON_KEY}`,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify({ description: buildDescription(refinement) }),
       });
 
       if (!resp.ok || !resp.body) {
@@ -363,7 +363,7 @@ const TourPlannerSection = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${ANON_KEY}`,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           type: "tour_plan",
@@ -385,7 +385,7 @@ const TourPlannerSection = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${ANON_KEY}`,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           type: "inquiry",
