@@ -64,7 +64,7 @@ const DestinationsSection = () => {
             </h2>
 
             <p className="text-secondary-foreground/70 text-lg md:text-xl leading-relaxed mb-8 max-w-3xl mx-auto">
-              We perfected our <span className="text-primary font-semibold">"Direct Connection"</span> model through a rigorous pilot launch in Washington D.C. By testing every variable in the U.S. capital, we developed the{" "}
+              We are working hard to perfect our <span className="text-primary font-semibold">"Direct Connection"</span> model through our rigorous pilot launch in Washington D.C. Through testing every variable in the U.S. capital, we are developing the{" "}
               <span className="text-primary font-semibold">Launch-City Playbook</span>—a blueprint for transparent, commission-free travel.
             </p>
 
@@ -78,7 +78,7 @@ const DestinationsSection = () => {
             >
               <div className="font-display text-3xl text-primary/30 absolute -top-2 -left-1">"</div>
               <p className="font-display text-lg md:text-xl italic text-secondary-foreground/80 leading-relaxed">
-                D.C. isn't just our first city; it is our laboratory in which we proved that travelers prefer direct access — and guides deserve 100% of their earnings.
+                D.C. isn't just our first city; it is our laboratory in which we'll prove that travelers prefer direct access — and guides deserve 100% of their earnings.
               </p>
             </motion.blockquote>
 
