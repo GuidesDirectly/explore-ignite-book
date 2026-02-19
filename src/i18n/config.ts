@@ -10,6 +10,8 @@ import fr from "./locales/fr.json";
 import es from "./locales/es.json";
 import zh from "./locales/zh.json";
 import ja from "./locales/ja.json";
+import he from "./locales/he.json";
+import ar from "./locales/ar.json";
 
 export const languages = [
   { code: "en", name: "English", flag: "us" },
@@ -20,6 +22,8 @@ export const languages = [
   { code: "es", name: "Español", flag: "es" },
   { code: "zh", name: "中文", flag: "cn" },
   { code: "ja", name: "日本語", flag: "jp" },
+  { code: "he", name: "עברית", flag: "il" },
+  { code: "ar", name: "العربية", flag: "eg" },
 ];
 
 i18n
@@ -35,6 +39,8 @@ i18n
       es: { translation: es },
       zh: { translation: zh },
       ja: { translation: ja },
+      he: { translation: he },
+      ar: { translation: ar },
     },
     fallbackLng: "en",
     interpolation: { escapeValue: false },
