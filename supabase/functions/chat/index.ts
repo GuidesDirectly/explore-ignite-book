@@ -6,20 +6,39 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-// Simple in-memory rate limiter: max 20 requests per IP per minute
+// Per-minute rate limiter: max 20 requests per IP per minute
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 20;
 const RATE_WINDOW_MS = 60_000;
 
+// Per-hour rate limiter: max 60 requests per IP per hour (blocks sustained abuse)
+const hourlyLimitMap = new Map<string, { count: number; resetAt: number }>();
+const HOURLY_LIMIT = 60;
+const HOURLY_WINDOW_MS = 60 * 60_000;
+
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+
+  // Check per-minute limit
   const entry = rateLimitMap.get(ip);
   if (!entry || now > entry.resetAt) {
     rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
-    return false;
+  } else if (entry.count >= RATE_LIMIT) {
+    return true;
+  } else {
+    entry.count++;
   }
-  if (entry.count >= RATE_LIMIT) return true;
-  entry.count++;
+
+  // Check per-hour limit
+  const hourEntry = hourlyLimitMap.get(ip);
+  if (!hourEntry || now > hourEntry.resetAt) {
+    hourlyLimitMap.set(ip, { count: 1, resetAt: now + HOURLY_WINDOW_MS });
+  } else if (hourEntry.count >= HOURLY_LIMIT) {
+    return true;
+  } else {
+    hourEntry.count++;
+  }
+
   return false;
 }
 
