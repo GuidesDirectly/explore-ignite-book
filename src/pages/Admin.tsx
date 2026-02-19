@@ -293,7 +293,8 @@ const Admin = () => {
             />
             <Button variant="hero" className="w-full" type="submit">Sign In</Button>
           </form>
-          <a href="/" className="block text-center text-primary text-sm mt-4 hover:underline">← Back to Home</a>
+          <a href="/forgot-password" className="block text-center text-primary/80 text-sm mt-3 hover:text-primary hover:underline transition-colors">Forgot password?</a>
+          <a href="/" className="block text-center text-primary text-sm mt-2 hover:underline">← Back to Home</a>
         </div>
       </div>
     );
