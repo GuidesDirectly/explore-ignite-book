@@ -11,6 +11,8 @@ import Review from "./pages/Review";
 import Admin from "./pages/Admin";
 import Testimonials from "./pages/Testimonials";
 import GuideRegister from "./pages/GuideRegister";
+import ApplyCityPilot from "./pages/ApplyCityPilot";
+import ExploreCities from "./pages/ExploreCities";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import NotFound from "./pages/NotFound";
@@ -40,6 +42,8 @@ const App = () => (
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/guide-register" element={<GuideRegister />} />
+          <Route path="/apply-city-pilot" element={<ApplyCityPilot />} />
+          <Route path="/explore" element={<ExploreCities />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
