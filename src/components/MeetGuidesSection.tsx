@@ -64,10 +64,10 @@ const MeetGuidesSection = () => {
       }
 
       // Fetch review stats
-      const { data: reviewData } = await supabase
-        .from("reviews")
+      const { data: reviewData } = await (supabase
+        .from("reviews_public" as any)
         .select("guide_user_id, rating")
-        .eq("hidden", false);
+        .eq("hidden", false) as any);
 
       const statsMap = new Map<string, { count: number; total: number }>();
       if (reviewData) {
