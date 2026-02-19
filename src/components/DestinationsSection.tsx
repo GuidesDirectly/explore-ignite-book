@@ -233,20 +233,62 @@ const DestinationsSection = () => {
                 ))}
               </div>
 
-              {/* Continents simplified shapes */}
-              <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice">
+              {/* Realistic continent SVG paths */}
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet">
                 {/* North America */}
-                <ellipse cx="160" cy="160" rx="100" ry="80" fill="hsl(var(--primary))" opacity="0.6" />
+                <path d="M120,60 L145,55 L175,50 L210,55 L235,70 L255,85 L270,100 L275,120 L265,140 L255,155 L240,165 L225,175 L215,190 L210,205 L200,215 L185,220 L170,215 L155,205 L140,195 L130,180 L120,165 L110,150 L105,135 L105,115 L110,95 L115,75 Z"
+                  fill="hsl(var(--primary))" opacity="0.35" />
+                {/* Greenland */}
+                <path d="M195,30 L215,25 L235,28 L245,38 L240,50 L225,55 L210,52 L198,44 Z"
+                  fill="hsl(var(--primary))" opacity="0.25" />
+                {/* Central America connector */}
+                <path d="M185,220 L190,232 L188,242 L183,248 L178,242 L176,230 L178,220 Z"
+                  fill="hsl(var(--primary))" opacity="0.3" />
                 {/* South America */}
-                <ellipse cx="220" cy="280" rx="55" ry="80" fill="hsl(var(--primary))" opacity="0.5" />
+                <path d="M178,248 L195,245 L215,248 L230,258 L240,275 L245,295 L242,315 L235,335 L225,350 L210,360 L195,358 L182,348 L172,332 L165,312 L163,290 L165,270 L170,255 Z"
+                  fill="hsl(var(--primary))" opacity="0.35" />
                 {/* Europe */}
-                <ellipse cx="415" cy="130" rx="55" ry="45" fill="hsl(var(--primary))" opacity="0.6" />
+                <path d="M430,55 L450,50 L470,52 L485,60 L492,72 L488,85 L478,95 L465,100 L455,108 L448,118 L440,115 L432,105 L425,92 L422,78 L425,65 Z"
+                  fill="hsl(var(--primary))" opacity="0.38" />
+                {/* Scandinavia */}
+                <path d="M440,30 L452,25 L462,28 L468,38 L465,50 L455,52 L445,48 L438,38 Z"
+                  fill="hsl(var(--primary))" opacity="0.28" />
+                {/* UK */}
+                <path d="M415,58 L422,54 L428,58 L426,68 L420,70 L414,65 Z"
+                  fill="hsl(var(--primary))" opacity="0.28" />
                 {/* Africa */}
-                <ellipse cx="430" cy="250" rx="65" ry="90" fill="hsl(var(--primary))" opacity="0.5" />
-                {/* Asia */}
-                <ellipse cx="590" cy="155" rx="130" ry="85" fill="hsl(var(--primary))" opacity="0.55" />
+                <path d="M440,118 L462,112 L478,115 L492,125 L500,140 L505,160 L505,182 L500,205 L492,225 L480,242 L465,255 L450,260 L435,255 L422,242 L412,225 L408,205 L408,182 L412,160 L420,140 L430,128 Z"
+                  fill="hsl(var(--primary))" opacity="0.35" />
+                {/* Madagascar */}
+                <path d="M508,195 L514,190 L519,200 L518,215 L512,220 L507,212 Z"
+                  fill="hsl(var(--primary))" opacity="0.25" />
+                {/* Russia / North Asia */}
+                <path d="M490,40 L540,32 L600,28 L660,30 L710,35 L745,45 L760,58 L755,72 L735,82 L705,88 L670,90 L635,88 L600,85 L565,82 L535,80 L510,78 L495,68 L488,55 Z"
+                  fill="hsl(var(--primary))" opacity="0.32" />
+                {/* Middle East / West Asia */}
+                <path d="M490,118 L515,112 L540,115 L558,125 L565,140 L560,155 L545,162 L528,160 L512,150 L498,138 L488,128 Z"
+                  fill="hsl(var(--primary))" opacity="0.32" />
+                {/* South / SE Asia */}
+                <path d="M560,100 L610,88 L660,85 L705,88 L730,100 L742,115 L738,132 L720,142 L698,148 L672,148 L645,142 L618,135 L595,128 L572,120 Z"
+                  fill="hsl(var(--primary))" opacity="0.35" />
+                {/* India */}
+                <path d="M580,148 L598,145 L612,150 L618,165 L615,182 L605,195 L592,200 L580,192 L572,178 L570,162 Z"
+                  fill="hsl(var(--primary))" opacity="0.32" />
+                {/* SE Asia islands */}
+                <path d="M690,165 L710,160 L728,162 L738,172 L735,182 L720,185 L705,180 L692,172 Z"
+                  fill="hsl(var(--primary))" opacity="0.28" />
+                {/* Japan */}
+                <path d="M752,78 L762,72 L772,75 L778,85 L774,96 L763,100 L753,95 L748,85 Z"
+                  fill="hsl(var(--primary))" opacity="0.28" />
                 {/* Australia */}
-                <ellipse cx="660" cy="290" rx="55" ry="40" fill="hsl(var(--primary))" opacity="0.5" />
+                <path d="M700,278 L730,268 L762,265 L790,270 L808,282 L815,298 L812,315 L800,328 L782,335 L760,335 L738,328 L720,315 L708,300 L700,285 Z"
+                  fill="hsl(var(--primary))" opacity="0.35" />
+                {/* New Zealand */}
+                <path d="M828,318 L836,312 L844,316 L845,328 L838,336 L830,332 Z"
+                  fill="hsl(var(--primary))" opacity="0.25" />
+                {/* Antarctica hint */}
+                <path d="M250,440 L400,430 L550,428 L700,430 L820,440 L840,455 L700,460 L550,462 L400,460 L250,458 Z"
+                  fill="hsl(var(--primary))" opacity="0.15" />
               </svg>
 
               {/* "Proven" marker — North America */}
