@@ -13,7 +13,7 @@ const LaunchStripSection = () => {
   ];
 
   return (
-    <section className="py-16 bg-secondary border-b border-primary/10">
+    <section id="launch-roadmap" className="py-16 bg-secondary border-b border-primary/10">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
