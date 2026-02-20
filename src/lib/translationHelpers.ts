@@ -31,6 +31,7 @@ const OPTION_KEY_MAP: Record<string, string> = {
   "Turkish": "options.lang_turkish",
   "Swedish": "options.lang_swedish",
   "Ukrainian": "options.lang_ukrainian",
+  "Hebrew": "options.lang_hebrew",
 
   // Specializations
   "City Tours": "options.spec_city_tours",
