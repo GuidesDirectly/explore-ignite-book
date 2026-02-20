@@ -19,6 +19,7 @@ import {
   Eye,
 } from "lucide-react";
 import logoImg from "@/assets/logo.jpg";
+import { scanFileForViruses } from "@/lib/scanUpload";
 import BookingsManager from "@/components/dashboard/BookingsManager";
 import AvailabilityManager from "@/components/dashboard/AvailabilityManager";
 
@@ -257,8 +258,17 @@ const GuideDashboard = () => {
 
     setUploading(true);
     let successCount = 0;
+    const rejectedFiles: string[] = [];
 
     for (const file of toUpload) {
+      // Virus scan before committing to storage
+      const scanResult = await scanFileForViruses(file);
+      if (!scanResult.clean) {
+        rejectedFiles.push(file.name);
+        console.warn(`File rejected by virus scan: ${file.name}`);
+        continue;
+      }
+
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const fileName = `portfolio-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext}`;
 
@@ -273,6 +283,9 @@ const GuideDashboard = () => {
       else console.error("Upload error:", error);
     }
 
+    if (rejectedFiles.length > 0) {
+      toast.error(`Rejected (malicious content detected): ${rejectedFiles.join(", ")}`);
+    }
     if (successCount > 0) {
       toast.success(`${successCount} photo${successCount > 1 ? "s" : ""} uploaded!`);
       await fetchPhotos();

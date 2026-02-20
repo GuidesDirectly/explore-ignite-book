@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.translate-content]
 verify_jwt = false
+
+[functions.scan-upload]
+verify_jwt = false
