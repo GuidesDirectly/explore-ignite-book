@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock, CheckCircle, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import PasswordStrengthMeter, { isPasswordStrong } from "@/components/PasswordStrengthMeter";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -35,8 +36,8 @@ const ResetPassword = () => {
     e.preventDefault();
     setError("");
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    if (!isPasswordStrong(password)) {
+      setError("Password does not meet all strength requirements.");
       return;
     }
     if (password !== confirm) {
@@ -90,10 +91,11 @@ const ResetPassword = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 8 characters"
+                  placeholder="At least 10 characters"
                   required
-                  minLength={8}
+                  minLength={10}
                 />
+                <PasswordStrengthMeter password={password} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirm">Confirm Password</Label>
