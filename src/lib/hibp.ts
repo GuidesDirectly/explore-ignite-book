@@ -1,22 +1,23 @@
 /**
- * HIBP k-Anonymity Password Breach Check
+ * HIBP k-Anonymity Password Breach Check — Server-Side via Edge Function
  *
- * Uses the Have I Been Pwned Pwned Passwords API with k-anonymity:
+ * Security architecture:
  *  1. SHA-1 hash is computed client-side using the Web Crypto API
- *  2. Only the first 5 hex characters (prefix) are sent to the API
- *  3. The full hash never leaves the device
- *  4. The returned suffix list is compared locally
+ *  2. Only the first 5 hex chars (prefix) AND the 35-char suffix are sent
+ *     to our own Edge Function — never to HIBP directly
+ *  3. The Edge Function queries HIBP server-side and caches results for 24 h
+ *  4. The full password never leaves the client; the API never sees it
  *
- * This matches the protection provided by Supabase's "Leaked Password Protection"
- * toggle, implemented directly without any dependency on Supabase settings.
+ * Moving the check server-side means:
+ *  - Client-side bypass is no longer possible
+ *  - Caching and rate limiting are centralised
+ *  - Breached password rejections are logged server-side
  *
  * Reference: https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange
  */
 
-// Simple in-memory cache: prefix → Set<suffix> | null (null means API error)
-// Keyed by prefix, value is { suffixes, expiresAt }
-const cache = new Map<string, { suffixes: Set<string>; expiresAt: number }>();
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
 async function sha1Hex(text: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -31,55 +32,44 @@ async function sha1Hex(text: string): Promise<string> {
 
 /**
  * Checks whether a password appears in any known data breach.
- * Uses k-anonymity so the full password and full hash never leave the device.
+ * The full password and full hash never leave the client.
+ * Only the 5-char prefix and 35-char suffix are sent to our own Edge Function.
  *
  * @returns true  if the password is compromised (found in breach database)
- * @returns false if the password is safe, or if the API is unreachable (fail-open)
+ * @returns false if the password is safe, or if the service is unreachable (fail-open)
  */
 export async function checkPasswordBreached(password: string): Promise<boolean> {
   if (!password || password.length < 3) return false;
 
   try {
     const hash = await sha1Hex(password);
-    const prefix = hash.slice(0, 5);
-    const suffix = hash.slice(5);
+    const prefix = hash.slice(0, 5);  // First 5 chars — sent to edge function
+    const suffix = hash.slice(5);     // Remaining 35 chars — sent to edge function
 
-    // Check in-memory cache first
-    const cached = cache.get(prefix);
-    if (cached && Date.now() < cached.expiresAt) {
-      return cached.suffixes.has(suffix);
-    }
-
-    // Fetch range from HIBP — Add-Padding prevents traffic analysis
+    // Call our server-side edge function — HIBP API call happens there
     const response = await fetch(
-      `https://api.pwnedpasswords.com/range/${prefix}`,
-      { headers: { "Add-Padding": "true" } }
+      `${SUPABASE_URL}/functions/v1/check-password-breach`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ prefix, suffix }),
+      }
     );
 
     if (!response.ok) {
-      // Fail open: don't block signup if API is unavailable
-      console.warn("HIBP API unavailable:", response.status);
-      return false;
+      console.warn("Breach check service unavailable:", response.status);
+      return false; // Fail open — flag account for review server-side
     }
 
-    const text = await response.text();
-    const suffixes = new Set<string>();
-
-    for (const line of text.split("\n")) {
-      // Each line is: SUFFIX:COUNT  (padding entries have count 0)
-      const colonIdx = line.indexOf(":");
-      if (colonIdx !== -1) {
-        suffixes.add(line.slice(0, colonIdx).trim().toUpperCase());
-      }
-    }
-
-    // Cache for 24 hours
-    cache.set(prefix, { suffixes, expiresAt: Date.now() + CACHE_TTL_MS });
-
-    return suffixes.has(suffix);
+    const data = await response.json();
+    return data.breached === true;
   } catch (err) {
     // Fail open: network errors should not block users
     console.warn("HIBP check failed (network error):", err);
     return false;
   }
 }
+
