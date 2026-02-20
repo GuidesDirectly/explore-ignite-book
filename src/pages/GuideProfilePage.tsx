@@ -6,12 +6,13 @@ import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import GuideContactForm from "@/components/GuideContactForm";
+import BookingRequestForm from "@/components/BookingRequestForm";
 import GuideGallery from "@/components/GuideGallery";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   MapPin, Globe, Star, ShieldCheck, CheckCircle2,
-  ArrowLeft, Mail, Clock, Users, Camera, Mountain
+  ArrowLeft, Mail, Clock, Users, Camera, Mountain, CalendarCheck
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -318,9 +319,9 @@ const GuideProfilePage = () => {
 
                 {/* CTA */}
                 <Button variant="hero" className="w-full" asChild>
-                  <a href="#contact-section">
-                    <Mail className="w-4 h-4 mr-2" />
-                    {t("guideProfile.requestTour", "Request a Tour")}
+                  <a href="#booking-section">
+                    <CalendarCheck className="w-4 h-4 mr-2" />
+                    {t("guideProfile.requestBooking", "Request a Booking")}
                   </a>
                 </Button>
               </div>
@@ -452,6 +453,14 @@ const GuideProfilePage = () => {
                 </Button>
               </div>
             </section>
+
+            {/* Booking request form */}
+            <BookingRequestForm
+              guideUserId={guide.user_id}
+              guideName={`${fd.firstName} ${fd.lastName}`}
+              tourTypes={fd.tourTypes || []}
+              serviceAreas={guide.service_areas || []}
+            />
 
             {/* Contact form */}
             <GuideContactForm
