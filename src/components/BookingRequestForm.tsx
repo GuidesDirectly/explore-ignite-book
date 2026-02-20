@@ -50,6 +50,7 @@ interface Props {
   guideName: string;
   tourTypes: string[];
   serviceAreas: string[];
+  availableDates?: Date[];
 }
 
 const TIME_SLOTS = [
@@ -59,7 +60,7 @@ const TIME_SLOTS = [
   "17:00", "17:30", "18:00", "18:30", "19:00",
 ];
 
-const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas }: Props) => {
+const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas, availableDates }: Props) => {
   const { t } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -226,7 +227,14 @@ const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas }:
                   mode="single"
                   selected={form.date}
                   onSelect={(d) => update("date", d)}
-                  disabled={(date) => date < new Date()}
+                  disabled={(date) => {
+                    if (date < new Date()) return true;
+                    if (availableDates && availableDates.length > 0) {
+                      const dateStr = format(date, "yyyy-MM-dd");
+                      return !availableDates.some(d => format(d, "yyyy-MM-dd") === dateStr);
+                    }
+                    return false;
+                  }}
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
                 />

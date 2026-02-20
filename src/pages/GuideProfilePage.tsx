@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
@@ -52,6 +53,7 @@ const GuideProfilePage = () => {
   const [guide, setGuide] = useState<GuideData | null>(null);
   const [reviews, setReviews] = useState<ReviewData[]>([]);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -88,6 +90,19 @@ const GuideProfilePage = () => {
         .order("created_at", { ascending: false }) as any);
 
       setReviews(reviewData || []);
+
+      // Availability
+      const { data: availData } = await supabase
+        .from("guide_availability" as any)
+        .select("date, status")
+        .eq("guide_user_id", data.user_id)
+        .eq("status", "available")
+        .gte("date", format(new Date(), "yyyy-MM-dd"));
+
+      setAvailableDates(
+        (availData as any[] || []).map((e: any) => new Date(e.date + "T00:00:00"))
+      );
+
       setLoading(false);
     };
 
@@ -464,6 +479,7 @@ const GuideProfilePage = () => {
               guideName={`${fd.firstName} ${fd.lastName}`}
               tourTypes={fd.tourTypes || []}
               serviceAreas={guide.service_areas || []}
+              availableDates={availableDates}
             />
 
             {/* Contact form */}
