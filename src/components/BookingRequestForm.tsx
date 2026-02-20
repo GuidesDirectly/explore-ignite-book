@@ -209,6 +209,12 @@ const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas, a
           {/* Date */}
           <div className="space-y-1.5">
             <Label>{t("booking.date", "Preferred Date")} *</Label>
+            {availableDates && availableDates.length > 0 && (
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <span className="inline-block w-2 h-2 rounded-sm bg-green-500/40 border border-green-500/60" />
+                {t("booking.onlyAvailableDates", "Only dates marked available on the calendar above can be selected.")}
+              </p>
+            )}
             <Popover>
               <PopoverTrigger asChild>
                 <Button
