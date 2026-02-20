@@ -66,7 +66,7 @@ const Navbar = () => {
             <a href="/guide-register">{t("nav.becomeGuide")}</a>
           </Button>
           <Button variant="hero" size="sm" asChild>
-            <a href="#meet-guides">{t("nav.forTravelers")}</a>
+            <a href="#meet-guides" onClick={(e) => handleNavClick(e, "#meet-guides")}>{t("nav.forTravelers")}</a>
           </Button>
         </div>
 
@@ -114,7 +114,7 @@ const Navbar = () => {
                 <a href="/guide-register" onClick={() => setIsOpen(false)}>{t("nav.becomeGuide")}</a>
               </Button>
               <Button variant="hero" size="sm" asChild>
-                <a href="#meet-guides" onClick={() => setIsOpen(false)}>{t("nav.findGuide")}</a>
+                <a href="#meet-guides" onClick={(e) => { handleNavClick(e, "#meet-guides"); setIsOpen(false); }}>{t("nav.findGuide")}</a>
               </Button>
             </div>
           </motion.div>
