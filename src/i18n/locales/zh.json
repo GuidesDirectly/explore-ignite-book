@@ -8,7 +8,8 @@
     "bookTour": "计划您的旅行",
     "becomeGuide": "免费加入",
     "forTravelers": "寻找导游",
-    "findGuide": "寻找导游"
+    "findGuide": "寻找导游",
+    "forGuides": "导游专区"
   },
   "hero": {
     "headline": "直接与本地导游预订",
@@ -28,7 +29,8 @@
     "whyCommissionFree": "为什么零佣金很重要",
     "avgRating": "平均评分",
     "happyTravelers": "满意游客",
-    "citiesCovered": "覆盖城市"
+    "citiesCovered": "覆盖城市",
+    "noMiddlemen": "无中间商。无佣金。直接沟通。"
   },
   "valueProp": {
     "label": "为什么我们不同",
@@ -405,7 +407,17 @@
     "tour_group": "团体旅游",
     "tour_walking": "步行旅游",
     "tour_driving": "自驾旅游",
-    "tour_multiday": "多日旅游"
+    "tour_multiday": "多日旅游",
+    "spec_city_tours": "城市游览",
+    "spec_ecotourism": "生态旅游",
+    "spec_cultural": "文化探索",
+    "spec_nature_adventures": "自然探险",
+    "spec_hiking_wildlife": "徒步与野生动物",
+    "spec_custom_itineraries": "定制行程",
+    "spec_religious": "宗教与灵修场所",
+    "spec_wine": "葡萄酒与啤酒厂之旅",
+    "spec_beach": "海滩与水上活动",
+    "spec_shopping": "购物与当地市场"
   },
   "dest": {
     "whereWeStarted": "我们的起点",

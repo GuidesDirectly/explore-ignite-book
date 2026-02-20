@@ -8,7 +8,8 @@
     "bookTour": "خطّط جولتك",
     "becomeGuide": "انضم مجاناً",
     "forTravelers": "ابحث عن مرشد",
-    "findGuide": "ابحث عن مرشد"
+    "findGuide": "ابحث عن مرشد",
+    "forGuides": "للمرشدين"
   },
   "hero": {
     "headline": "احجز مباشرةً مع المرشدين المحليين — مدن وسياحة بيئية حول العالم",
@@ -467,7 +468,17 @@
     "tour_group": "جولات جماعية",
     "tour_walking": "جولات مشي",
     "tour_driving": "جولات بالسيارة",
-    "tour_multiday": "جولات متعددة الأيام"
+    "tour_multiday": "جولات متعددة الأيام",
+    "spec_city_tours": "جولات المدينة",
+    "spec_ecotourism": "السياحة البيئية",
+    "spec_cultural": "استكشاف ثقافي",
+    "spec_nature_adventures": "مغامرات الطبيعة",
+    "spec_hiking_wildlife": "المشي لمسافات طويلة والحياة البرية",
+    "spec_custom_itineraries": "مسارات مخصصة",
+    "spec_religious": "مواقع دينية وروحانية",
+    "spec_wine": "جولات النبيذ ومصانع الجعة",
+    "spec_beach": "الشاطئ والأنشطة المائية",
+    "spec_shopping": "التسوق والأسواق المحلية"
   },
   "dest": {
     "whereWeStarted": "أين بدأنا",
