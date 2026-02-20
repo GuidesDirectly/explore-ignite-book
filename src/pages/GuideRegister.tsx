@@ -45,6 +45,8 @@ const LANGUAGE_OPTIONS = [
   "Korean",
   "Italian",
   "Hindi",
+  "Vietnamese",
+  "Indonesian",
 ];
 
 const SPECIALIZATION_OPTIONS = [
