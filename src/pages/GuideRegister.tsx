@@ -47,6 +47,12 @@ const LANGUAGE_OPTIONS = [
   "Hindi",
   "Vietnamese",
   "Indonesian",
+  "Dutch",
+  "Thai",
+  "Turkish",
+  "Swedish",
+  "Ukrainian",
+  "Hebrew",
 ];
 
 const SPECIALIZATION_OPTIONS = [
@@ -677,6 +683,62 @@ const GuideRegister = () => {
                   );
                 })}
               </div>
+
+              {/* Other language free-text */}
+              <div className="pt-2">
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  {t("guideRegister.otherLanguage", "Other language(s)")}
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={t("guideRegister.otherLanguagePlaceholder", "e.g. Swahili, Tagalog…")}
+                    className="flex-1"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const val = (e.target as HTMLInputElement).value.trim();
+                        if (val && !languages.includes(val)) {
+                          setLanguages([...languages, val]);
+                          (e.target as HTMLInputElement).value = "";
+                        }
+                      }
+                    }}
+                    id="other-language-input"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="border-primary/20"
+                    onClick={() => {
+                      const input = document.getElementById("other-language-input") as HTMLInputElement;
+                      const val = input?.value.trim();
+                      if (val && !languages.includes(val)) {
+                        setLanguages([...languages, val]);
+                        input.value = "";
+                      }
+                    }}
+                  >
+                    {t("guideRegister.addLanguage", "Add")}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Show custom (non-preset) languages as removable badges */}
+              {languages.filter(l => !LANGUAGE_OPTIONS.includes(l)).length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {languages.filter(l => !LANGUAGE_OPTIONS.includes(l)).map(lang => (
+                    <Badge
+                      key={lang}
+                      variant="secondary"
+                      className="gap-1 cursor-pointer bg-primary/10 text-primary border-primary/20 hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => setLanguages(languages.filter(l => l !== lang))}
+                    >
+                      {lang} ✕
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
