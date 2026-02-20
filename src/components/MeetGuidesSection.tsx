@@ -39,6 +39,28 @@ interface ReviewStats {
 
 const AREA_OPTIONS = ["Washington DC", "New York City", "Niagara Falls", "Toronto", "Boston", "Chicago"];
 
+const SPECIALTY_OPTIONS = [
+  "City Tours",
+  "Ecotourism",
+  "Cultural Exploration",
+  "Nature Adventures",
+  "Hiking & Wildlife",
+  "Custom Itineraries",
+  "History & Heritage",
+  "Food & Culinary",
+  "Art & Museums",
+  "Architecture & Urban Design",
+  "Photography Tours",
+  "Family-Friendly",
+  "Luxury & VIP",
+  "Adventure & Sports",
+  "Nightlife & Entertainment",
+  "Religious & Spiritual Sites",
+  "Wine & Brewery Tours",
+  "Beach & Water Activities",
+  "Shopping & Local Markets",
+];
+
 const MeetGuidesSection = () => {
   const { t, i18n } = useTranslation();
   const [guides, setGuides] = useState<GuideProfile[]>([]);
@@ -107,9 +129,12 @@ const MeetGuidesSection = () => {
   }, [guides]);
 
   const allSpecialties = useMemo(() => {
-    const specs = new Set<string>();
+    const specs = new Set<string>(SPECIALTY_OPTIONS);
     guides.forEach(g => g.form_data.specializations?.forEach(s => specs.add(s)));
-    return Array.from(specs).sort();
+    // Keep SPECIALTY_OPTIONS order first, then any extras sorted
+    const ordered = SPECIALTY_OPTIONS.filter(s => specs.has(s));
+    const extras = Array.from(specs).filter(s => !SPECIALTY_OPTIONS.includes(s)).sort();
+    return [...ordered, ...extras];
   }, [guides]);
 
   // Filtered guides
