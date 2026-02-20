@@ -19,6 +19,7 @@ import {
   Eye,
 } from "lucide-react";
 import logoImg from "@/assets/logo.jpg";
+import BookingsManager from "@/components/dashboard/BookingsManager";
 
 interface PhotoItem {
   name: string;
@@ -438,6 +439,9 @@ const GuideDashboard = () => {
             )}
           </section>
         )}
+
+        {/* Bookings Management */}
+        {user && <BookingsManager userId={user.id} />}
 
         {/* Portfolio Photos Section */}
         <section className="bg-card rounded-2xl border border-border/50 p-6">
