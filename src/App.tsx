@@ -16,6 +16,7 @@ import GuideProfilePage from "./pages/GuideProfilePage";
 import ExploreCities from "./pages/ExploreCities";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
+import GuideDashboard from "./pages/GuideDashboard";
 import NotFound from "./pages/NotFound";
 
 const ScrollToTop = () => {
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/guide-register" element={<GuideRegister />} />
+          <Route path="/guide-dashboard" element={<GuideDashboard />} />
           <Route path="/apply-city-pilot" element={<ApplyCityPilot />} />
           <Route path="/guide/:id" element={<GuideProfilePage />} />
           <Route path="/explore" element={<ExploreCities />} />

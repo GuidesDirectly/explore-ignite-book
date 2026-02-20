@@ -470,9 +470,14 @@ const GuideRegister = () => {
           <p className="text-muted-foreground mb-6">
             {t("guideRegister.pendingReview")}
           </p>
-          <Button variant="outline" onClick={() => navigate("/")}>
-            ← {t("guideRegister.backHome")}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button variant="default" onClick={() => navigate("/guide-dashboard")}>
+              {t("guideRegister.manageDashboard", "Manage Portfolio")}
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/")}>
+              ← {t("guideRegister.backHome")}
+            </Button>
+          </div>
         </div>
       </div>
     );
