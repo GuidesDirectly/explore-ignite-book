@@ -12,6 +12,12 @@ import zh from "./locales/zh.json";
 import ja from "./locales/ja.json";
 import he from "./locales/he.json";
 import ar from "./locales/ar.json";
+import pt from "./locales/pt.json";
+import ko from "./locales/ko.json";
+import it from "./locales/it.json";
+import hi from "./locales/hi.json";
+import vi from "./locales/vi.json";
+import id from "./locales/id.json";
 
 export const languages = [
   { code: "en", name: "English", flag: "us" },
@@ -24,6 +30,12 @@ export const languages = [
   { code: "ja", name: "日本語", flag: "jp" },
   { code: "he", name: "עברית", flag: "il" },
   { code: "ar", name: "العربية", flag: "eg" },
+  { code: "pt", name: "Português", flag: "br" },
+  { code: "ko", name: "한국어", flag: "kr" },
+  { code: "it", name: "Italiano", flag: "it" },
+  { code: "hi", name: "हिन्दी", flag: "in" },
+  { code: "vi", name: "Tiếng Việt", flag: "vn" },
+  { code: "id", name: "Bahasa Indonesia", flag: "id" },
 ];
 
 i18n
@@ -41,6 +53,12 @@ i18n
       ja: { translation: ja },
       he: { translation: he },
       ar: { translation: ar },
+      pt: { translation: pt },
+      ko: { translation: ko },
+      it: { translation: it },
+      hi: { translation: hi },
+      vi: { translation: vi },
+      id: { translation: id },
     },
     fallbackLng: "en",
     interpolation: { escapeValue: false },

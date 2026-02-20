@@ -24,6 +24,8 @@ const OPTION_KEY_MAP: Record<string, string> = {
   "Korean": "options.lang_korean",
   "Italian": "options.lang_italian",
   "Hindi": "options.lang_hindi",
+  "Vietnamese": "options.lang_vietnamese",
+  "Indonesian": "options.lang_indonesian",
 
   // Specializations
   "City Tours": "options.spec_city_tours",
