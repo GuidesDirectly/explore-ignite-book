@@ -80,6 +80,7 @@ const TourPlannerSection = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [tourPlanId, setTourPlanId] = useState<string | null>(null);
+  const [updateToken, setUpdateToken] = useState<string | null>(null);
 
   // Refinement
   const [refinementCount, setRefinementCount] = useState(0);
@@ -195,11 +196,28 @@ const TourPlannerSection = () => {
     if (refCount !== undefined) data.refinement_count = refCount;
     if (refHistory !== undefined) data.refinement_history = refHistory;
 
-    if (tourPlanId) {
-      await supabase.from("tour_plans").update(data as any).eq("id", tourPlanId);
+    if (tourPlanId && updateToken) {
+      // Use direct REST API to pass x-update-token header for RLS validation
+      await fetch(`${SUPABASE_URL}/rest/v1/tour_plans?id=eq.${tourPlanId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "x-update-token": updateToken,
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify(data),
+      });
     } else {
+      // Generate a random token for this session
+      const token = crypto.randomUUID();
+      data.update_token = token;
       const { data: inserted } = await supabase.from("tour_plans").insert(data as any).select("id").single();
-      if (inserted) setTourPlanId(inserted.id);
+      if (inserted) {
+        setTourPlanId(inserted.id);
+        setUpdateToken(token);
+      }
     }
   };
 
@@ -301,9 +319,19 @@ const TourPlannerSection = () => {
     // Send email to customer
     await sendCustomerEmail();
     setEmailSent(true);
-    // Update status
-    if (tourPlanId) {
-      await supabase.from("tour_plans").update({ status: "completed" } as any).eq("id", tourPlanId);
+    // Update status via REST API with token
+    if (tourPlanId && updateToken) {
+      await fetch(`${SUPABASE_URL}/rest/v1/tour_plans?id=eq.${tourPlanId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "x-update-token": updateToken,
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({ status: "completed" }),
+      });
     }
   };
 
@@ -432,7 +460,7 @@ const TourPlannerSection = () => {
     setGuideDescription("");
     setError("");
     setTourPlanId(null);
-    setRefinementCount(0);
+    setUpdateToken(null);
     setRefinementText("");
     setRefinementHistory([]);
     setShowRefinementInput(false);
