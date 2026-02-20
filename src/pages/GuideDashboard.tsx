@@ -11,7 +11,12 @@ import {
   Images,
   Loader2,
   Plus,
-  GripVertical,
+  BarChart3,
+  Star,
+  MessageSquare,
+  CalendarCheck,
+  TrendingUp,
+  Eye,
 } from "lucide-react";
 import logoImg from "@/assets/logo.jpg";
 
@@ -20,9 +25,45 @@ interface PhotoItem {
   url: string;
 }
 
+interface AnalyticsData {
+  totalReviews: number;
+  avgRating: number;
+  totalBookings: number;
+  pendingBookings: number;
+  confirmedBookings: number;
+  totalConversations: number;
+  totalPhotos: number;
+  recentReviews: { reviewer_name: string; rating: number; comment: string | null; created_at: string }[];
+}
+
 const MAX_PHOTOS = 20;
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+const StatCard = ({
+  icon: Icon,
+  label,
+  value,
+  subValue,
+  accent = false,
+}: {
+  icon: any;
+  label: string;
+  value: string | number;
+  subValue?: string;
+  accent?: boolean;
+}) => (
+  <div className="bg-card rounded-xl border border-border/50 p-5 flex flex-col gap-2">
+    <div className="flex items-center gap-2 text-muted-foreground">
+      <Icon className={`w-4 h-4 ${accent ? "text-primary" : ""}`} />
+      <span className="text-xs font-semibold uppercase tracking-wide">{label}</span>
+    </div>
+    <p className={`font-display text-3xl font-bold ${accent ? "text-primary" : "text-foreground"}`}>
+      {value}
+    </p>
+    {subValue && <p className="text-xs text-muted-foreground">{subValue}</p>}
+  </div>
+);
 
 const GuideDashboard = () => {
   const { t } = useTranslation();
@@ -33,6 +74,17 @@ const GuideDashboard = () => {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [guideName, setGuideName] = useState("");
+  const [guideProfileId, setGuideProfileId] = useState<string | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData>({
+    totalReviews: 0,
+    avgRating: 0,
+    totalBookings: 0,
+    pendingBookings: 0,
+    confirmedBookings: 0,
+    totalConversations: 0,
+    totalPhotos: 0,
+    recentReviews: [],
+  });
 
   useEffect(() => {
     const init = async () => {
@@ -46,10 +98,10 @@ const GuideDashboard = () => {
       }
       setUser(u);
 
-      // Fetch guide profile name
+      // Fetch guide profile
       const { data: profile } = await supabase
         .from("guide_profiles")
-        .select("form_data")
+        .select("id, form_data")
         .eq("user_id", u.id)
         .maybeSingle();
 
@@ -60,6 +112,7 @@ const GuideDashboard = () => {
 
       const fd = profile.form_data as any;
       setGuideName(`${fd.firstName || ""} ${fd.lastName || ""}`.trim());
+      setGuideProfileId(profile.id);
       setLoading(false);
     };
     init();
@@ -71,6 +124,72 @@ const GuideDashboard = () => {
     });
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Fetch analytics data
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchAnalytics = async () => {
+      // Fetch reviews, bookings, conversations in parallel
+      const [reviewsRes, bookingsRes, conversationsRes] = await Promise.all([
+        supabase
+          .from("reviews" as any)
+          .select("rating, reviewer_name, comment, created_at")
+          .eq("guide_user_id", user.id)
+          .eq("hidden", false)
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabase
+          .from("bookings")
+          .select("status")
+          .eq("guide_user_id", user.id),
+        supabase
+          .from("conversations")
+          .select("id")
+          .eq("guide_user_id", user.id),
+      ]);
+
+      const reviews = (reviewsRes.data as any[]) || [];
+      const bookings = bookingsRes.data || [];
+      const conversations = conversationsRes.data || [];
+
+      const totalRating = reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0);
+
+      setAnalytics({
+        totalReviews: reviews.length >= 5 ? reviews.length : reviews.length, // limited to 5 recent
+        avgRating: reviews.length > 0 ? Math.round((totalRating / reviews.length) * 10) / 10 : 0,
+        totalBookings: bookings.length,
+        pendingBookings: bookings.filter((b) => b.status === "pending").length,
+        confirmedBookings: bookings.filter((b) => b.status === "confirmed").length,
+        totalConversations: conversations.length,
+        totalPhotos: 0, // will be set from photos state
+        recentReviews: reviews.slice(0, 3).map((r: any) => ({
+          reviewer_name: r.reviewer_name,
+          rating: r.rating,
+          comment: r.comment,
+          created_at: r.created_at,
+        })),
+      });
+
+      // Get full review count (the query above is limited)
+      const { count } = await supabase
+        .from("reviews" as any)
+        .select("id", { count: "exact", head: true })
+        .eq("guide_user_id", user.id)
+        .eq("hidden", false);
+
+      if (count !== null) {
+        setAnalytics((prev) => ({ ...prev, totalReviews: count }));
+      }
+    };
+
+    fetchAnalytics();
+  }, [user]);
+
+  // Update photo count in analytics
+  useEffect(() => {
+    setAnalytics((prev) => ({ ...prev, totalPhotos: photos.length }));
+  }, [photos]);
 
   const fetchPhotos = useCallback(async () => {
     if (!user) return;
@@ -158,7 +277,6 @@ const GuideDashboard = () => {
     }
 
     setUploading(false);
-    // Reset file input
     e.target.value = "";
   };
 
@@ -178,6 +296,17 @@ const GuideDashboard = () => {
     }
     setDeleting(null);
   };
+
+  const renderStars = (rating: number) => (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`w-3 h-3 ${star <= rating ? "text-primary fill-primary" : "text-muted-foreground/30"}`}
+        />
+      ))}
+    </div>
+  );
 
   if (loading) {
     return (
@@ -218,7 +347,98 @@ const GuideDashboard = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
+        {/* Analytics Overview */}
+        <section>
+          <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2 mb-4">
+            <BarChart3 className="w-5 h-5 text-primary" />
+            {t("guideDashboard.analytics", "Analytics Overview")}
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <StatCard
+              icon={Star}
+              label={t("guideDashboard.avgRating", "Avg Rating")}
+              value={analytics.avgRating > 0 ? analytics.avgRating : "—"}
+              subValue={
+                analytics.totalReviews > 0
+                  ? `${analytics.totalReviews} ${analytics.totalReviews === 1 ? "review" : "reviews"}`
+                  : "No reviews yet"
+              }
+              accent
+            />
+            <StatCard
+              icon={Star}
+              label={t("guideDashboard.reviews", "Reviews")}
+              value={analytics.totalReviews}
+            />
+            <StatCard
+              icon={CalendarCheck}
+              label={t("guideDashboard.bookings", "Bookings")}
+              value={analytics.totalBookings}
+              subValue={
+                analytics.pendingBookings > 0
+                  ? `${analytics.pendingBookings} pending`
+                  : undefined
+              }
+            />
+            <StatCard
+              icon={MessageSquare}
+              label={t("guideDashboard.messages", "Conversations")}
+              value={analytics.totalConversations}
+            />
+            <StatCard
+              icon={Images}
+              label={t("guideDashboard.photos", "Photos")}
+              value={analytics.totalPhotos}
+              subValue={`${MAX_PHOTOS - analytics.totalPhotos} slots left`}
+            />
+          </div>
+        </section>
+
+        {/* Recent Reviews */}
+        {analytics.recentReviews.length > 0 && (
+          <section className="bg-card rounded-2xl border border-border/50 p-6">
+            <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              {t("guideDashboard.recentReviews", "Recent Reviews")}
+            </h2>
+            <div className="space-y-4">
+              {analytics.recentReviews.map((review, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-col gap-1 pb-4 border-b border-border/30 last:border-0 last:pb-0"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-foreground">
+                      {review.reviewer_name}
+                    </span>
+                    {renderStars(review.rating)}
+                  </div>
+                  {review.comment && (
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {review.comment}
+                    </p>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(review.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {guideProfileId && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={() => navigate(`/guide/${guideProfileId}`)}
+              >
+                <Eye className="w-4 h-4 mr-1" />
+                {t("guideDashboard.viewProfile", "View Public Profile")}
+              </Button>
+            )}
+          </section>
+        )}
+
         {/* Portfolio Photos Section */}
         <section className="bg-card rounded-2xl border border-border/50 p-6">
           <div className="flex items-center justify-between mb-6">
