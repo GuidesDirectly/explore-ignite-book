@@ -286,6 +286,24 @@ export type Database = {
         }
         Relationships: []
       }
+      password_breach_cache: {
+        Row: {
+          fetched_at: string
+          hashes: string
+          prefix: string
+        }
+        Insert: {
+          fetched_at?: string
+          hashes: string
+          prefix: string
+        }
+        Update: {
+          fetched_at?: string
+          hashes?: string
+          prefix?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           booking_id: string | null
