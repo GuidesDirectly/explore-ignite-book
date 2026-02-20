@@ -14,3 +14,7 @@ verify_jwt = false
 
 [functions.scan-upload]
 verify_jwt = false
+
+[functions.check-password-breach]
+verify_jwt = false
+
