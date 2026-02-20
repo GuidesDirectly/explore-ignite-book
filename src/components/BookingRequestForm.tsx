@@ -117,6 +117,27 @@ const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas }:
     } else {
       setSubmitted(true);
       toast.success("Booking request sent!");
+
+      // Send confirmation email to traveler
+      try {
+        await supabase.functions.invoke("send-notification", {
+          body: {
+            type: "booking_request",
+            data: {
+              travelerName: data.traveler_name,
+              travelerEmail: data.traveler_email,
+              guideName,
+              tourType: data.tour_type,
+              date: format(data.date, "PPP"),
+              time: data.time,
+              location: data.location || null,
+              groupSize: data.group_size,
+            },
+          },
+        });
+      } catch (e) {
+        console.error("Failed to send confirmation email:", e);
+      }
     }
     setSubmitting(false);
   };

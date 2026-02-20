@@ -27,14 +27,14 @@ const corsHeaders = {
 const NOTIFY_EMAIL = "michael@iguidetours.net";
 
 interface NotificationRequest {
-  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status";
+  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request";
   data: Record<string, unknown>;
 }
 
-const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status"]);
+const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request"]);
 
 // Notification types that can be sent without authentication (public forms)
-const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan"]);
+const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request"]);
 // Notification types that require authentication
 const AUTH_TYPES = new Set(["guide_status", "guide_application", "booking_status"]);
 
