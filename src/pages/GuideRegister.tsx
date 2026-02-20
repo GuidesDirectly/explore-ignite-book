@@ -48,16 +48,25 @@ const LANGUAGE_OPTIONS = [
 ];
 
 const SPECIALIZATION_OPTIONS = [
-  "History & Culture",
+  "City Tours",
+  "Ecotourism",
+  "Cultural Exploration",
+  "Nature Adventures",
+  "Hiking & Wildlife",
+  "Custom Itineraries",
+  "History & Heritage",
   "Food & Culinary",
   "Art & Museums",
-  "Nature & Outdoors",
-  "Architecture",
-  "Nightlife & Entertainment",
+  "Architecture & Urban Design",
   "Photography Tours",
   "Family-Friendly",
   "Luxury & VIP",
   "Adventure & Sports",
+  "Nightlife & Entertainment",
+  "Religious & Spiritual Sites",
+  "Wine & Brewery Tours",
+  "Beach & Water Activities",
+  "Shopping & Local Markets",
 ];
 
 const TOUR_TYPE_OPTIONS = [
