@@ -470,6 +470,50 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews_guide: {
+        Row: {
+          booking_id: string | null
+          comment: string | null
+          created_at: string | null
+          guide_user_id: string | null
+          hidden: boolean | null
+          id: string | null
+          rating: number | null
+          reviewer_name: string | null
+          translations: Json | null
+        }
+        Insert: {
+          booking_id?: string | null
+          comment?: string | null
+          created_at?: string | null
+          guide_user_id?: string | null
+          hidden?: boolean | null
+          id?: string | null
+          rating?: number | null
+          reviewer_name?: string | null
+          translations?: Json | null
+        }
+        Update: {
+          booking_id?: string | null
+          comment?: string | null
+          created_at?: string | null
+          guide_user_id?: string | null
+          hidden?: boolean | null
+          id?: string | null
+          rating?: number | null
+          reviewer_name?: string | null
+          translations?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews_public: {
         Row: {
           booking_id: string | null
