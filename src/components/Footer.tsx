@@ -5,13 +5,13 @@ const Footer = () => {
   const { t } = useTranslation();
 
   const platformLinks = [
-    { label: t("footer.findGuide"), href: "#guides" },
+    { label: t("footer.findGuide"), href: "/home#meet-guides" },
     { label: t("footer.joinGuide"), href: "/guide-register" },
-    { label: t("footer.howItWorks"), href: "#how-it-works" },
+    { label: t("footer.howItWorks"), href: "/home#how-it-works" },
   ];
   const resourceLinks = [
-    { label: t("footer.faq"), href: "#faq" },
-    { label: t("footer.safety"), href: "#trust" },
+    { label: t("footer.faq"), href: "/home#faq" },
+    { label: t("footer.safety"), href: "/home#trust" },
   ];
   const companyLinks = [
     { label: t("footer.about"), href: "#about" },
