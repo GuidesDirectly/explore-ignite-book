@@ -14,6 +14,7 @@ import {
   Clock,
   ChevronDown,
   ChevronUp,
+  Mail,
 } from "lucide-react";
 
 interface Booking {
@@ -39,7 +40,7 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
   cancelled: { label: "Cancelled", variant: "destructive" },
 };
 
-const BookingsManager = ({ userId }: { userId: string }) => {
+const BookingsManager = ({ userId, guideName }: { userId: string; guideName: string }) => {
   const { t } = useTranslation();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +65,7 @@ const BookingsManager = ({ userId }: { userId: string }) => {
 
   const updateStatus = async (bookingId: string, newStatus: string) => {
     setUpdating(bookingId);
+    const booking = bookings.find((b) => b.id === bookingId);
     const { error } = await supabase
       .from("bookings")
       .update({ status: newStatus })
@@ -76,6 +78,31 @@ const BookingsManager = ({ userId }: { userId: string }) => {
       setBookings((prev) =>
         prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b))
       );
+
+      // Send email notification to traveler if they have an email
+      if (booking?.traveler_email && (newStatus === "confirmed" || newStatus === "declined")) {
+        try {
+          await supabase.functions.invoke("send-notification", {
+            body: {
+              type: "booking_status",
+              data: {
+                bookingId,
+                travelerName: booking.traveler_name,
+                travelerEmail: booking.traveler_email,
+                guideName,
+                status: newStatus,
+                tourType: booking.tour_type,
+                date: booking.date,
+                time: booking.time,
+                location: booking.location,
+              },
+            },
+          });
+          toast.success("Notification sent to traveler.", { icon: "📧" });
+        } catch (e) {
+          console.error("Failed to send booking notification:", e);
+        }
+      }
     }
     setUpdating(null);
   };
