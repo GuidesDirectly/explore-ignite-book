@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import GuideContactForm from "@/components/GuideContactForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -362,6 +363,13 @@ const GuideProfilePage = () => {
                 </Button>
               </div>
             </section>
+
+            {/* Contact form */}
+            <GuideContactForm
+              guideName={`${fd.firstName} ${fd.lastName}`}
+              guideUserId={guide.user_id}
+              serviceAreas={guide.service_areas || []}
+            />
           </motion.div>
         </div>
       </div>
