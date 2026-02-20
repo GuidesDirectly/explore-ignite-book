@@ -22,6 +22,8 @@ import {
 import logoImg from "@/assets/logo.jpg";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import PasswordStrengthMeter, { isPasswordStrong } from "@/components/PasswordStrengthMeter";
+import { checkPasswordBreached } from "@/lib/hibp";
+import { scanFileForViruses } from "@/lib/scanUpload";
 
 
 const AREA_OPTIONS = [
@@ -101,6 +103,7 @@ const GuideRegister = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [checkingBreach, setCheckingBreach] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [profileExists, setProfileExists] = useState(false);
@@ -196,6 +199,20 @@ const GuideRegister = () => {
         toast.error("Password does not meet all strength requirements.");
         return;
       }
+
+      // HIBP k-anonymity breach check — password hash prefix only, never the full password
+      setCheckingBreach(true);
+      const breached = await checkPasswordBreached(authPassword);
+      setCheckingBreach(false);
+
+      if (breached) {
+        toast.error(
+          "This password has appeared in known data breaches. Please choose another.",
+          { duration: 6000 }
+        );
+        return;
+      }
+
       const { error } = await supabase.auth.signUp({
         email: authEmail,
         password: authPassword,
@@ -330,10 +347,16 @@ const GuideRegister = () => {
     setSubmitting(true);
 
     try {
-      // Upload profile photo — validate MIME, rename to random filename
+      // Upload profile photo — scan, validate MIME, rename to random filename
       if (profilePhoto) {
         if (!ALLOWED_IMAGE_TYPES.includes(profilePhoto.type)) {
           toast.error("Invalid profile photo type.");
+          setSubmitting(false);
+          return;
+        }
+        const photoScan = await scanFileForViruses(profilePhoto);
+        if (!photoScan.clean) {
+          toast.error("Profile photo failed security scan. Please use a different file.");
           setSubmitting(false);
           return;
         }
@@ -348,10 +371,16 @@ const GuideRegister = () => {
         if (uploadError) console.error("Photo upload error:", uploadError);
       }
 
-      // Upload license doc — validate MIME, rename to random filename, store in private bucket
+      // Upload license doc — scan, validate MIME, rename to random filename, store in private bucket
       if (licenseDoc) {
         if (!ALLOWED_DOC_TYPES.includes(licenseDoc.type)) {
           toast.error("Invalid license document type.");
+          setSubmitting(false);
+          return;
+        }
+        const docScan = await scanFileForViruses(licenseDoc);
+        if (!docScan.clean) {
+          toast.error("License document failed security scan. Please use a different file.");
           setSubmitting(false);
           return;
         }
@@ -365,6 +394,7 @@ const GuideRegister = () => {
           });
         if (licenseUploadError) console.error("License doc upload error:", licenseUploadError);
       }
+
 
       const certList = certifications
         .split(",")
@@ -500,8 +530,8 @@ const GuideRegister = () => {
                 <PasswordStrengthMeter password={authPassword} />
               </div>
             )}
-            <Button variant="hero" className="w-full" type="submit">
-              {isSignUp ? t("guideRegister.signUp") : t("guideRegister.signIn")}
+            <Button variant="hero" className="w-full" type="submit" disabled={checkingBreach}>
+              {checkingBreach ? "Checking password safety…" : isSignUp ? t("guideRegister.signUp") : t("guideRegister.signIn")}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
               {isSignUp ? t("guideRegister.haveAccount") : t("guideRegister.noAccount")}{" "}

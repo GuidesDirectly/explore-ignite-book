@@ -6,11 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Lock, CheckCircle, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PasswordStrengthMeter, { isPasswordStrong } from "@/components/PasswordStrengthMeter";
+import { checkPasswordBreached } from "@/lib/hibp";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkingBreach, setCheckingBreach] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [isRecovery, setIsRecovery] = useState(false);
@@ -42,6 +44,18 @@ const ResetPassword = () => {
     }
     if (password !== confirm) {
       setError("Passwords do not match.");
+      return;
+    }
+
+    // HIBP k-anonymity breach check before accepting new password
+    setCheckingBreach(true);
+    const breached = await checkPasswordBreached(password);
+    setCheckingBreach(false);
+
+    if (breached) {
+      setError(
+        "This password has appeared in known data breaches. Please choose another."
+      );
       return;
     }
 
@@ -116,8 +130,8 @@ const ResetPassword = () => {
                 </div>
               )}
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Updating…" : "Update Password"}
+              <Button type="submit" className="w-full" disabled={loading || checkingBreach}>
+                {checkingBreach ? "Checking password safety…" : loading ? "Updating…" : "Update Password"}
               </Button>
             </form>
           )}
