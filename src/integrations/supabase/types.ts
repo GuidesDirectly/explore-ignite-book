@@ -375,6 +375,7 @@ export type Database = {
           refinement_count: number
           refinement_history: Json
           status: string
+          update_token: string | null
           updated_at: string
         }
         Insert: {
@@ -394,6 +395,7 @@ export type Database = {
           refinement_count?: number
           refinement_history?: Json
           status?: string
+          update_token?: string | null
           updated_at?: string
         }
         Update: {
@@ -413,6 +415,7 @@ export type Database = {
           refinement_count?: number
           refinement_history?: Json
           status?: string
+          update_token?: string | null
           updated_at?: string
         }
         Relationships: []
