@@ -6,6 +6,7 @@ import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import GuideContactForm from "@/components/GuideContactForm";
+import GuideGallery from "@/components/GuideGallery";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -393,6 +394,9 @@ const GuideProfilePage = () => {
                 </div>
               </section>
             )}
+
+            {/* Photo gallery */}
+            <GuideGallery guideUserId={guide.user_id} />
 
             {/* Reviews */}
             <section className="bg-card rounded-2xl border border-border/50 p-6">
