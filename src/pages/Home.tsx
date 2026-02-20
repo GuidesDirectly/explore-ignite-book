@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import LaunchStripSection from "@/components/LaunchStripSection";
@@ -15,10 +17,29 @@ import FAQSection from "@/components/FAQSection";
 import FinalCtaSection from "@/components/FinalCtaSection";
 import InquirySection from "@/components/InquirySection";
 import Footer from "@/components/Footer";
-import { Link } from "react-router-dom";
 import { MessageCircle } from "lucide-react";
 
 const Home = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const scrollToHash = () => {
+        const el = document.querySelector(location.hash);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+          return true;
+        }
+        return false;
+      };
+      // Try multiple times as sections may load async
+      const attempts = [100, 500, 1000];
+      attempts.forEach((delay) => {
+        setTimeout(() => scrollToHash(), delay);
+      });
+    }
+  }, [location.hash]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
