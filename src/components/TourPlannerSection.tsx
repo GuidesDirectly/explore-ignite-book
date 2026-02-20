@@ -239,6 +239,7 @@ const TourPlannerSection = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
+        body: JSON.stringify({ description: buildDescription(refinement) }),
       });
 
       if (!resp.ok || !resp.body) {
