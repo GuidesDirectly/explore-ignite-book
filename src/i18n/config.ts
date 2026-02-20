@@ -18,6 +18,11 @@ import it from "./locales/it.json";
 import hi from "./locales/hi.json";
 import vi from "./locales/vi.json";
 import id from "./locales/id.json";
+import nl from "./locales/nl.json";
+import th from "./locales/th.json";
+import tr from "./locales/tr.json";
+import sv from "./locales/sv.json";
+import uk from "./locales/uk.json";
 
 export const languages = [
   { code: "en", name: "English", flag: "us" },
@@ -36,6 +41,11 @@ export const languages = [
   { code: "hi", name: "हिन्दी", flag: "in" },
   { code: "vi", name: "Tiếng Việt", flag: "vn" },
   { code: "id", name: "Bahasa Indonesia", flag: "id" },
+  { code: "nl", name: "Nederlands", flag: "nl" },
+  { code: "th", name: "ไทย", flag: "th" },
+  { code: "tr", name: "Türkçe", flag: "tr" },
+  { code: "sv", name: "Svenska", flag: "se" },
+  { code: "uk", name: "Українська", flag: "ua" },
 ];
 
 i18n
@@ -59,6 +69,11 @@ i18n
       hi: { translation: hi },
       vi: { translation: vi },
       id: { translation: id },
+      nl: { translation: nl },
+      th: { translation: th },
+      tr: { translation: tr },
+      sv: { translation: sv },
+      uk: { translation: uk },
     },
     fallbackLng: "en",
     interpolation: { escapeValue: false },
