@@ -91,6 +91,91 @@ const GuideProfilePage = () => {
     fetchGuide();
   }, [id]);
 
+  // Dynamic SEO meta tags & JSON-LD
+  useEffect(() => {
+    if (!guide) return;
+    const fd = guide.form_data;
+    const name = `${fd.firstName} ${fd.lastName}`;
+    const areas = (guide.service_areas || []).join(", ");
+    const specs = (fd.specializations || []).join(", ");
+    const bio = fd.biography || "";
+    const shortBio = bio.length > 150 ? bio.slice(0, 147) + "…" : bio;
+
+    const title = `${name} — Local Guide in ${areas || "Your City"} | Guides Directly`;
+    const description = shortBio || `Book ${name} for private tours in ${areas}. ${specs ? `Specializes in ${specs}.` : ""} Zero commissions, direct booking.`;
+    const pageUrl = `https://explore-ignite-book.lovable.app/guide/${guide.id}`;
+    const imageUrl = photoUrl || "https://explore-ignite-book.lovable.app/og-image.jpg";
+
+    // Title
+    document.title = title;
+
+    // Helper to set/create meta tags
+    const setMeta = (attr: string, key: string, content: string) => {
+      let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+
+    setMeta("name", "description", description);
+    setMeta("property", "og:title", title);
+    setMeta("property", "og:description", description);
+    setMeta("property", "og:type", "profile");
+    setMeta("property", "og:url", pageUrl);
+    setMeta("property", "og:image", imageUrl);
+    setMeta("name", "twitter:card", "summary_large_image");
+    setMeta("name", "twitter:title", title);
+    setMeta("name", "twitter:description", description);
+    setMeta("name", "twitter:image", imageUrl);
+
+    // Canonical
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", pageUrl);
+
+    // JSON-LD structured data
+    const jsonLdId = "guide-profile-jsonld";
+    let script = document.getElementById(jsonLdId) as HTMLScriptElement | null;
+    if (!script) {
+      script = document.createElement("script");
+      script.id = jsonLdId;
+      script.type = "application/ld+json";
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "TouristGuide",
+      "name": name,
+      "description": shortBio,
+      "url": pageUrl,
+      "image": imageUrl,
+      "knowsLanguage": fd.languages || [],
+      "areaServed": (guide.service_areas || []).map(a => ({ "@type": "City", "name": a })),
+      ...(reviews.length > 0 && {
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10,
+          "reviewCount": reviews.length,
+          "bestRating": 5,
+          "worstRating": 1
+        }
+      })
+    });
+
+    // Cleanup
+    return () => {
+      document.title = "iGuide Tours — Premium Local Tour Guides in USA & Canada";
+      const ldScript = document.getElementById(jsonLdId);
+      if (ldScript) ldScript.remove();
+    };
+  }, [guide, photoUrl, reviews]);
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
