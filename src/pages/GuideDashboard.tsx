@@ -441,7 +441,7 @@ const GuideDashboard = () => {
         )}
 
         {/* Bookings Management */}
-        {user && <BookingsManager userId={user.id} />}
+        {user && <BookingsManager userId={user.id} guideName={guideName} />}
 
         {/* Portfolio Photos Section */}
         <section className="bg-card rounded-2xl border border-border/50 p-6">

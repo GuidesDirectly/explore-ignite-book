@@ -27,16 +27,16 @@ const corsHeaders = {
 const NOTIFY_EMAIL = "michael@iguidetours.net";
 
 interface NotificationRequest {
-  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application";
+  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status";
   data: Record<string, unknown>;
 }
 
-const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application"]);
+const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status"]);
 
 // Notification types that can be sent without authentication (public forms)
 const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan"]);
 // Notification types that require authentication
-const AUTH_TYPES = new Set(["guide_status", "guide_application"]);
+const AUTH_TYPES = new Set(["guide_status", "guide_application", "booking_status"]);
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -120,23 +120,48 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
 
-      // Authorization: guide_application must match authenticated user
-      if (type === "guide_application") {
+      // Authorization: guide_application and booking_status must match authenticated user
+      if (type === "guide_application" || type === "booking_status") {
         const supabaseAdmin = createClient(
           Deno.env.get("SUPABASE_URL")!,
           Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
         );
-        const { data: profile } = await supabaseAdmin
-          .from("guide_profiles")
-          .select("user_id")
-          .eq("user_id", userId)
-          .maybeSingle();
 
-        if (!profile) {
-          return new Response(
-            JSON.stringify({ error: "Forbidden: no guide profile found" }),
-            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+        if (type === "guide_application") {
+          const { data: profile } = await supabaseAdmin
+            .from("guide_profiles")
+            .select("user_id")
+            .eq("user_id", userId)
+            .maybeSingle();
+
+          if (!profile) {
+            return new Response(
+              JSON.stringify({ error: "Forbidden: no guide profile found" }),
+              { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
+
+        if (type === "booking_status") {
+          const bookingId = data.bookingId as string;
+          if (!bookingId) {
+            return new Response(
+              JSON.stringify({ error: "bookingId is required" }),
+              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          const { data: booking } = await supabaseAdmin
+            .from("bookings")
+            .select("guide_user_id")
+            .eq("id", bookingId)
+            .maybeSingle();
+
+          if (!booking || booking.guide_user_id !== userId) {
+            return new Response(
+              JSON.stringify({ error: "Forbidden: not your booking" }),
+              { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
         }
       }
     }
@@ -321,6 +346,66 @@ const handler = async (req: Request): Promise<Response> => {
           to: [NOTIFY_EMAIL],
           subject: `📋 New Guide Application: ${escapeHtml(guideName)}`,
           html: `<p>A new guide application has been submitted by <strong>${escapeHtml(guideName)}</strong> (${escapeHtml(guideEmail)}). Please review it in the admin dashboard.</p>`,
+        });
+      } catch (e) {
+        console.error("Failed to notify admin:", e);
+      }
+    } else if (type === "booking_status") {
+      const travelerName = data.travelerName as string;
+      const travelerEmail = data.travelerEmail as string;
+      const guideName = data.guideName as string;
+      const status = data.status as string;
+      const tourType = data.tourType as string;
+      const date = data.date as string;
+      const time = data.time as string;
+      const location = data.location as string | undefined;
+
+      if (!travelerEmail) throw new Error("Traveler email is required");
+
+      const isConfirmed = status === "confirmed";
+      const statusLabel = isConfirmed ? "Confirmed ✅" : status === "declined" ? "Declined" : status.charAt(0).toUpperCase() + status.slice(1);
+      const statusColor = isConfirmed ? "#1a7a4c" : status === "declined" ? "#c0392b" : "#d4a843";
+
+      subject = isConfirmed
+        ? `✅ Your booking with ${escapeHtml(guideName)} is confirmed!`
+        : status === "declined"
+        ? `Booking update from ${escapeHtml(guideName)}`
+        : `Booking status update — ${escapeHtml(statusLabel)}`;
+
+      html = `
+        <div style="font-family:'Georgia',serif;max-width:600px;margin:0 auto;border:1px solid #e8e0d0;">
+          <div style="background:linear-gradient(135deg,#1a1f2e 0%,#2a2f3e 100%);padding:40px 30px;text-align:center;">
+            <h1 style="color:#d4a843;margin:0;font-size:28px;letter-spacing:1px;">iGuide Tours</h1>
+            <p style="color:#8a8fa0;margin:8px 0 0;font-size:13px;letter-spacing:2px;text-transform:uppercase;">Booking Update</p>
+          </div>
+          <div style="padding:40px 35px;background:#faf9f7;">
+            <h2 style="color:#1a1f2e;font-size:22px;margin:0 0 20px;">Hi ${escapeHtml(travelerName)},</h2>
+            <p style="color:#333;line-height:1.8;font-size:15px;">Your booking with <strong>${escapeHtml(guideName)}</strong> has been <strong style="color:${statusColor};">${escapeHtml(statusLabel.toLowerCase())}</strong>.</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;background:white;border-radius:8px;border:1px solid #e8e0d0;">
+              <tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Tour</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(tourType)}</td></tr>
+              <tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Date</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(date)}</td></tr>
+              <tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Time</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(time)}</td></tr>
+              ${location ? `<tr><td style="padding:12px 15px;font-weight:bold;color:#555;">Location</td><td style="padding:12px 15px;">${escapeHtml(location)}</td></tr>` : ""}
+            </table>
+            ${isConfirmed ? `<p style="color:#333;line-height:1.8;font-size:15px;">Your guide is looking forward to showing you an amazing experience. If you have any questions, feel free to reply to this email.</p>` : status === "declined" ? `<p style="color:#333;line-height:1.8;font-size:15px;">Unfortunately, your guide was unable to accommodate this booking. We encourage you to explore other available guides or adjust your dates.</p>` : ""}
+            <div style="text-align:center;margin:25px 0;">
+              <a href="https://explore-ignite-book.lovable.app" style="display:inline-block;background:linear-gradient(135deg,#d4a843,#c49a3a);color:#1a1f2e;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;">Browse Guides</a>
+            </div>
+          </div>
+          <div style="padding:20px;text-align:center;background:#1a1f2e;">
+            <p style="color:#8a8fa0;font-size:11px;margin:0;letter-spacing:1px;">iGuide Tours — Premium Private Tours Across North America</p>
+          </div>
+        </div>
+      `;
+      toEmails = [travelerEmail];
+
+      // Also notify admin
+      try {
+        await resend.emails.send({
+          from: "iGuide Tours <noreply@iguidetours.net>",
+          to: [NOTIFY_EMAIL],
+          subject: `Booking ${escapeHtml(statusLabel)}: ${escapeHtml(travelerName)} with ${escapeHtml(guideName)}`,
+          html: `<p>Booking for <strong>${escapeHtml(travelerName)}</strong> with guide <strong>${escapeHtml(guideName)}</strong> has been <strong>${escapeHtml(status)}</strong>.</p><p>Tour: ${escapeHtml(tourType)} on ${escapeHtml(date)}</p>`,
         });
       } catch (e) {
         console.error("Failed to notify admin:", e);
