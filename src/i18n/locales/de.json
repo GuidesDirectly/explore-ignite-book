@@ -8,7 +8,8 @@
     "bookTour": "Tour planen",
     "becomeGuide": "Kostenlos beitreten",
     "forTravelers": "Guide finden",
-    "findGuide": "Guide finden"
+    "findGuide": "Guide finden",
+    "forGuides": "Für Reiseführer"
   },
   "hero": {
     "headline": "Direkt beim lokalen Guide buchen",
@@ -28,7 +29,8 @@
     "whyCommissionFree": "Warum provisionsfrei wichtig ist",
     "avgRating": "Durchschnittsbewertung",
     "happyTravelers": "Zufriedene Reisende",
-    "citiesCovered": "Städte"
+    "citiesCovered": "Städte",
+    "noMiddlemen": "Keine Vermittler. Keine Provisionen. Direkte Kommunikation."
   },
   "valueProp": {
     "label": "Warum wir anders sind",
@@ -405,7 +407,17 @@
     "tour_group": "Gruppentouren",
     "tour_walking": "Wandertouren",
     "tour_driving": "Fahrtouren",
-    "tour_multiday": "Mehrtagestouren"
+    "tour_multiday": "Mehrtagestouren",
+    "spec_city_tours": "Stadttouren",
+    "spec_ecotourism": "Ökotourismus",
+    "spec_cultural": "Kulturelle Erkundung",
+    "spec_nature_adventures": "Naturabenteuer",
+    "spec_hiking_wildlife": "Wandern & Wildtiere",
+    "spec_custom_itineraries": "Individuelle Reiserouten",
+    "spec_religious": "Religiöse & Spirituelle Stätten",
+    "spec_wine": "Wein- & Brauereitouren",
+    "spec_beach": "Strand & Wasseraktivitäten",
+    "spec_shopping": "Einkaufen & Lokale Märkte"
   },
   "dest": {
     "whereWeStarted": "Unser Ursprung",

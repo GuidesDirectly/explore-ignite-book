@@ -8,7 +8,8 @@
     "bookTour": "תכנון סיור",
     "becomeGuide": "הצטרפו בחינם",
     "forTravelers": "מצא מדריך",
-    "findGuide": "מצא מדריך"
+    "findGuide": "מצא מדריך",
+    "forGuides": "למדריכים"
   },
   "hero": {
     "headline": "הזמינו ישירות ממדריכים מקומיים — ערים ואקוטוריזם בכל העולם",
@@ -467,7 +468,17 @@
     "tour_group": "סיורים קבוצתיים",
     "tour_walking": "סיורים רגליים",
     "tour_driving": "סיורי נהיגה",
-    "tour_multiday": "סיורים רב-יומיים"
+    "tour_multiday": "סיורים רב-יומיים",
+    "spec_city_tours": "סיורים בעיר",
+    "spec_ecotourism": "תיירות אקולוגית",
+    "spec_cultural": "חקירה תרבותית",
+    "spec_nature_adventures": "הרפתקאות טבע",
+    "spec_hiking_wildlife": "טיולים וחיות בר",
+    "spec_custom_itineraries": "מסלולים מותאמים אישית",
+    "spec_religious": "אתרים דתיים ורוחניים",
+    "spec_wine": "סיורי יין ומבשלות",
+    "spec_beach": "חוף ופעילויות מים",
+    "spec_shopping": "קניות ושווקים מקומיים"
   },
   "dest": {
     "whereWeStarted": "איפה התחלנו",

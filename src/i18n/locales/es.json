@@ -8,7 +8,8 @@
     "bookTour": "Planifica tu tour",
     "becomeGuide": "Únete gratis",
     "forTravelers": "Encontrar guía",
-    "findGuide": "Encontrar guía"
+    "findGuide": "Encontrar guía",
+    "forGuides": "Para guías"
   },
   "hero": {
     "headline": "Reserva directamente con guías locales",
@@ -28,7 +29,8 @@
     "whyCommissionFree": "Por qué importa sin comisiones",
     "avgRating": "Calificación promedio",
     "happyTravelers": "Viajeros felices",
-    "citiesCovered": "Ciudades"
+    "citiesCovered": "Ciudades",
+    "noMiddlemen": "Sin intermediarios. Sin comisiones. Comunicación directa."
   },
   "valueProp": {
     "label": "Por qué somos diferentes",
@@ -405,7 +407,17 @@
     "tour_group": "Tours en grupo",
     "tour_walking": "Tours a pie",
     "tour_driving": "Tours en coche",
-    "tour_multiday": "Tours de varios días"
+    "tour_multiday": "Tours de varios días",
+    "spec_city_tours": "Tours urbanos",
+    "spec_ecotourism": "Ecoturismo",
+    "spec_cultural": "Exploración cultural",
+    "spec_nature_adventures": "Aventuras en la naturaleza",
+    "spec_hiking_wildlife": "Senderismo y fauna",
+    "spec_custom_itineraries": "Itinerarios personalizados",
+    "spec_religious": "Sitios religiosos y espirituales",
+    "spec_wine": "Tours de vinos y cervecerías",
+    "spec_beach": "Playa y actividades acuáticas",
+    "spec_shopping": "Compras y mercados locales"
   },
   "dest": {
     "whereWeStarted": "Dónde comenzamos",

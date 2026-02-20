@@ -8,7 +8,8 @@
     "bookTour": "ツアーを計画",
     "becomeGuide": "無料で登録",
     "forTravelers": "ガイドを探す",
-    "findGuide": "ガイドを探す"
+    "findGuide": "ガイドを探す",
+    "forGuides": "ガイド向け"
   },
   "hero": {
     "headline": "地元ガイドに直接予約する",
@@ -28,7 +29,8 @@
     "whyCommissionFree": "手数料無料が重要な理由",
     "avgRating": "平均評価",
     "happyTravelers": "満足した旅行者",
-    "citiesCovered": "対応都市"
+    "citiesCovered": "対応都市",
+    "noMiddlemen": "仲介なし。手数料なし。直接コミュニケーション。"
   },
   "valueProp": {
     "label": "私たちが違う理由",
@@ -405,7 +407,17 @@
     "tour_group": "グループツアー",
     "tour_walking": "ウォーキングツアー",
     "tour_driving": "ドライブツアー",
-    "tour_multiday": "複数日ツアー"
+    "tour_multiday": "複数日ツアー",
+    "spec_city_tours": "シティツアー",
+    "spec_ecotourism": "エコツーリズム",
+    "spec_cultural": "文化探訪",
+    "spec_nature_adventures": "ネイチャーアドベンチャー",
+    "spec_hiking_wildlife": "ハイキング＆野生動物",
+    "spec_custom_itineraries": "カスタムイティネラリー",
+    "spec_religious": "宗教・スピリチュアルスポット",
+    "spec_wine": "ワイン＆ブルワリーツアー",
+    "spec_beach": "ビーチ＆ウォーターアクティビティ",
+    "spec_shopping": "ショッピング＆地元マーケット"
   },
   "dest": {
     "whereWeStarted": "私たちの始まり",

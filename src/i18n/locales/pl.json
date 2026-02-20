@@ -8,7 +8,8 @@
     "bookTour": "Zaplanuj wycieczkę",
     "becomeGuide": "Dołącz za darmo",
     "forTravelers": "Znajdź przewodnika",
-    "findGuide": "Znajdź przewodnika"
+    "findGuide": "Znajdź przewodnika",
+    "forGuides": "Dla przewodników"
   },
   "hero": {
     "headline": "Rezerwuj bezpośrednio u lokalnych przewodników",
@@ -28,7 +29,8 @@
     "whyCommissionFree": "Dlaczego brak prowizji ma znaczenie",
     "avgRating": "Średnia ocena",
     "happyTravelers": "Zadowolonych turystów",
-    "citiesCovered": "Miast"
+    "citiesCovered": "Miast",
+    "noMiddlemen": "Bez pośredników. Bez prowizji. Bezpośrednia komunikacja."
   },
   "valueProp": {
     "label": "Dlaczego jesteśmy inni",
@@ -405,7 +407,17 @@
     "tour_group": "Wycieczki grupowe",
     "tour_walking": "Wycieczki piesze",
     "tour_driving": "Wycieczki samochodowe",
-    "tour_multiday": "Wycieczki wielodniowe"
+    "tour_multiday": "Wycieczki wielodniowe",
+    "spec_city_tours": "Wycieczki miejskie",
+    "spec_ecotourism": "Ekoturystyka",
+    "spec_cultural": "Eksploracja kulturowa",
+    "spec_nature_adventures": "Przygody na łonie natury",
+    "spec_hiking_wildlife": "Piesze wędrówki i dzika przyroda",
+    "spec_custom_itineraries": "Niestandardowe trasy",
+    "spec_religious": "Miejsca religijne i duchowe",
+    "spec_wine": "Wycieczki po winnicach i browarach",
+    "spec_beach": "Plaża i aktywności wodne",
+    "spec_shopping": "Zakupy i lokalne rynki"
   },
   "dest": {
     "whereWeStarted": "Jak zaczęliśmy",

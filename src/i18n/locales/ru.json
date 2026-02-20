@@ -8,7 +8,8 @@
     "bookTour": "Спланируйте тур",
     "becomeGuide": "Присоединиться бесплатно",
     "forTravelers": "Найти гида",
-    "findGuide": "Найти гида"
+    "findGuide": "Найти гида",
+    "forGuides": "Для гидов"
   },
   "hero": {
     "headline": "Бронируйте напрямую у местных гидов",
@@ -28,7 +29,8 @@
     "whyCommissionFree": "Почему без комиссий важно",
     "avgRating": "Средний рейтинг",
     "happyTravelers": "Довольных туристов",
-    "citiesCovered": "Городов"
+    "citiesCovered": "Городов",
+    "noMiddlemen": "Без посредников. Без комиссий. Прямая связь."
   },
   "valueProp": {
     "label": "Почему мы другие",
@@ -405,7 +407,17 @@
     "tour_group": "Групповые туры",
     "tour_walking": "Пешие туры",
     "tour_driving": "Автомобильные туры",
-    "tour_multiday": "Многодневные туры"
+    "tour_multiday": "Многодневные туры",
+    "spec_city_tours": "Городские туры",
+    "spec_ecotourism": "Экотуризм",
+    "spec_cultural": "Культурные исследования",
+    "spec_nature_adventures": "Природные приключения",
+    "spec_hiking_wildlife": "Пешие прогулки и дикая природа",
+    "spec_custom_itineraries": "Индивидуальные маршруты",
+    "spec_religious": "Религиозные и духовные места",
+    "spec_wine": "Винные и пивоваренные туры",
+    "spec_beach": "Пляжный отдых и водные развлечения",
+    "spec_shopping": "Шоппинг и местные рынки"
   },
   "dest": {
     "whereWeStarted": "Как мы начинали",
