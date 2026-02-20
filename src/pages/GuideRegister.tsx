@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import logoImg from "@/assets/logo.jpg";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
+import PasswordStrengthMeter, { isPasswordStrong } from "@/components/PasswordStrengthMeter";
+
 
 const AREA_OPTIONS = [
   "Washington DC",
@@ -190,6 +192,10 @@ const GuideRegister = () => {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSignUp) {
+      if (!isPasswordStrong(authPassword)) {
+        toast.error("Password does not meet all strength requirements.");
+        return;
+      }
       const { error } = await supabase.auth.signUp({
         email: authEmail,
         password: authPassword,
@@ -220,14 +226,31 @@ const GuideRegister = () => {
     }
   };
 
+  const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+  const ALLOWED_DOC_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+  const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5 MB
+  const MAX_DOC_SIZE = 10 * 1024 * 1024; // 10 MB
+
+  const generateSafeFilename = (ext: string) =>
+    `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext.toLowerCase()}`;
+
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setProfilePhoto(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setProfilePhotoPreview(reader.result as string);
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.error("Profile photo must be a JPG, PNG, or WebP image.");
+      e.target.value = "";
+      return;
     }
+    if (file.size > MAX_PHOTO_SIZE) {
+      toast.error("Profile photo must be under 5 MB.");
+      e.target.value = "";
+      return;
+    }
+    setProfilePhoto(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setProfilePhotoPreview(reader.result as string);
+    reader.readAsDataURL(file);
   };
 
   const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
@@ -287,10 +310,19 @@ const GuideRegister = () => {
 
   const handleLicenseDocChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setLicenseDoc(file);
-      setLicenseDocName(file.name);
+    if (!file) return;
+    if (!ALLOWED_DOC_TYPES.includes(file.type)) {
+      toast.error("License document must be a PDF, JPG, PNG, or WebP file.");
+      e.target.value = "";
+      return;
     }
+    if (file.size > MAX_DOC_SIZE) {
+      toast.error("License document must be under 10 MB.");
+      e.target.value = "";
+      return;
+    }
+    setLicenseDoc(file);
+    setLicenseDocName(file.name);
   };
 
   const handleSubmit = async () => {
@@ -298,23 +330,37 @@ const GuideRegister = () => {
     setSubmitting(true);
 
     try {
-      // Upload profile photo if provided
+      // Upload profile photo — validate MIME, rename to random filename
       if (profilePhoto) {
+        if (!ALLOWED_IMAGE_TYPES.includes(profilePhoto.type)) {
+          toast.error("Invalid profile photo type.");
+          setSubmitting(false);
+          return;
+        }
+        const ext = profilePhoto.type === "image/png" ? "png" : profilePhoto.type === "image/webp" ? "webp" : "jpg";
+        const safePhotoName = `profile-${generateSafeFilename(ext)}`;
         const { error: uploadError } = await supabase.storage
           .from("guide-photos")
-          .upload(`${user.id}/profile.jpg`, profilePhoto, {
-            upsert: true,
+          .upload(`${user.id}/${safePhotoName}`, profilePhoto, {
+            upsert: false,
             contentType: profilePhoto.type,
           });
         if (uploadError) console.error("Photo upload error:", uploadError);
       }
 
-      // Upload license doc if provided
+      // Upload license doc — validate MIME, rename to random filename, store in private bucket
       if (licenseDoc) {
+        if (!ALLOWED_DOC_TYPES.includes(licenseDoc.type)) {
+          toast.error("Invalid license document type.");
+          setSubmitting(false);
+          return;
+        }
+        const ext = licenseDoc.type === "application/pdf" ? "pdf" : licenseDoc.type === "image/png" ? "png" : licenseDoc.type === "image/webp" ? "webp" : "jpg";
+        const safeLicenseName = `license-${generateSafeFilename(ext)}`;
         const { error: licenseUploadError } = await supabase.storage
           .from("guide-licenses")
-          .upload(`${user.id}/license-doc${licenseDoc.name.substring(licenseDoc.name.lastIndexOf('.'))}`, licenseDoc, {
-            upsert: true,
+          .upload(`${user.id}/${safeLicenseName}`, licenseDoc, {
+            upsert: false,
             contentType: licenseDoc.type,
           });
         if (licenseUploadError) console.error("License doc upload error:", licenseUploadError);
@@ -443,11 +489,17 @@ const GuideRegister = () => {
             />
             <Input
               type="password"
-              placeholder="Password"
+              placeholder={isSignUp ? "Min 10 chars, mixed case, number & symbol" : "Password"}
               value={authPassword}
               onChange={(e) => setAuthPassword(e.target.value)}
               className="bg-secondary/50 border-primary/20 text-primary-foreground"
+              minLength={isSignUp ? 10 : undefined}
             />
+            {isSignUp && (
+              <div className="bg-card/20 rounded-lg px-3 py-2">
+                <PasswordStrengthMeter password={authPassword} />
+              </div>
+            )}
             <Button variant="hero" className="w-full" type="submit">
               {isSignUp ? t("guideRegister.signUp") : t("guideRegister.signIn")}
             </Button>
