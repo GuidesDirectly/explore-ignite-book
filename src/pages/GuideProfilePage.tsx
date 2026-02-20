@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import GuideContactForm from "@/components/GuideContactForm";
 import BookingRequestForm from "@/components/BookingRequestForm";
 import GuideGallery from "@/components/GuideGallery";
+import GuideAvailabilityCalendar from "@/components/GuideAvailabilityCalendar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -395,6 +396,9 @@ const GuideProfilePage = () => {
                 </div>
               </section>
             )}
+
+            {/* Availability calendar */}
+            <GuideAvailabilityCalendar guideUserId={guide.user_id} />
 
             {/* Photo gallery */}
             <GuideGallery guideUserId={guide.user_id} />

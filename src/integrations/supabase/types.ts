@@ -122,6 +122,33 @@ export type Database = {
         }
         Relationships: []
       }
+      guide_availability: {
+        Row: {
+          created_at: string
+          date: string
+          guide_user_id: string
+          id: string
+          note: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          guide_user_id: string
+          id?: string
+          note?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          guide_user_id?: string
+          id?: string
+          note?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       guide_profiles: {
         Row: {
           created_at: string
