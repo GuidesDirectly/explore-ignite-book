@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Globe, Star, Filter, X, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -339,13 +340,14 @@ const MeetGuidesSection = () => {
                 : translatedBio;
 
               return (
+                <Link to={`/guide/${guide.id}`} className="block">
                 <motion.div
                   key={guide.id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group relative bg-card rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
+                  className="group relative bg-card rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 cursor-pointer"
                 >
                   {/* Header with photo or initials avatar */}
                   <div className="relative h-28 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent">
@@ -444,6 +446,7 @@ const MeetGuidesSection = () => {
                     )}
                   </div>
                 </motion.div>
+                </Link>
               );
             })}
           </div>

@@ -12,6 +12,7 @@ import Admin from "./pages/Admin";
 import Testimonials from "./pages/Testimonials";
 import GuideRegister from "./pages/GuideRegister";
 import ApplyCityPilot from "./pages/ApplyCityPilot";
+import GuideProfilePage from "./pages/GuideProfilePage";
 import ExploreCities from "./pages/ExploreCities";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/guide-register" element={<GuideRegister />} />
           <Route path="/apply-city-pilot" element={<ApplyCityPilot />} />
+          <Route path="/guide/:id" element={<GuideProfilePage />} />
           <Route path="/explore" element={<ExploreCities />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
