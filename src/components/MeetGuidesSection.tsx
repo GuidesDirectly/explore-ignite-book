@@ -101,17 +101,31 @@ const MeetGuidesSection = () => {
         });
       }
 
+      // Fetch profile photos for all guides
+      const photoUrls = new Map<string, string>();
+      for (const g of guideData) {
+        const { data: files } = await supabase.storage
+          .from("guide-photos")
+          .list(g.user_id, { limit: 10 });
+        const profileFile = files?.find(f => f.name.startsWith("profile"));
+        if (profileFile) {
+          const { data: photoData } = supabase.storage
+            .from("guide-photos")
+            .getPublicUrl(`${g.user_id}/${profileFile.name}`);
+          if (photoData?.publicUrl) {
+            photoUrls.set(g.user_id, photoData.publicUrl);
+          }
+        }
+      }
+
       const enriched: GuideProfile[] = guideData.map((g: any) => {
         const stats = statsMap.get(g.user_id);
-        const { data: photoData } = supabase.storage
-          .from("guide-photos")
-          .getPublicUrl(`${g.user_id}/profile.jpg`);
         return {
           ...g,
           service_areas: g.service_areas || [],
           reviewCount: stats?.count || 0,
           avgRating: stats ? Math.round((stats.total / stats.count) * 10) / 10 : 0,
-          photoUrl: photoData?.publicUrl || null,
+          photoUrl: photoUrls.get(g.user_id) || null,
         };
       });
 
