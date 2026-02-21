@@ -50,7 +50,7 @@ const LanguageSelectScreen = ({ onLanguageSelected }: LanguageSelectScreenProps)
             Guides Directly
           </h1>
           <p className="text-primary/80 text-sm md:text-base font-medium mb-2">Powered by iGuide Tours</p>
-          <p className="text-secondary text-sm md:text-base tracking-wide bg-primary px-4 py-2 rounded-lg inline-block">
+          <p className="text-secondary text-sm md:text-base tracking-wide font-bold bg-primary px-4 py-2 rounded-lg inline-block">
             Select your language
           </p>
         </motion.div>
