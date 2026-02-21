@@ -75,11 +75,17 @@ const GuideProfilePage = () => {
 
       setGuide(data);
 
-      // Photo
-      const { data: photoData } = supabase.storage
+      // Photo — find actual profile file (name may include timestamp)
+      const { data: photoFiles } = await supabase.storage
         .from("guide-photos")
-        .getPublicUrl(`${data.user_id}/profile.jpg`);
-      setPhotoUrl(photoData?.publicUrl || null);
+        .list(data.user_id, { limit: 10 });
+      const profileFile = photoFiles?.find(f => f.name.startsWith("profile"));
+      if (profileFile) {
+        const { data: photoData } = supabase.storage
+          .from("guide-photos")
+          .getPublicUrl(`${data.user_id}/${profileFile.name}`);
+        setPhotoUrl(photoData?.publicUrl || null);
+      }
 
       // Reviews
       const { data: reviewData } = await (supabase

@@ -89,6 +89,7 @@ const Admin = () => {
   const [editServiceAreas, setEditServiceAreas] = useState<string[]>([]);
   const [savingGuide, setSavingGuide] = useState(false);
   const [expandedTour, setExpandedTour] = useState<string | null>(null);
+  const [guidePhotoUrls, setGuidePhotoUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     let isMounted = true;
@@ -149,7 +150,20 @@ const Admin = () => {
     ]);
     if (inqRes.data) setInquiries(inqRes.data);
     if (revRes.data) setReviews(revRes.data);
-    if (guideRes.data) setGuides(guideRes.data as any);
+    if (guideRes.data) {
+      setGuides(guideRes.data as any);
+      // Fetch profile photos for all guides
+      const photoMap: Record<string, string> = {};
+      await Promise.all((guideRes.data as any[]).map(async (g: any) => {
+        const { data: files } = await supabase.storage.from("guide-photos").list(g.user_id, { limit: 10 });
+        const pf = files?.find((f: any) => f.name.startsWith("profile"));
+        if (pf) {
+          const { data: d } = supabase.storage.from("guide-photos").getPublicUrl(`${g.user_id}/${pf.name}`);
+          if (d?.publicUrl) photoMap[g.user_id] = d.publicUrl;
+        }
+      }));
+      setGuidePhotoUrls(photoMap);
+    }
     if (tourRes.data) setTourPlans(tourRes.data as any);
   };
 
@@ -308,7 +322,7 @@ const Admin = () => {
     const fd = guide.form_data;
     const isExpanded = expandedGuide === guide.id;
     const isEditing = editingGuide === guide.id;
-    const photoUrl = supabase.storage.from("guide-photos").getPublicUrl(`${guide.user_id}/profile.jpg`).data.publicUrl;
+    const photoUrl = guidePhotoUrls[guide.user_id] || supabase.storage.from("guide-photos").getPublicUrl(`${guide.user_id}/profile.jpg`).data.publicUrl;
 
     const ef = editFormData; // shorthand for edit fields
 

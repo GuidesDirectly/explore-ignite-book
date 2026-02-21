@@ -1,0 +1,1 @@
+UPDATE guide_profiles SET status = 'approved' WHERE id = '6f6e341e-b696-4c3f-80a8-ca64cc1be863';
