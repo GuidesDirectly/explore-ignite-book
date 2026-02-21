@@ -583,7 +583,10 @@
     "contactUs": "お問い合わせ",
     "terms": "利用規約",
     "privacy": "プライバシー",
-    "rights": "Guides Directly / iGuide Tours. 全著作権所有。"
+    "rights": "Guides Directly / iGuide Tours. 全著作権所有。",
+    "trustSecurity": "信頼とセキュリティ",
+    "securityTitle": "セキュリティと信頼",
+    "securityNote": "私たちはお客様のデータを最優先にしています。Guides Directlyはリアルタイムの侵害監視と暗号化された接続を使用して、ビジネスおよび旅行の詳細のプライバシーを確保します。"
   },
   "about": {
     "label": "私たちについて",

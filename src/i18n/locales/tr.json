@@ -241,7 +241,10 @@
     "contactUs": "Bize Ulaşın",
     "terms": "Koşullar",
     "privacy": "Gizlilik",
-    "rights": "Guides Directly / iGuide Tours. Tüm hakları saklıdır."
+    "rights": "Guides Directly / iGuide Tours. Tüm hakları saklıdır.",
+    "trustSecurity": "Güven ve Güvenlik",
+    "securityTitle": "Güvenlik ve Güven",
+    "securityNote": "Verilerinize öncelik veriyoruz. Guides Directly, iş ve seyahat bilgilerinizin gizliliğini sağlamak için gerçek zamanlı ihlal izleme ve şifreli bağlantılar kullanır."
   },
   "about": {
     "label": "Hakkımızda",

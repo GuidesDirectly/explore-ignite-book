@@ -583,7 +583,10 @@
     "contactUs": "联系我们",
     "terms": "条款",
     "privacy": "隐私",
-    "rights": "Guides Directly / iGuide Tours. 保留所有权利。"
+    "rights": "Guides Directly / iGuide Tours. 保留所有权利。",
+    "trustSecurity": "信任与安全",
+    "securityTitle": "安全与信任",
+    "securityNote": "我们优先保护您的数据。Guides Directly使用实时违规监控和加密连接，确保您的商业和旅行信息保持私密。"
   },
   "about": {
     "label": "关于我们",

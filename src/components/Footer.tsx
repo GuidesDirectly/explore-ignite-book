@@ -12,7 +12,7 @@ const Footer = () => {
   const resourceLinks = [
     { label: t("footer.faq"), href: "/home#faq" },
     { label: t("footer.safety"), href: "/home#trust" },
-    { label: "Trust & Security", href: "/trust" },
+    { label: t("footer.trustSecurity"), href: "/trust" },
   ];
   const companyLinks = [
     { label: t("footer.about"), href: "#about" },

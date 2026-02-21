@@ -241,7 +241,10 @@
     "contactUs": "संपर्क करें",
     "terms": "शर्तें",
     "privacy": "गोपनीयता",
-    "rights": "Guides Directly / iGuide Tours. सर्वाधिकार सुरक्षित।"
+    "rights": "Guides Directly / iGuide Tours. सर्वाधिकार सुरक्षित।",
+    "trustSecurity": "विश्वास और सुरक्षा",
+    "securityTitle": "सुरक्षा और विश्वास",
+    "securityNote": "हम आपके डेटा को प्राथमिकता देते हैं। Guides Directly रियल-टाइम ब्रीच मॉनिटरिंग और एन्क्रिप्टेड कनेक्शन का उपयोग करता है ताकि आपके व्यावसायिक और यात्रा विवरण निजी रहें।"
   },
   "about": {
     "label": "हमारे बारे में",

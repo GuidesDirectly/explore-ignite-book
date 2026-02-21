@@ -241,7 +241,10 @@
     "contactUs": "Liên hệ",
     "terms": "Điều khoản",
     "privacy": "Quyền riêng tư",
-    "rights": "Guides Directly / iGuide Tours. Mọi quyền được bảo lưu."
+    "rights": "Guides Directly / iGuide Tours. Mọi quyền được bảo lưu.",
+    "trustSecurity": "Tin cậy & Bảo mật",
+    "securityTitle": "Bảo mật & Tin cậy",
+    "securityNote": "Chúng tôi ưu tiên dữ liệu của bạn. Guides Directly sử dụng giám sát vi phạm thời gian thực và kết nối mã hóa để đảm bảo thông tin kinh doanh và du lịch của bạn luôn riêng tư."
   },
   "about": {
     "label": "Về chúng tôi",

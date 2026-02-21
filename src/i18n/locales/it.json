@@ -241,7 +241,10 @@
     "contactUs": "Contattaci",
     "terms": "Termini",
     "privacy": "Privacy",
-    "rights": "Guides Directly / iGuide Tours. Tutti i diritti riservati."
+    "rights": "Guides Directly / iGuide Tours. Tutti i diritti riservati.",
+    "trustSecurity": "Fiducia e Sicurezza",
+    "securityTitle": "Sicurezza e Fiducia",
+    "securityNote": "Diamo priorità ai tuoi dati. Guides Directly utilizza il monitoraggio delle violazioni in tempo reale e connessioni crittografate per garantire la privacy dei tuoi dati aziendali e di viaggio."
   },
   "about": {
     "label": "Chi Siamo",

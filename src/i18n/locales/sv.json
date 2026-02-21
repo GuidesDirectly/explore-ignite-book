@@ -241,7 +241,10 @@
     "contactUs": "Kontakta Oss",
     "terms": "Villkor",
     "privacy": "Integritet",
-    "rights": "Guides Directly / iGuide Tours. Alla rättigheter förbehållna."
+    "rights": "Guides Directly / iGuide Tours. Alla rättigheter förbehållna.",
+    "trustSecurity": "Förtroende & Säkerhet",
+    "securityTitle": "Säkerhet & Förtroende",
+    "securityNote": "Vi prioriterar dina data. Guides Directly använder realtidsövervakning av intrång och krypterade anslutningar för att säkerställa att dina affärs- och reseuppgifter förblir privata."
   },
   "about": {
     "label": "Om Oss",
