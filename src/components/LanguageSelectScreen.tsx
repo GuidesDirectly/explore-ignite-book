@@ -28,7 +28,7 @@ const LanguageSelectScreen = ({ onLanguageSelected }: LanguageSelectScreenProps)
         <div className="absolute inset-0 bg-secondary/85 backdrop-blur-sm" />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center gap-8 px-6 max-w-lg w-full">
+      <div className="relative z-10 flex flex-col items-center gap-8 px-6 max-w-3xl w-full">
         {/* Logo */}
         <motion.img
           src={logo}
@@ -51,7 +51,7 @@ const LanguageSelectScreen = ({ onLanguageSelected }: LanguageSelectScreenProps)
           </h1>
           <p className="text-primary/80 text-sm md:text-base font-medium mb-2">Powered by iGuide Tours</p>
           <p className="text-muted text-sm md:text-base tracking-wide">
-            Select your language · Выберите язык
+            Select your language
           </p>
         </motion.div>
 
@@ -60,7 +60,7 @@ const LanguageSelectScreen = ({ onLanguageSelected }: LanguageSelectScreenProps)
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.35 }}
-          className="grid grid-cols-2 gap-3 w-full"
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full"
         >
           {languages.map(({ code, name, flag }, i) => (
             <motion.button
