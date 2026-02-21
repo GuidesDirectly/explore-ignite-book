@@ -241,7 +241,10 @@
     "contactUs": "문의하기",
     "terms": "이용약관",
     "privacy": "개인정보처리방침",
-    "rights": "Guides Directly / iGuide Tours. 모든 권리 보유."
+    "rights": "Guides Directly / iGuide Tours. 모든 권리 보유.",
+    "trustSecurity": "신뢰 및 보안",
+    "securityTitle": "보안 및 신뢰",
+    "securityNote": "우리는 귀하의 데이터를 최우선으로 합니다. Guides Directly는 실시간 침해 모니터링과 암호화된 연결을 통해 비즈니스 및 여행 세부 정보의 개인 정보를 보호합니다."
   },
   "about": {
     "label": "소개",

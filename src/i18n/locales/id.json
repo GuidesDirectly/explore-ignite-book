@@ -241,7 +241,10 @@
     "contactUs": "Hubungi Kami",
     "terms": "Ketentuan",
     "privacy": "Privasi",
-    "rights": "Guides Directly / iGuide Tours. Hak cipta dilindungi."
+    "rights": "Guides Directly / iGuide Tours. Hak cipta dilindungi.",
+    "trustSecurity": "Kepercayaan & Keamanan",
+    "securityTitle": "Keamanan & Kepercayaan",
+    "securityNote": "Kami memprioritaskan data Anda. Guides Directly menggunakan pemantauan pelanggaran real-time dan koneksi terenkripsi untuk memastikan detail bisnis dan perjalanan Anda tetap pribadi."
   },
   "about": {
     "label": "Tentang Kami",

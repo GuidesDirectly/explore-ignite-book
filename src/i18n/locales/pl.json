@@ -583,7 +583,10 @@
     "contactUs": "Skontaktuj się",
     "terms": "Warunki",
     "privacy": "Prywatność",
-    "rights": "Guides Directly / iGuide Tours. Wszelkie prawa zastrzeżone."
+    "rights": "Guides Directly / iGuide Tours. Wszelkie prawa zastrzeżone.",
+    "trustSecurity": "Zaufanie i bezpieczeństwo",
+    "securityTitle": "Bezpieczeństwo i zaufanie",
+    "securityNote": "Priorytetowo traktujemy Twoje dane. Guides Directly wykorzystuje monitorowanie naruszeń w czasie rzeczywistym i szyfrowane połączenia, aby zapewnić prywatność Twoich danych biznesowych i podróżnych."
   },
   "about": {
     "label": "O nas",
