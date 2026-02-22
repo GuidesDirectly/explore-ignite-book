@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Globe, Star, Filter, X, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import GuideBadge, { getHighestBadge, type BadgeType } from "@/components/GuideBadge";
 import { Button } from "@/components/ui/button";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
 
@@ -29,6 +30,7 @@ interface GuideProfile {
   reviewCount: number;
   avgRating: number;
   photoUrl: string | null;
+  badges: BadgeType[];
 }
 
 interface ReviewStats {
@@ -101,6 +103,19 @@ const MeetGuidesSection = () => {
         });
       }
 
+      // Fetch badges for all guides
+      const { data: badgeData } = await supabase
+        .from("guide_badges" as any)
+        .select("guide_user_id, badge_type");
+      const badgeMap = new Map<string, BadgeType[]>();
+      if (badgeData) {
+        (badgeData as any[]).forEach((b: any) => {
+          const existing = badgeMap.get(b.guide_user_id) || [];
+          existing.push(b.badge_type as BadgeType);
+          badgeMap.set(b.guide_user_id, existing);
+        });
+      }
+
       // Fetch profile photos for all guides
       const photoUrls = new Map<string, string>();
       for (const g of guideData) {
@@ -126,6 +141,7 @@ const MeetGuidesSection = () => {
           reviewCount: stats?.count || 0,
           avgRating: stats ? Math.round((stats.total / stats.count) * 10) / 10 : 0,
           photoUrl: photoUrls.get(g.user_id) || null,
+          badges: badgeMap.get(g.user_id) || [],
         };
       });
 
@@ -423,6 +439,12 @@ const MeetGuidesSection = () => {
                     <h3 className="font-display text-xl font-bold text-foreground mb-1">
                       {fd.firstName} {fd.lastName}
                     </h3>
+                    {/* Verification badge — show highest only */}
+                    {getHighestBadge(guide.badges) && (
+                      <div className="mb-1">
+                        <GuideBadge type={getHighestBadge(guide.badges)!} size="sm" />
+                      </div>
+                    )}
 
                     {/* Review stats */}
                     <div className="flex items-center gap-3 mb-2">

@@ -686,5 +686,13 @@
     "ctaTitle": "Ready to Book With Confidence?",
     "ctaDesc": "Every booking is protected by the same enterprise-grade security that powers top travel platforms.",
     "ctaButton": "Find a Verified Guide"
+  },
+  "badge": {
+    "licensedVerified": "Licensed Guide Verified",
+    "permitConfirmed": "Local Permit Confirmed",
+    "certPending": "Certification Pending",
+    "licensedTooltip": "This guide's professional license has been verified.",
+    "permitTooltip": "This guide is authorized for specific locations.",
+    "pendingTooltip": "Verification in progress. Documentation submitted."
   }
 }

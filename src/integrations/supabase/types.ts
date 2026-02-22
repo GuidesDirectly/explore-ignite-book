@@ -149,6 +149,36 @@ export type Database = {
         }
         Relationships: []
       }
+      guide_badges: {
+        Row: {
+          badge_type: Database["public"]["Enums"]["badge_type"]
+          expires_at: string | null
+          guide_user_id: string
+          id: string
+          issued_at: string
+          issued_by: string | null
+          notes: string | null
+        }
+        Insert: {
+          badge_type: Database["public"]["Enums"]["badge_type"]
+          expires_at?: string | null
+          guide_user_id: string
+          id?: string
+          issued_at?: string
+          issued_by?: string | null
+          notes?: string | null
+        }
+        Update: {
+          badge_type?: Database["public"]["Enums"]["badge_type"]
+          expires_at?: string | null
+          guide_user_id?: string
+          id?: string
+          issued_at?: string
+          issued_by?: string | null
+          notes?: string | null
+        }
+        Relationships: []
+      }
       guide_profiles: {
         Row: {
           created_at: string
@@ -483,6 +513,101 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_audit_log: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          target_guide_id: string
+          target_request_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_guide_id: string
+          target_request_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_guide_id?: string
+          target_request_id?: string | null
+        }
+        Relationships: []
+      }
+      verification_documents: {
+        Row: {
+          created_at: string
+          doc_type: string
+          file_url: string
+          id: string
+          request_id: string
+          verified: boolean
+        }
+        Insert: {
+          created_at?: string
+          doc_type: string
+          file_url: string
+          id?: string
+          request_id: string
+          verified?: boolean
+        }
+        Update: {
+          created_at?: string
+          doc_type?: string
+          file_url?: string
+          id?: string
+          request_id?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_documents_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "verification_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verification_requests: {
+        Row: {
+          guide_user_id: string
+          id: string
+          notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+        }
+        Insert: {
+          guide_user_id: string
+          id?: string
+          notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+        }
+        Update: {
+          guide_user_id?: string
+          id?: string
+          notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       guide_profiles_public: {
@@ -615,6 +740,10 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "guide"
+      badge_type:
+        | "licensed_verified"
+        | "permit_confirmed"
+        | "certification_pending"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -743,6 +872,11 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user", "guide"],
+      badge_type: [
+        "licensed_verified",
+        "permit_confirmed",
+        "certification_pending",
+      ],
     },
   },
 } as const

@@ -767,5 +767,13 @@
     "ctaTitle": "Prêt à réserver en toute confiance ?",
     "ctaDesc": "Chaque réservation est protégée par la même sécurité d'entreprise utilisée par les meilleures plateformes de voyage.",
     "ctaButton": "Trouver un guide vérifié"
+  },
+  "badge": {
+    "licensedVerified": "Guide licencié vérifié",
+    "permitConfirmed": "Permis local confirmé",
+    "certPending": "Certification en attente",
+    "licensedTooltip": "La licence professionnelle de ce guide a été vérifiée.",
+    "permitTooltip": "Ce guide est autorisé pour des lieux spécifiques.",
+    "pendingTooltip": "Vérification en cours. Documentation soumise."
   }
 }
