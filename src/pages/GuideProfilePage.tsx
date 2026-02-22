@@ -11,6 +11,7 @@ import BookingRequestForm from "@/components/BookingRequestForm";
 import GuideGallery from "@/components/GuideGallery";
 import GuideAvailabilityCalendar from "@/components/GuideAvailabilityCalendar";
 import { Badge } from "@/components/ui/badge";
+import GuideBadge, { getHighestBadge, type BadgeType } from "@/components/GuideBadge";
 import { Button } from "@/components/ui/button";
 import {
   MapPin, Globe, Star, ShieldCheck, CheckCircle2,
@@ -56,6 +57,7 @@ const GuideProfilePage = () => {
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [badges, setBadges] = useState<BadgeType[]>([]);
 
   useEffect(() => {
     const fetchGuide = async () => {
@@ -96,6 +98,13 @@ const GuideProfilePage = () => {
         .order("created_at", { ascending: false }) as any);
 
       setReviews(reviewData || []);
+
+      // Badges
+      const { data: badgeData } = await supabase
+        .from("guide_badges" as any)
+        .select("badge_type")
+        .eq("guide_user_id", data.user_id);
+      setBadges((badgeData as any[] || []).map((b: any) => b.badge_type as BadgeType));
 
       // Availability
       const { data: availData } = await supabase
@@ -294,6 +303,18 @@ const GuideProfilePage = () => {
                 <h1 className="font-display text-2xl font-bold text-foreground">
                   {fd.firstName} {fd.lastName}
                 </h1>
+
+                {/* Verification badges — primary (large) + secondary row */}
+                {badges.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    <GuideBadge type={getHighestBadge(badges)!} size="md" />
+                    {badges
+                      .filter((b) => b !== getHighestBadge(badges))
+                      .map((b) => (
+                        <GuideBadge key={b} type={b} size="sm" />
+                      ))}
+                  </div>
+                )}
 
                 {/* Rating */}
                 {reviews.length > 0 && (

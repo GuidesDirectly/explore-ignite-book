@@ -767,5 +767,13 @@
     "ctaTitle": "Bereit, mit Vertrauen zu buchen?",
     "ctaDesc": "Jede Buchung ist durch die gleiche Unternehmenssicherheit geschützt, die führende Reiseplattformen antreibt.",
     "ctaButton": "Verifizierten Guide finden"
+  },
+  "badge": {
+    "licensedVerified": "Lizenzierter Guide verifiziert",
+    "permitConfirmed": "Lokale Genehmigung bestätigt",
+    "certPending": "Zertifizierung ausstehend",
+    "licensedTooltip": "Die professionelle Lizenz dieses Guides wurde verifiziert.",
+    "permitTooltip": "Dieser Guide ist für bestimmte Standorte autorisiert.",
+    "pendingTooltip": "Verifizierung läuft. Dokumentation eingereicht."
   }
 }
