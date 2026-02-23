@@ -27,3 +27,7 @@ verify_jwt = false
 [functions.swap-itinerary]
 verify_jwt = false
 
+[functions.analyze-feedback]
+verify_jwt = false
+
+
