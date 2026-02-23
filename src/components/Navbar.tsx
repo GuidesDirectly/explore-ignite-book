@@ -31,6 +31,7 @@ const Navbar = () => {
 
   const navLinks = [
     { label: t("nav.home"), href: "#home" },
+    { label: "Tours", href: "/tours", isRoute: true },
     { label: t("nav.forTravelers"), href: "#meet-guides" },
     { label: t("nav.destinations"), href: "#destinations", isDestinations: true },
     { label: t("nav.services"), href: "#how-it-works" },
@@ -73,6 +74,19 @@ const Navbar = () => {
                     <ChevronDown className="w-3.5 h-3.5" />
                   </button>
                 </div>
+              );
+            }
+
+            if ((link as any).isRoute) {
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => { e.preventDefault(); navigate(link.href); }}
+                  className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors duration-200"
+                >
+                  {link.label}
+                </a>
               );
             }
 
@@ -173,6 +187,19 @@ const Navbar = () => {
                     >
                       {link.label} →
                     </button>
+                  );
+                }
+
+                if ((link as any).isRoute) {
+                  return (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      onClick={(e) => { e.preventDefault(); navigate(link.href); setIsOpen(false); }}
+                      className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2.5 border-b border-border/20"
+                    >
+                      {link.label}
+                    </a>
                   );
                 }
 
