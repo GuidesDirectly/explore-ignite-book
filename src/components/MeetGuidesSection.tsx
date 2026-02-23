@@ -75,6 +75,7 @@ const MeetGuidesSection = () => {
   const [filterSpecialty, setFilterSpecialty] = useState<string>("");
   const [filterMinReviews, setFilterMinReviews] = useState<string>("");
   const [filterMinRating, setFilterMinRating] = useState<string>("");
+  const [filterBadge, setFilterBadge] = useState<string>("");
 
   useEffect(() => {
     const fetchGuides = async () => {
@@ -175,11 +176,12 @@ const MeetGuidesSection = () => {
       if (filterSpecialty && !g.form_data.specializations?.includes(filterSpecialty)) return false;
       if (filterMinReviews && g.reviewCount < parseInt(filterMinReviews)) return false;
       if (filterMinRating && g.avgRating < parseFloat(filterMinRating)) return false;
+      if (filterBadge && !g.badges?.includes(filterBadge as BadgeType)) return false;
       return true;
     });
-  }, [guides, filterArea, filterLanguage, filterSpecialty, filterMinReviews, filterMinRating]);
+  }, [guides, filterArea, filterLanguage, filterSpecialty, filterMinReviews, filterMinRating, filterBadge]);
 
-  const activeFilterCount = [filterArea, filterLanguage, filterSpecialty, filterMinReviews, filterMinRating].filter(Boolean).length;
+  const activeFilterCount = [filterArea, filterLanguage, filterSpecialty, filterMinReviews, filterMinRating, filterBadge].filter(Boolean).length;
 
   const clearFilters = () => {
     setFilterArea("");
@@ -187,6 +189,7 @@ const MeetGuidesSection = () => {
     setFilterSpecialty("");
     setFilterMinReviews("");
     setFilterMinRating("");
+    setFilterBadge("");
   };
 
   if (loading) {
@@ -276,7 +279,7 @@ const MeetGuidesSection = () => {
               exit={{ opacity: 0, height: 0 }}
               className="bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-5"
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                 {/* Area filter */}
                 <div>
                   <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
@@ -361,6 +364,23 @@ const MeetGuidesSection = () => {
                     <option value="3.5">3.5+ ★</option>
                     <option value="4">4+ ★</option>
                     <option value="4.5">4.5+ ★</option>
+                  </select>
+                </div>
+
+                {/* Badge type filter */}
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
+                    {t("guides.filterBadge", "Verification")}
+                  </label>
+                  <select
+                    value={filterBadge}
+                    onChange={(e) => setFilterBadge(e.target.value)}
+                    className="w-full h-9 rounded-lg border border-border/50 bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="">{t("guides.any")}</option>
+                    <option value="licensed_verified">Licensed & Verified</option>
+                    <option value="permit_confirmed">Permit Confirmed</option>
+                    <option value="certification_pending">Certification Pending</option>
                   </select>
                 </div>
               </div>
