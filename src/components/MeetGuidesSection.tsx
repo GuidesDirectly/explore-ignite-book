@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Globe, Star, Filter, X, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -65,6 +65,7 @@ const SPECIALTY_OPTIONS = [
 
 const MeetGuidesSection = () => {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
   const [guides, setGuides] = useState<GuideProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
@@ -76,6 +77,23 @@ const MeetGuidesSection = () => {
   const [filterMinReviews, setFilterMinReviews] = useState<string>("");
   const [filterMinRating, setFilterMinRating] = useState<string>("");
   const [filterBadge, setFilterBadge] = useState<string>("");
+  const [filterCities, setFilterCities] = useState<string[]>([]);
+
+  // Read cities from URL hash params (e.g., /home#guides?cities=Paris,Bali)
+  useEffect(() => {
+    const hash = location.hash;
+    if (hash.includes("cities=")) {
+      const params = new URLSearchParams(hash.split("?")[1] || "");
+      const citiesParam = params.get("cities");
+      if (citiesParam) {
+        const cities = decodeURIComponent(citiesParam).split(",").map(c => c.trim()).filter(Boolean);
+        if (cities.length > 0) {
+          setFilterCities(cities);
+          setShowFilters(true);
+        }
+      }
+    }
+  }, [location.hash]);
 
   useEffect(() => {
     const fetchGuides = async () => {
@@ -177,11 +195,17 @@ const MeetGuidesSection = () => {
       if (filterMinReviews && g.reviewCount < parseInt(filterMinReviews)) return false;
       if (filterMinRating && g.avgRating < parseFloat(filterMinRating)) return false;
       if (filterBadge && !g.badges?.includes(filterBadge as BadgeType)) return false;
+      if (filterCities.length > 0) {
+        const matchesCity = filterCities.some(city =>
+          g.service_areas?.some(area => area.toLowerCase().includes(city.toLowerCase()))
+        );
+        if (!matchesCity) return false;
+      }
       return true;
     });
-  }, [guides, filterArea, filterLanguage, filterSpecialty, filterMinReviews, filterMinRating, filterBadge]);
+  }, [guides, filterArea, filterLanguage, filterSpecialty, filterMinReviews, filterMinRating, filterBadge, filterCities]);
 
-  const activeFilterCount = [filterArea, filterLanguage, filterSpecialty, filterMinReviews, filterMinRating, filterBadge].filter(Boolean).length;
+  const activeFilterCount = [filterArea, filterLanguage, filterSpecialty, filterMinReviews, filterMinRating, filterBadge].filter(Boolean).length + (filterCities.length > 0 ? 1 : 0);
 
   const clearFilters = () => {
     setFilterArea("");
@@ -190,6 +214,7 @@ const MeetGuidesSection = () => {
     setFilterMinReviews("");
     setFilterMinRating("");
     setFilterBadge("");
+    setFilterCities([]);
   };
 
   if (loading) {
@@ -235,6 +260,31 @@ const MeetGuidesSection = () => {
             {t("guides.subtitle")}
           </p>
         </motion.div>
+
+        {/* Active city filter chips from destinations */}
+        {filterCities.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Filtering by:</span>
+            {filterCities.map(city => (
+              <span key={city} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs font-semibold pl-2.5 pr-1.5 py-1 rounded-full border border-primary/20">
+                <MapPin className="w-3 h-3" />
+                {city}
+                <button
+                  onClick={() => setFilterCities(prev => prev.filter(c => c !== city))}
+                  className="ml-0.5 hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            <button
+              onClick={() => setFilterCities([])}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
 
         {/* Filter bar */}
         <motion.div
