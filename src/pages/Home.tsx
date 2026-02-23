@@ -25,7 +25,9 @@ const Home = () => {
   useEffect(() => {
     if (location.hash) {
       const scrollToHash = () => {
-        const el = document.querySelector(location.hash);
+        // Strip query params from hash for querySelector (e.g., #guides?cities=X → #guides)
+        const hashId = location.hash.split("?")[0];
+        const el = document.querySelector(hashId);
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });
           return true;
@@ -33,7 +35,7 @@ const Home = () => {
         return false;
       };
       // Try multiple times as sections may load async
-      const attempts = [100, 500, 1000];
+      const attempts = [100, 500, 1000, 2000];
       attempts.forEach((delay) => {
         setTimeout(() => scrollToHash(), delay);
       });

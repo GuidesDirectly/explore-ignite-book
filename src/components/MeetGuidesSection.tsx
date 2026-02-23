@@ -220,7 +220,7 @@ const MeetGuidesSection = () => {
 
   if (loading) {
     return (
-      <section className="py-24 bg-background">
+      <section id="meet-guides" className="py-24 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(3)].map((_, i) => (
@@ -232,7 +232,7 @@ const MeetGuidesSection = () => {
     );
   }
 
-  if (guides.length === 0) return null;
+  if (guides.length === 0) return <section id="meet-guides" />;
 
   return (
     <section id="meet-guides" className="py-24 bg-background relative overflow-hidden">
@@ -467,16 +467,7 @@ const MeetGuidesSection = () => {
                 variant="default"
                 onClick={() => {
                   const dest = filterCities.length > 0 ? filterCities[0] : "";
-                  navigate(`/home#about`);
-                  // Small delay to allow navigation, then set destination in inquiry form
-                  setTimeout(() => {
-                    const destSelect = document.querySelector<HTMLSelectElement>('[name="destination"]');
-                    if (destSelect) {
-                      // Try to set to "other" or first custom option
-                      destSelect.value = "other";
-                      destSelect.dispatchEvent(new Event("change", { bubbles: true }));
-                    }
-                  }, 500);
+                  navigate(`/home#inquiry${dest ? `?dest=${encodeURIComponent(dest)}` : ""}`);
                 }}
                 className="gap-2"
               >

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,11 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Send, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { inquirySchema } from "@/lib/formSchemas";
 
 const InquirySection = () => {
   const { t } = useTranslation();
+  const location = useLocation();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -23,6 +25,23 @@ const InquirySection = () => {
     groupSize: "",
     message: "",
   });
+
+  // Pre-fill destination from URL hash (e.g., #inquiry?dest=Bali)
+  useEffect(() => {
+    const hash = location.hash;
+    if (hash.includes("dest=")) {
+      const params = new URLSearchParams(hash.split("?")[1] || "");
+      const dest = params.get("dest");
+      if (dest) {
+        const decoded = decodeURIComponent(dest);
+        setFormData(prev => ({
+          ...prev,
+          destination: "other",
+          message: prev.message || `I'm looking for a guide in ${decoded}. Please help me find one!`,
+        }));
+      }
+    }
+  }, [location.hash]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,7 +218,7 @@ const InquirySection = () => {
 
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>{t("inquiry.destination")} *</label>
-              <Select onValueChange={(val) => setFormData({ ...formData, destination: val })}>
+              <Select value={formData.destination} onValueChange={(val) => setFormData({ ...formData, destination: val })}>
                 <SelectTrigger className="bg-secondary/50 border-primary/20 text-primary-foreground">
                   <SelectValue placeholder={t("inquiry.chooseDest")} />
                 </SelectTrigger>
