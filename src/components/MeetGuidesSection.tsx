@@ -1,9 +1,9 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Globe, Star, Filter, X, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { MapPin, Globe, Star, Filter, X, ShieldCheck, CheckCircle2, Send } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import GuideBadge, { getHighestBadge, type BadgeType } from "@/components/GuideBadge";
 import { Button } from "@/components/ui/button";
@@ -66,6 +66,7 @@ const SPECIALTY_OPTIONS = [
 const MeetGuidesSection = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const [guides, setGuides] = useState<GuideProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
@@ -447,11 +448,45 @@ const MeetGuidesSection = () => {
 
         {/* Guide cards */}
         {filteredGuides.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-lg text-muted-foreground">{t("guides.noResults")}</p>
-            <Button variant="outline" size="sm" className="mt-4" onClick={clearFilters}>
-              {t("guides.clearFilters")}
-            </Button>
+          <div className="text-center py-16 space-y-6">
+            <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+              <MapPin className="w-7 h-7 text-primary" />
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-foreground mb-1">
+                {filterCities.length > 0
+                  ? t("guides.noGuidesInCity", { city: filterCities.join(", "), defaultValue: `No guides found in ${filterCities.join(", ")} yet` })
+                  : t("guides.noResults")}
+              </p>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                {t("guides.noResultsHint", "We're expanding fast! Request a guide for your destination and we'll match you with one.")}
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button
+                variant="default"
+                onClick={() => {
+                  const dest = filterCities.length > 0 ? filterCities[0] : "";
+                  navigate(`/home#about`);
+                  // Small delay to allow navigation, then set destination in inquiry form
+                  setTimeout(() => {
+                    const destSelect = document.querySelector<HTMLSelectElement>('[name="destination"]');
+                    if (destSelect) {
+                      // Try to set to "other" or first custom option
+                      destSelect.value = "other";
+                      destSelect.dispatchEvent(new Event("change", { bubbles: true }));
+                    }
+                  }, 500);
+                }}
+                className="gap-2"
+              >
+                <Send className="w-4 h-4" />
+                {t("guides.requestGuide", "Request a Guide")}
+              </Button>
+              <Button variant="outline" size="sm" onClick={clearFilters}>
+                {t("guides.clearFilters")}
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
