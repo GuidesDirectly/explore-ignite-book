@@ -51,6 +51,7 @@ const ALL_DESTINATIONS: Destination[] = [
 interface DestinationsModalProps {
   open: boolean;
   onClose: () => void;
+  onDone?: (selected: string[]) => void;
 }
 
 const statusConfig = {
@@ -59,7 +60,7 @@ const statusConfig = {
   international: { label: "International", icon: Globe, color: "text-muted-foreground" },
 } as const;
 
-const DestinationsModal = ({ open, onClose }: DestinationsModalProps) => {
+const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) => {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -224,7 +225,12 @@ const DestinationsModal = ({ open, onClose }: DestinationsModalProps) => {
                 {ALL_DESTINATIONS.length} destinations · {selected.length} selected
               </span>
               <button
-                onClick={onClose}
+                onClick={() => {
+                  if (onDone && selected.length > 0) {
+                    onDone(selected);
+                  }
+                  onClose();
+                }}
                 className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
               >
                 Done
