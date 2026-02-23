@@ -108,16 +108,23 @@ const Navbar = () => {
             className="lg:hidden bg-white border-t border-border/40 overflow-hidden"
           >
             <div className="container mx-auto px-4 py-4 flex flex-col gap-2">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => { handleNavClick(e, link.href); setIsOpen(false); }}
-                  className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2.5 border-b border-border/20 last:border-0"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) => {
+                const isFind = link.href === "#meet-guides";
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={(e) => { handleNavClick(e, link.href); setIsOpen(false); }}
+                    className={
+                      isFind
+                        ? "text-sm font-semibold bg-primary text-primary-foreground px-4 py-2.5 rounded-md shadow-sm text-center hover:bg-primary/85 transition-all duration-200"
+                        : "text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2.5 border-b border-border/20 last:border-0"
+                    }
+                  >
+                    {link.label}
+                  </a>
+                );
+              })}
               <div className="flex flex-col gap-2 pt-3">
                 <Button variant="hero" size="sm" asChild>
                   <a href="/guide-register" onClick={() => setIsOpen(false)}>
