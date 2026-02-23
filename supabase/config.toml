@@ -24,3 +24,6 @@ verify_jwt = false
 [functions.expansion-digest]
 verify_jwt = false
 
+[functions.swap-itinerary]
+verify_jwt = false
+
