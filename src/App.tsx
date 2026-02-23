@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Index from "./pages/Index";
 import Home from "./pages/Home";
+import Tours from "./pages/Tours";
+import TourDetail from "./pages/TourDetail";
+import BookingCheckout from "./pages/BookingCheckout";
 import Chat from "./pages/Chat";
 import Review from "./pages/Review";
 import Admin from "./pages/Admin";
@@ -41,6 +44,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/tours" element={<Tours />} />
+          <Route path="/tour/:guideId" element={<TourDetail />} />
+          <Route path="/book/:guideId" element={<BookingCheckout />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/review" element={<Review />} />
           <Route path="/testimonials" element={<Testimonials />} />
