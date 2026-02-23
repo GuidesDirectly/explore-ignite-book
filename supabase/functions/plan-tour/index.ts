@@ -50,7 +50,15 @@ serve(async (req) => {
       );
     }
 
-    const { description } = body;
+    const { description, profileContext } = body;
+
+    // Validate profileContext
+    if (profileContext !== undefined && (typeof profileContext !== "string" || profileContext.length > 2000)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid profile context." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Input validation
     if (!description || typeof description !== "string") {
@@ -111,7 +119,7 @@ Your job is to:
 
 Keep the tone warm, professional, and exciting. Use markdown formatting with headers, bullet points, and emojis for readability. Make the customer feel like this will be an unforgettable experience.
 
-Our tour destinations include: Washington DC, New York City, Niagara Falls, Toronto, Boston, and Chicago. If they mention other destinations, politely note our primary service areas but still help plan.${guidesContext}`;
+Our tour destinations include: Washington DC, New York City, Niagara Falls, Toronto, Boston, and Chicago. If they mention other destinations, politely note our primary service areas but still help plan.${guidesContext}${profileContext ? `\n\nThis traveler has shared their personal preferences — tailor the plan accordingly:${profileContext}` : ""}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",

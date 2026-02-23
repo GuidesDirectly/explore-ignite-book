@@ -531,6 +531,63 @@ export type Database = {
         }
         Relationships: []
       }
+      traveler_profiles: {
+        Row: {
+          budget_preference: string | null
+          children_ages: string | null
+          created_at: string
+          dietary_restrictions: string[] | null
+          group_type: string | null
+          has_children: boolean | null
+          id: string
+          interests: string[] | null
+          mobility_needs: string | null
+          notes: string | null
+          pace: string | null
+          preferred_languages: string[] | null
+          previous_destinations: string[] | null
+          travel_style: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget_preference?: string | null
+          children_ages?: string | null
+          created_at?: string
+          dietary_restrictions?: string[] | null
+          group_type?: string | null
+          has_children?: boolean | null
+          id?: string
+          interests?: string[] | null
+          mobility_needs?: string | null
+          notes?: string | null
+          pace?: string | null
+          preferred_languages?: string[] | null
+          previous_destinations?: string[] | null
+          travel_style?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget_preference?: string | null
+          children_ages?: string | null
+          created_at?: string
+          dietary_restrictions?: string[] | null
+          group_type?: string | null
+          has_children?: boolean | null
+          id?: string
+          interests?: string[] | null
+          mobility_needs?: string | null
+          notes?: string | null
+          pace?: string | null
+          preferred_languages?: string[] | null
+          previous_destinations?: string[] | null
+          travel_style?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
