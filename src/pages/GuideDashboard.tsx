@@ -24,6 +24,7 @@ import BookingsManager from "@/components/dashboard/BookingsManager";
 import AvailabilityManager from "@/components/dashboard/AvailabilityManager";
 import GuideVerificationUpload from "@/components/dashboard/GuideVerificationUpload";
 import EarningsDashboard from "@/components/dashboard/EarningsDashboard";
+import AiBanner from "@/components/dashboard/AiBanner";
 
 interface PhotoItem {
   name: string;
@@ -365,6 +366,9 @@ const GuideDashboard = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
+        {/* AI Banner */}
+        <AiBanner />
+
         {/* Analytics Overview */}
         <section>
           <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2 mb-4">
