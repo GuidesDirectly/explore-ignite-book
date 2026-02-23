@@ -10,6 +10,8 @@ import MeetGuidesSection from "@/components/MeetGuidesSection";
 import WhyDirectSection from "@/components/WhyDirectSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import ForGuidesSection from "@/components/ForGuidesSection";
+import TravelerAiCta from "@/components/TravelerAiCta";
+import AiDemoWidget from "@/components/AiDemoWidget";
 import TrustSection from "@/components/TrustSection";
 import MonetizationSection from "@/components/MonetizationSection";
 import AboutSection from "@/components/AboutSection";
@@ -67,6 +69,9 @@ const Home = () => {
       {/* Section 7 — Why Direct Booking Is Better */}
       <WhyDirectSection />
 
+      {/* Traveler AI CTA */}
+      <TravelerAiCta />
+
       {/* Section 8 — Testimonials */}
       <TestimonialsSection />
 
@@ -81,6 +86,9 @@ const Home = () => {
 
       {/* Section 12 — About */}
       <AboutSection />
+
+      {/* AI Demo Widget */}
+      <AiDemoWidget />
 
       {/* Section 13 — FAQ */}
       <FAQSection />
