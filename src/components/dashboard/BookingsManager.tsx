@@ -103,6 +103,28 @@ const BookingsManager = ({ userId, guideName }: { userId: string; guideName: str
           console.error("Failed to send booking notification:", e);
         }
       }
+
+      // Send review request email when booking is completed
+      if (booking?.traveler_email && newStatus === "completed") {
+        try {
+          await supabase.functions.invoke("send-notification", {
+            body: {
+              type: "review_request",
+              data: {
+                travelerName: booking.traveler_name,
+                travelerEmail: booking.traveler_email,
+                guideName,
+                tourType: booking.tour_type,
+                date: booking.date,
+                guideProfileId: "", // Will be resolved by guide's profile
+              },
+            },
+          });
+          toast.success("Review request sent to traveler.", { icon: "⭐" });
+        } catch (e) {
+          console.error("Failed to send review request:", e);
+        }
+      }
     }
     setUpdating(null);
   };

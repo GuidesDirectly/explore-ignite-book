@@ -27,14 +27,14 @@ const corsHeaders = {
 const NOTIFY_EMAIL = "michael@iguidetours.net";
 
 interface NotificationRequest {
-  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request";
+  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request";
   data: Record<string, unknown>;
 }
 
-const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request"]);
+const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request"]);
 
 // Notification types that can be sent without authentication (public forms)
-const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request"]);
+const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request", "review_request"]);
 // Notification types that require authentication
 const AUTH_TYPES = new Set(["guide_status", "guide_application", "booking_status"]);
 
@@ -410,6 +410,43 @@ const handler = async (req: Request): Promise<Response> => {
       } catch (e) {
         console.error("Failed to notify admin:", e);
       }
+    } else if (type === "review_request") {
+      const travelerName = data.travelerName as string;
+      const travelerEmail = data.travelerEmail as string;
+      const gName = data.guideName as string;
+      const tourType = data.tourType as string;
+      const date = data.date as string;
+      const guideProfileId = data.guideProfileId as string;
+
+      if (!travelerEmail) throw new Error("Traveler email is required for review request");
+
+      const reviewUrl = `https://explore-ignite-book.lovable.app/review?guide=${encodeURIComponent(guideProfileId || "")}`;
+
+      subject = `How was your tour with ${escapeHtml(gName)}? ⭐`;
+      html = `
+        <div style="font-family:'Georgia',serif;max-width:600px;margin:0 auto;border:1px solid #e8e0d0;">
+          <div style="background:linear-gradient(135deg,#1a1f2e 0%,#2a2f3e 100%);padding:40px 30px;text-align:center;">
+            <h1 style="color:#d4a843;margin:0;font-size:28px;letter-spacing:1px;">iGuide Tours</h1>
+            <p style="color:#8a8fa0;margin:8px 0 0;font-size:13px;letter-spacing:2px;text-transform:uppercase;">Review Your Experience</p>
+          </div>
+          <div style="padding:40px 35px;background:#faf9f7;">
+            <h2 style="color:#1a1f2e;font-size:22px;margin:0 0 20px;">Hi ${escapeHtml(travelerName)},</h2>
+            <p style="color:#333;line-height:1.8;font-size:15px;">Thank you for choosing <strong>iGuide Tours</strong> for your recent experience! We hope you had an unforgettable time.</p>
+            <p style="color:#333;line-height:1.8;font-size:15px;">Your tour — <strong>${escapeHtml(tourType)}</strong> on <strong>${escapeHtml(date)}</strong> with <strong>${escapeHtml(gName)}</strong> — has been marked as completed.</p>
+            <div style="border-left:3px solid #d4a843;padding:15px 20px;margin:25px 0;background:#f5f0e8;">
+              <p style="color:#555;line-height:1.7;font-size:14px;margin:0;font-style:italic;">Your feedback helps other travelers find great guides and helps our guides improve their craft. It only takes a minute!</p>
+            </div>
+            <div style="text-align:center;margin:30px 0;">
+              <a href="${reviewUrl}" style="display:inline-block;background:linear-gradient(135deg,#d4a843,#c49a3a);color:#1a1f2e;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;letter-spacing:0.5px;box-shadow:0 4px 12px rgba(212,168,67,0.3);">Leave a Review ⭐</a>
+            </div>
+            <p style="color:#888;font-size:13px;margin-top:20px;">If you've already left a review, thank you! You can safely ignore this email.</p>
+          </div>
+          <div style="padding:20px;text-align:center;background:#1a1f2e;">
+            <p style="color:#8a8fa0;font-size:11px;margin:0;letter-spacing:1px;">iGuide Tours — Premium Private Tours Across North America</p>
+          </div>
+        </div>
+      `;
+      toEmails = [travelerEmail];
     } else {
       throw new Error("Invalid notification type");
     }
