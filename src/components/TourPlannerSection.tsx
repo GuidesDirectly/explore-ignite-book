@@ -12,6 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
+import ItinerarySwap from "@/components/ItinerarySwap";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import { tourPlannerContactSchema } from "@/lib/formSchemas";
 import { useTravelerProfile, profileToContext } from "@/hooks/useTravelerProfile";
@@ -1018,6 +1019,15 @@ const TourPlannerSection = () => {
                     <div className="prose prose-invert prose-sm max-w-none prose-headings:text-primary prose-headings:font-display prose-strong:text-primary/90 prose-li:text-[hsl(40,33%,80%)]" style={{ color: "hsl(40, 33%, 80%)" }}>
                       <ReactMarkdown>{plan}</ReactMarkdown>
                     </div>
+
+                    {/* Itinerary Swap */}
+                    {!isGenerating && (
+                      <ItinerarySwap
+                        currentPlan={plan}
+                        tourPlanId={tourPlanId}
+                        userEmail={email}
+                      />
+                    )}
                   </div>
                 )}
 

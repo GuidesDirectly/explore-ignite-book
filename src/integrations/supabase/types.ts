@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_data: Json
+          event_type: string
+          id: string
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json
+          event_type: string
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json
+          event_type?: string
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           category: string
@@ -247,6 +274,53 @@ export type Database = {
           phone?: string | null
         }
         Relationships: []
+      }
+      itinerary_swaps: {
+        Row: {
+          ai_response: string | null
+          created_at: string
+          day_number: number | null
+          id: string
+          original_activity: string
+          reason: string | null
+          status: string
+          swapped_activity: string
+          tour_plan_id: string | null
+          user_email: string
+        }
+        Insert: {
+          ai_response?: string | null
+          created_at?: string
+          day_number?: number | null
+          id?: string
+          original_activity: string
+          reason?: string | null
+          status?: string
+          swapped_activity: string
+          tour_plan_id?: string | null
+          user_email: string
+        }
+        Update: {
+          ai_response?: string | null
+          created_at?: string
+          day_number?: number | null
+          id?: string
+          original_activity?: string
+          reason?: string | null
+          status?: string
+          swapped_activity?: string
+          tour_plan_id?: string | null
+          user_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_swaps_tour_plan_id_fkey"
+            columns: ["tour_plan_id"]
+            isOneToOne: false
+            referencedRelation: "tour_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
