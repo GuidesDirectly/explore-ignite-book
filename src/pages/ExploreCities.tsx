@@ -201,9 +201,12 @@ const ExploreCities = () => {
                 {city}
               </span>
             ))}
-            <span className="px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm font-semibold">
-              + many more
-            </span>
+            <button
+              onClick={() => navigate("/explore")}
+              className="px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm font-semibold cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
+            >
+              + many more →
+            </button>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="lg" asChild>
