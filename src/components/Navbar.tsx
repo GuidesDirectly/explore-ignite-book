@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
-import DestinationsDropdown from "./DestinationsDropdown";
+import DestinationsModal from "./DestinationsModal";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,13 +52,12 @@ const Navbar = () => {
               return (
                 <div key={link.href} ref={destBtnRef} className="relative">
                   <button
-                    onClick={() => setDestOpen((v) => !v)}
+                    onClick={() => setDestOpen(true)}
                     className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors duration-200 inline-flex items-center gap-1"
                   >
                     {link.label}
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${destOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown className="w-3.5 h-3.5" />
                   </button>
-                  <DestinationsDropdown open={destOpen} onClose={() => setDestOpen(false)} />
                 </div>
               );
             }
@@ -182,6 +181,14 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <DestinationsModal
+        open={destOpen}
+        onClose={() => setDestOpen(false)}
+        onDone={(cities) => {
+          setDestOpen(false);
+          navigate(`/home#guides?cities=${encodeURIComponent(cities.join(","))}`);
+        }}
+      />
     </nav>
   );
 };

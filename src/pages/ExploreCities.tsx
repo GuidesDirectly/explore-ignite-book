@@ -234,7 +234,13 @@ const ExploreCities = () => {
           <span>100% Authentic for Travelers</span>
         </div>
       </div>
-      <DestinationsModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <DestinationsModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onDone={(cities) => {
+          navigate(`/home#guides?cities=${encodeURIComponent(cities.join(","))}`);
+        }}
+      />
     </div>
   );
 };
