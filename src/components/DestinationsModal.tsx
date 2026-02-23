@@ -63,6 +63,7 @@ const statusConfig = {
 const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) => {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
+  const [customDestinations, setCustomDestinations] = useState<Destination[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -79,19 +80,38 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
     return () => document.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
+  const allDests = useMemo(() => [...ALL_DESTINATIONS, ...customDestinations], [customDestinations]);
+
   const filtered = useMemo(() => {
-    if (!query.trim()) return ALL_DESTINATIONS;
+    if (!query.trim()) return allDests;
     const q = query.toLowerCase();
-    return ALL_DESTINATIONS.filter(
+    return allDests.filter(
       (d) => d.name.toLowerCase().includes(q) || d.region.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [query, allDests]);
 
   const toggleSelect = (name: string) => {
     setSelected((prev) =>
       prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
     );
   };
+
+  const addCustomDestination = () => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    const exists = allDests.some((d) => d.name.toLowerCase() === trimmed.toLowerCase());
+    if (exists) return;
+    const newDest: Destination = { name: trimmed, region: "Custom", status: "international" };
+    setCustomDestinations((prev) => [...prev, newDest]);
+    setSelected((prev) => [...prev, trimmed]);
+    setQuery("");
+  };
+
+  // Check if query matches no existing destinations (for showing "add custom" prompt)
+  const queryHasNoExactMatch = useMemo(() => {
+    if (!query.trim()) return false;
+    return !allDests.some((d) => d.name.toLowerCase() === query.trim().toLowerCase());
+  }, [query, allDests]);
 
   const grouped = useMemo(() => {
     const groups: Record<string, Destination[]> = { active: [], "coming-soon": [], international: [] };
@@ -138,7 +158,13 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search a city or region..."
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && queryHasNoExactMatch && query.trim()) {
+                      e.preventDefault();
+                      addCustomDestination();
+                    }
+                  }}
+                  placeholder="Search or type your own destination..."
                   className="w-full pl-9 pr-3 py-2.5 text-sm bg-background border border-input rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
@@ -212,9 +238,25 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
                 );
               })}
 
-              {filtered.length === 0 && (
+              {/* Add custom destination prompt */}
+              {queryHasNoExactMatch && query.trim() && (
+                <div className="px-3 py-3">
+                  <button
+                    onClick={addCustomDestination}
+                    className="w-full flex items-center gap-2 px-3 py-3 text-sm rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors text-foreground"
+                  >
+                    <MapPin className="w-4 h-4 text-primary" />
+                    <span>
+                      Add <strong>"{query.trim()}"</strong> as your destination
+                    </span>
+                    <span className="ml-auto text-xs text-muted-foreground">Press Enter</span>
+                  </button>
+                </div>
+              )}
+
+              {filtered.length === 0 && !query.trim() && (
                 <div className="px-3 py-8 text-center text-sm text-muted-foreground">
-                  No destinations found for "{query}"
+                  No destinations found
                 </div>
               )}
             </div>
@@ -222,7 +264,7 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
             {/* Footer */}
             <div className="border-t border-border/50 px-5 py-3 flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
-                {ALL_DESTINATIONS.length} destinations · {selected.length} selected
+                {allDests.length} destinations · {selected.length} selected
               </span>
               <button
                 onClick={() => {
