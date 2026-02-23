@@ -22,6 +22,7 @@ const InquirySection = () => {
     email: "",
     phone: "",
     destination: "",
+    customDestination: "",
     groupSize: "",
     message: "",
   });
@@ -47,7 +48,12 @@ const InquirySection = () => {
     e.preventDefault();
     setErrors({});
 
-    const result = inquirySchema.safeParse(formData);
+    // Resolve destination: use custom text if "other" is selected
+    const resolvedDestination = formData.destination === "other" && formData.customDestination.trim()
+      ? `other: ${formData.customDestination.trim()}`
+      : formData.destination;
+
+    const result = inquirySchema.safeParse({ ...formData, destination: resolvedDestination });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
@@ -229,9 +235,18 @@ const InquirySection = () => {
                   <SelectItem value="toronto">Toronto</SelectItem>
                   <SelectItem value="boston">Boston</SelectItem>
                   <SelectItem value="chicago">Chicago</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="other">{t("inquiry.other", "Other")}</SelectItem>
                 </SelectContent>
               </Select>
+              {formData.destination === "other" && (
+                <Input
+                  placeholder={t("inquiry.customDestPlaceholder", "Enter your desired destination...")}
+                  className="mt-2 bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                  value={formData.customDestination || ""}
+                  onChange={(e) => setFormData({ ...formData, customDestination: e.target.value })}
+                  maxLength={100}
+                />
+              )}
               {fieldError("destination")}
             </div>
 
