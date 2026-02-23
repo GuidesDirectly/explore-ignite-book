@@ -19,6 +19,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import GuideDashboard from "./pages/GuideDashboard";
 import NotFound from "./pages/NotFound";
 import TrustPage from "./pages/TrustPage";
+import SavedGuides from "./pages/SavedGuides";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/trust" element={<TrustPage />} />
+          <Route path="/saved-guides" element={<SavedGuides />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -381,6 +381,42 @@ export type Database = {
           },
         ]
       }
+      saved_guides: {
+        Row: {
+          created_at: string
+          guide_profile_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          guide_profile_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          guide_profile_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_guides_guide_profile_id_fkey"
+            columns: ["guide_profile_id"]
+            isOneToOne: false
+            referencedRelation: "guide_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_guides_guide_profile_id_fkey"
+            columns: ["guide_profile_id"]
+            isOneToOne: false
+            referencedRelation: "guide_profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           created_at: string
