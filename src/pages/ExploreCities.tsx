@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Globe, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import DestinationsModal from "@/components/DestinationsModal";
 
 import nycImg from "@/assets/city-cards/nyc.jpg";
 import phillyImg from "@/assets/city-cards/philadelphia.jpg";
@@ -113,6 +115,7 @@ const CityCard = ({ city, index }: { city: City; index: number }) => {
 
 const ExploreCities = () => {
   const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -202,7 +205,7 @@ const ExploreCities = () => {
               </span>
             ))}
             <button
-              onClick={() => navigate("/explore")}
+              onClick={() => setModalOpen(true)}
               className="px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm font-semibold cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
             >
               + many more →
@@ -231,6 +234,7 @@ const ExploreCities = () => {
           <span>100% Authentic for Travelers</span>
         </div>
       </div>
+      <DestinationsModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 };
