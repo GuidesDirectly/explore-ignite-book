@@ -38,6 +38,7 @@ const InquirySection = () => {
         setFormData(prev => ({
           ...prev,
           destination: "other",
+          customDestination: decoded,
           message: prev.message || `I'm looking for a guide in ${decoded}. Please help me find one!`,
         }));
       }
