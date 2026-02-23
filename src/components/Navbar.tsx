@@ -41,16 +41,23 @@ const Navbar = () => {
 
         {/* Desktop nav links */}
         <div className="hidden lg:flex items-center gap-6 ml-8">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => handleNavClick(e, link.href)}
-              className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors duration-200"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const isFind = link.href === "#meet-guides";
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
+                className={
+                  isFind
+                    ? "text-sm font-semibold bg-primary text-primary-foreground px-4 py-2 rounded-md shadow-sm hover:bg-primary/85 transition-all duration-200"
+                    : "text-sm font-medium text-foreground/70 hover:text-primary transition-colors duration-200"
+                }
+              >
+                {link.label}
+              </a>
+            );
+          })}
         </div>
 
         {/* Desktop right section: CTAs + utility */}
