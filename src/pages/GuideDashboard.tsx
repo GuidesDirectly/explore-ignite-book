@@ -22,6 +22,7 @@ import logoImg from "@/assets/logo.jpg";
 import { scanFileForViruses } from "@/lib/scanUpload";
 import BookingsManager from "@/components/dashboard/BookingsManager";
 import AvailabilityManager from "@/components/dashboard/AvailabilityManager";
+import GuideVerificationUpload from "@/components/dashboard/GuideVerificationUpload";
 
 interface PhotoItem {
   name: string;
@@ -453,6 +454,9 @@ const GuideDashboard = () => {
             )}
           </section>
         )}
+
+        {/* Credential Verification */}
+        {user && <GuideVerificationUpload userId={user.id} />}
 
         {/* Bookings Management */}
         {user && <BookingsManager userId={user.id} guideName={guideName} />}
