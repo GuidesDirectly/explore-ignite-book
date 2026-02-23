@@ -217,7 +217,7 @@ const Navbar = () => {
         onClose={() => setDestOpen(false)}
         onDone={(cities) => {
           setDestOpen(false);
-          navigate(`/home#guides?cities=${encodeURIComponent(cities.join(","))}`);
+          navigate(`/home#meet-guides?cities=${encodeURIComponent(cities.join(","))}`);
         }}
       />
     </nav>
