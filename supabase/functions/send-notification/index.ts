@@ -171,14 +171,24 @@ const handler = async (req: Request): Promise<Response> => {
     let toEmails: string[] = [NOTIFY_EMAIL];
 
     if (type === "inquiry") {
-      subject = `🔔 New Tour Inquiry from ${escapeHtml(data.name)}`;
+      const destination = String(data.destination || "");
+      const isUnserved = destination.startsWith("other:");
+      const unservedCity = isUnserved ? destination.replace("other:", "").trim() : null;
+
+      subject = isUnserved
+        ? `🌍 EXPANSION OPPORTUNITY — Inquiry for ${escapeHtml(unservedCity)} from ${escapeHtml(data.name)}`
+        : `🔔 New Tour Inquiry from ${escapeHtml(data.name)}`;
       html = `
+        ${isUnserved ? `<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:16px;margin-bottom:20px;">
+          <h3 style="margin:0 0 8px;color:#856404;">🌍 New Market Request: ${escapeHtml(unservedCity)}</h3>
+          <p style="margin:0;color:#856404;font-size:14px;">A traveler is looking for a guide in <strong>${escapeHtml(unservedCity)}</strong> — a destination we don't currently serve. Consider recruiting guides in this area.</p>
+        </div>` : ""}
         <h2>New Tour Inquiry</h2>
         <table style="border-collapse:collapse;width:100%;max-width:500px;">
           <tr><td style="padding:8px;font-weight:bold;">Name</td><td style="padding:8px;">${escapeHtml(data.name)}</td></tr>
           <tr><td style="padding:8px;font-weight:bold;">Email</td><td style="padding:8px;"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td></tr>
           ${data.phone ? `<tr><td style="padding:8px;font-weight:bold;">Phone</td><td style="padding:8px;">${escapeHtml(data.phone)}</td></tr>` : ""}
-          <tr><td style="padding:8px;font-weight:bold;">Destination</td><td style="padding:8px;">${escapeHtml(data.destination)}</td></tr>
+          <tr><td style="padding:8px;font-weight:bold;">Destination</td><td style="padding:8px;"><strong${isUnserved ? ' style="color:#d63384;"' : ""}>${escapeHtml(data.destination)}</strong></td></tr>
           ${data.group_size ? `<tr><td style="padding:8px;font-weight:bold;">Group Size</td><td style="padding:8px;">${escapeHtml(data.group_size)}</td></tr>` : ""}
           ${data.message ? `<tr><td style="padding:8px;font-weight:bold;">Message</td><td style="padding:8px;">${escapeHtml(data.message)}</td></tr>` : ""}
         </table>
