@@ -14,6 +14,7 @@ import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import { tourPlannerContactSchema } from "@/lib/formSchemas";
+import { useTravelerProfile, profileToContext } from "@/hooks/useTravelerProfile";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -58,6 +59,7 @@ const STEP_ICONS = [
 
 const TourPlannerSection = () => {
   const { t } = useTranslation();
+  const { profile, isLoggedIn: hasProfile } = useTravelerProfile();
   const [currentStep, setCurrentStep] = useState(0);
 
   // Step 0: Contact info
@@ -239,7 +241,7 @@ const TourPlannerSection = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify({ description: buildDescription(refinement) }),
+        body: JSON.stringify({ description: buildDescription(refinement), profileContext: hasProfile ? profileToContext(profile) : undefined }),
       });
 
       if (!resp.ok || !resp.body) {

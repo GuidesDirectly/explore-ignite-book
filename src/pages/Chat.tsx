@@ -2,8 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Bot, User, ArrowLeft, Loader2 } from "lucide-react";
+import { Send, Bot, User, ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import { streamChat, type Msg } from "@/lib/streamChat";
+import { useTravelerProfile, profileToContext } from "@/hooks/useTravelerProfile";
+import TravelerProfileForm from "@/components/TravelerProfileForm";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -13,7 +15,9 @@ const Chat = () => {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { profile, isLoggedIn } = useTravelerProfile();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -41,10 +45,12 @@ const Chat = () => {
     };
 
     try {
+      const ctx = isLoggedIn ? profileToContext(profile) : undefined;
       await streamChat({
         messages: [...messages, userMsg],
         onDelta: upsertAssistant,
         onDone: () => setIsLoading(false),
+        profileContext: ctx,
       });
     } catch (e: any) {
       console.error(e);
@@ -63,10 +69,19 @@ const Chat = () => {
           </Button>
         </Link>
         <Bot className="w-6 h-6 text-primary" />
-        <div>
+        <div className="flex-1">
           <h1 className="font-display text-lg font-bold text-primary-foreground">{t("chat.title")}</h1>
           <p className="text-xs text-muted-foreground">{t("chat.subtitle")}</p>
         </div>
+        {isLoggedIn && (
+          <button
+            onClick={() => setProfileOpen(true)}
+            className="p-2 rounded-full text-primary-foreground/60 hover:text-primary hover:bg-primary/10 transition-colors"
+            title="My Travel Preferences"
+          >
+            <Sparkles className="w-5 h-5" />
+          </button>
+        )}
       </header>
 
       {/* Messages */}
@@ -152,6 +167,7 @@ const Chat = () => {
           </Button>
         </form>
       </div>
+      <TravelerProfileForm open={profileOpen} onClose={() => setProfileOpen(false)} />
     </div>
   );
 };

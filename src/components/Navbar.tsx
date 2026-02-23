@@ -1,16 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, ChevronDown, Heart } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, Heart, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 import DestinationsModal from "./DestinationsModal";
+import TravelerProfileForm from "./TravelerProfileForm";
 import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [destOpen, setDestOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -94,13 +96,23 @@ const Navbar = () => {
         {/* Desktop right section: CTAs + utility */}
         <div className="hidden lg:flex items-center gap-3 ml-auto">
           {isLoggedIn && (
-            <button
-              onClick={() => navigate("/saved-guides")}
-              className="relative p-2 rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors"
-              aria-label="Saved Guides"
-            >
-              <Heart className="w-4 h-4" />
-            </button>
+            <>
+              <button
+                onClick={() => setProfileOpen(true)}
+                className="relative p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                aria-label="Travel Preferences"
+                title="My Travel Preferences"
+              >
+                <Sparkles className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => navigate("/saved-guides")}
+                className="relative p-2 rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors"
+                aria-label="Saved Guides"
+              >
+                <Heart className="w-4 h-4" />
+              </button>
+            </>
           )}
           <Button
             variant="hero"
@@ -220,6 +232,7 @@ const Navbar = () => {
           navigate(`/home#meet-guides?cities=${encodeURIComponent(cities.join(","))}`);
         }}
       />
+      <TravelerProfileForm open={profileOpen} onClose={() => setProfileOpen(false)} />
     </nav>
   );
 };
