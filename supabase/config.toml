@@ -21,3 +21,6 @@ verify_jwt = false
 [functions.badge-expiration]
 verify_jwt = false
 
+[functions.expansion-digest]
+verify_jwt = false
+
