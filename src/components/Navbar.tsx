@@ -1,21 +1,24 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
+import DestinationsDropdown from "./DestinationsDropdown";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [destOpen, setDestOpen] = useState(false);
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const destBtnRef = useRef<HTMLDivElement>(null);
 
   const navLinks = [
     { label: t("nav.home"), href: "#home" },
     { label: t("nav.forTravelers"), href: "#meet-guides" },
-    { label: t("nav.destinations"), href: "#destinations" },
+    { label: t("nav.destinations"), href: "#destinations", isDestinations: true },
     { label: t("nav.services"), href: "#how-it-works" },
     { label: t("nav.contact"), href: "#about" },
   ];
@@ -43,6 +46,23 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-6 ml-8">
           {navLinks.map((link) => {
             const isFind = link.href === "#meet-guides";
+            const isDest = (link as any).isDestinations;
+
+            if (isDest) {
+              return (
+                <div key={link.href} ref={destBtnRef} className="relative">
+                  <button
+                    onClick={() => setDestOpen((v) => !v)}
+                    className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors duration-200 inline-flex items-center gap-1"
+                  >
+                    {link.label}
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${destOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  <DestinationsDropdown open={destOpen} onClose={() => setDestOpen(false)} />
+                </div>
+              );
+            }
+
             return (
               <a
                 key={link.href}
@@ -110,6 +130,20 @@ const Navbar = () => {
             <div className="container mx-auto px-4 py-4 flex flex-col gap-2">
               {navLinks.map((link) => {
                 const isFind = link.href === "#meet-guides";
+                const isDest = (link as any).isDestinations;
+
+                if (isDest) {
+                  return (
+                    <button
+                      key={link.href}
+                      onClick={() => { setIsOpen(false); navigate("/explore"); }}
+                      className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2.5 border-b border-border/20 text-left"
+                    >
+                      {link.label} →
+                    </button>
+                  );
+                }
+
                 return (
                   <a
                     key={link.href}
