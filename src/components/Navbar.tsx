@@ -1,11 +1,12 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, ChevronDown } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 import DestinationsModal from "./DestinationsModal";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,6 +15,17 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const destBtnRef = useRef<HTMLDivElement>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session?.user);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const navLinks = [
     { label: t("nav.home"), href: "#home" },
@@ -81,6 +93,15 @@ const Navbar = () => {
 
         {/* Desktop right section: CTAs + utility */}
         <div className="hidden lg:flex items-center gap-3 ml-auto">
+          {isLoggedIn && (
+            <button
+              onClick={() => navigate("/saved-guides")}
+              className="relative p-2 rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors"
+              aria-label="Saved Guides"
+            >
+              <Heart className="w-4 h-4" />
+            </button>
+          )}
           <Button
             variant="hero"
             size="sm"
@@ -158,6 +179,16 @@ const Navbar = () => {
                   </a>
                 );
               })}
+              {isLoggedIn && (
+                <a
+                  href="/saved-guides"
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm font-medium text-foreground/70 hover:text-red-500 transition-colors py-2.5 border-b border-border/20 flex items-center gap-2"
+                >
+                  <Heart className="w-4 h-4" />
+                  Saved Guides
+                </a>
+              )}
               <div className="flex flex-col gap-2 pt-3">
                 <Button variant="hero" size="sm" asChild>
                   <a href="/guide-register" onClick={() => setIsOpen(false)}>
