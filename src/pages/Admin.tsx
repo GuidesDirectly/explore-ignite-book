@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye, UserCheck, CheckCircle, XCircle, Globe, Briefcase, Map, DollarSign, Clock, Pencil, Save, X } from "lucide-react";
+import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye, UserCheck, CheckCircle, XCircle, Globe, Briefcase, Map, DollarSign, Clock, Pencil, Save, X, ShieldCheck } from "lucide-react";
+import VerificationDashboard from "@/components/dashboard/VerificationDashboard";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import logoImg from "@/assets/logo.jpg";
@@ -78,7 +79,7 @@ const Admin = () => {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours">("inquiries");
+  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours" | "verification">("inquiries");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [guides, setGuides] = useState<GuideApplication[]>([]);
@@ -663,6 +664,12 @@ const Admin = () => {
           >
             <Map className="w-4 h-4 mr-2" /> Tour Plans ({tourPlans.length})
           </Button>
+          <Button
+            variant={tab === "verification" ? "default" : "outline"}
+            onClick={() => setTab("verification")}
+          >
+            <ShieldCheck className="w-4 h-4 mr-2" /> Verification
+          </Button>
         </div>
 
         {/* Inquiries Tab */}
@@ -798,6 +805,9 @@ const Admin = () => {
             )}
           </div>
         )}
+
+        {/* Verification Tab */}
+        {tab === "verification" && <VerificationDashboard />}
 
         {/* Tour Plans Tab */}
         {tab === "tours" && (
