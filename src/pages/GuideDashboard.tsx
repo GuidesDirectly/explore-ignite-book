@@ -23,6 +23,7 @@ import { scanFileForViruses } from "@/lib/scanUpload";
 import BookingsManager from "@/components/dashboard/BookingsManager";
 import AvailabilityManager from "@/components/dashboard/AvailabilityManager";
 import GuideVerificationUpload from "@/components/dashboard/GuideVerificationUpload";
+import EarningsDashboard from "@/components/dashboard/EarningsDashboard";
 
 interface PhotoItem {
   name: string;
@@ -454,6 +455,9 @@ const GuideDashboard = () => {
             )}
           </section>
         )}
+
+        {/* Earnings Dashboard */}
+        {user && <EarningsDashboard userId={user.id} />}
 
         {/* Credential Verification */}
         {user && <GuideVerificationUpload userId={user.id} />}

@@ -17,6 +17,8 @@ import {
   MapPin, Globe, Star, ShieldCheck, CheckCircle2,
   ArrowLeft, Mail, Clock, Users, Camera, Mountain, CalendarCheck
 } from "lucide-react";
+import SaveGuideButton from "@/components/SaveGuideButton";
+import { useSavedGuides } from "@/hooks/useSavedGuides";
 import { motion } from "framer-motion";
 
 interface GuideData {
@@ -58,6 +60,7 @@ const GuideProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [badges, setBadges] = useState<BadgeType[]>([]);
+  const { savedIds, toggleSave, loading: saveLoading } = useSavedGuides();
 
   useEffect(() => {
     const fetchGuide = async () => {
@@ -281,6 +284,16 @@ const GuideProfilePage = () => {
             <div className="bg-card rounded-2xl border border-border/50 overflow-hidden sticky top-24">
               {/* Header gradient */}
               <div className="relative h-32 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent">
+                {guide && (
+                  <div className="absolute top-3 right-3 z-10">
+                    <SaveGuideButton
+                      isSaved={savedIds.has(guide.id)}
+                      onToggle={() => toggleSave(guide.id)}
+                      loading={saveLoading}
+                      size="md"
+                    />
+                  </div>
+                )}
                 <div className="absolute -bottom-10 left-6">
                   {photoUrl ? (
                     <img
