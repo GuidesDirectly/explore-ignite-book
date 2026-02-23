@@ -49,6 +49,7 @@ interface DestinationsDropdownProps {
 const DestinationsDropdown = ({ open, onClose }: DestinationsDropdownProps) => {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
+  const [customDestinations, setCustomDestinations] = useState<Destination[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -75,19 +76,36 @@ const DestinationsDropdown = ({ open, onClose }: DestinationsDropdownProps) => {
     return () => document.removeEventListener("mousedown", handler);
   }, [open, onClose]);
 
+  const allDests = useMemo(() => [...ALL_DESTINATIONS, ...customDestinations], [customDestinations]);
+
   const filtered = useMemo(() => {
-    if (!query.trim()) return ALL_DESTINATIONS;
+    if (!query.trim()) return allDests;
     const q = query.toLowerCase();
-    return ALL_DESTINATIONS.filter(
+    return allDests.filter(
       (d) => d.name.toLowerCase().includes(q) || d.region.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [query, allDests]);
 
   const toggleSelect = (name: string) => {
     setSelected((prev) =>
       prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
     );
   };
+
+  const addCustomDestination = () => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    const exists = allDests.some((d) => d.name.toLowerCase() === trimmed.toLowerCase());
+    if (exists) return;
+    setCustomDestinations((prev) => [...prev, { name: trimmed, region: "Custom", status: "international" }]);
+    setSelected((prev) => [...prev, trimmed]);
+    setQuery("");
+  };
+
+  const queryHasNoExactMatch = useMemo(() => {
+    if (!query.trim()) return false;
+    return !allDests.some((d) => d.name.toLowerCase() === query.trim().toLowerCase());
+  }, [query, allDests]);
 
   const removeChip = (name: string) => {
     setSelected((prev) => prev.filter((n) => n !== name));
@@ -113,7 +131,13 @@ const DestinationsDropdown = ({ open, onClose }: DestinationsDropdownProps) => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={t("nav.searchDestination", "Search a city or region...")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && queryHasNoExactMatch && query.trim()) {
+                e.preventDefault();
+                addCustomDestination();
+              }
+            }}
+            placeholder={t("nav.searchDestination", "Search or type your own destination...")}
             className="w-full pl-9 pr-3 py-2 text-sm bg-background border border-input rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
@@ -195,7 +219,20 @@ const DestinationsDropdown = ({ open, onClose }: DestinationsDropdownProps) => {
           </div>
         )}
 
-        {filtered.length === 0 && (
+        {/* Add custom destination */}
+        {queryHasNoExactMatch && query.trim() && (
+          <div className="px-3 py-2">
+            <button
+              onClick={addCustomDestination}
+              className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors text-foreground"
+            >
+              <MapPin className="w-3.5 h-3.5 text-primary" />
+              <span>Add "<strong>{query.trim()}</strong>"</span>
+            </button>
+          </div>
+        )}
+
+        {filtered.length === 0 && !query.trim() && (
           <div className="px-3 py-6 text-center text-sm text-muted-foreground">
             {t("nav.noResults", "No destinations found")}
           </div>
@@ -203,7 +240,19 @@ const DestinationsDropdown = ({ open, onClose }: DestinationsDropdownProps) => {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-border/50 p-3">
+      <div className="border-t border-border/50 p-3 space-y-2">
+        {selected.length > 0 && (
+          <button
+            onClick={() => {
+              onClose();
+              navigate(`/home#meet-guides?cities=${encodeURIComponent(selected.join(","))}`);
+            }}
+            className="w-full flex items-center justify-center gap-2 text-sm font-semibold bg-primary text-primary-foreground rounded-lg py-2 hover:bg-primary/90 transition-colors"
+          >
+            Search Guides in {selected.length} {selected.length === 1 ? "city" : "cities"}
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        )}
         <button
           onClick={() => {
             onClose();
