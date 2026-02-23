@@ -1,0 +1,1 @@
+DELETE FROM inquiries WHERE id = 'ea6f8c0f-9662-42e5-a11b-4349a6842896'
