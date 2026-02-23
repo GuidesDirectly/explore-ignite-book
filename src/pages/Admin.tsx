@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye, UserCheck, CheckCircle, XCircle, Globe, Briefcase, Map, DollarSign, Clock, Pencil, Save, X, ShieldCheck } from "lucide-react";
 import VerificationDashboard from "@/components/dashboard/VerificationDashboard";
+import UnservedDestinationsWidget from "@/components/dashboard/UnservedDestinationsWidget";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import logoImg from "@/assets/logo.jpg";
@@ -675,6 +676,7 @@ const Admin = () => {
         {/* Inquiries Tab */}
         {tab === "inquiries" && (
           <div className="space-y-4">
+            <UnservedDestinationsWidget inquiries={inquiries} />
             {inquiries.length === 0 && (
               <p className="text-center text-muted-foreground py-12">No inquiries yet.</p>
             )}
