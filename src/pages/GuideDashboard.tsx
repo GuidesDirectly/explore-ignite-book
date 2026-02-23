@@ -25,6 +25,7 @@ import AvailabilityManager from "@/components/dashboard/AvailabilityManager";
 import GuideVerificationUpload from "@/components/dashboard/GuideVerificationUpload";
 import EarningsDashboard from "@/components/dashboard/EarningsDashboard";
 import AiBanner from "@/components/dashboard/AiBanner";
+import FeedbackInsights from "@/components/dashboard/FeedbackInsights";
 
 interface PhotoItem {
   name: string;
@@ -459,6 +460,9 @@ const GuideDashboard = () => {
             )}
           </section>
         )}
+
+        {/* AI Feedback Insights */}
+        {user && <FeedbackInsights userId={user.id} />}
 
         {/* Earnings Dashboard */}
         {user && <EarningsDashboard userId={user.id} />}

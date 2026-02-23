@@ -16,6 +16,7 @@ import ItinerarySwap from "@/components/ItinerarySwap";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import { tourPlannerContactSchema } from "@/lib/formSchemas";
 import { useTravelerProfile, profileToContext } from "@/hooks/useTravelerProfile";
+import { trackTourPlanGenerated, trackTourPlanRefined, trackGuideMatched, trackCtaClick } from "@/lib/analytics";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -295,6 +296,14 @@ const TourPlannerSection = () => {
       // Save plan to DB
       await saveTourPlan(accumulated, newCount, newHistory);
 
+      // Track KPI events
+      const dest = destination === "other" ? otherDestination : t(`planner.${destination}`);
+      if (refinement) {
+        trackTourPlanRefined(dest, newCount);
+      } else {
+        trackTourPlanGenerated(dest);
+      }
+
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -397,8 +406,11 @@ const TourPlannerSection = () => {
         .map(s => s.guide);
 
       // If no matches, fall back to all guides
-      setGuides(matched.length > 0 ? matched : allGuides.slice(0, 6));
+      const finalGuides = matched.length > 0 ? matched : allGuides.slice(0, 6);
+      setGuides(finalGuides);
       setShowGuides(true);
+      const dest = destination === "other" ? otherDestination : t(`planner.${destination}`);
+      trackGuideMatched(dest, finalGuides.length);
     }
   };
 

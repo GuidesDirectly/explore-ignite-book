@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowRightLeft, Loader2, X, Send, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
+import { trackSwapRequest, trackSwapCompleted } from "@/lib/analytics";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -34,6 +35,11 @@ const ItinerarySwap = ({ currentPlan, tourPlanId, userEmail }: ItinerarySwapProp
     setSwapResult("");
     setIsLoading(true);
 
+    trackSwapRequest({
+      originalActivity: originalActivity.trim(),
+      swapRequest: swapRequest.trim(),
+      tourPlanId: tourPlanId || undefined,
+    });
     try {
       const resp = await fetch(SWAP_URL, {
         method: "POST",
@@ -89,6 +95,11 @@ const ItinerarySwap = ({ currentPlan, tourPlanId, userEmail }: ItinerarySwapProp
           }
         }
       }
+      trackSwapCompleted({
+        originalActivity: originalActivity.trim(),
+        swapRequest: swapRequest.trim(),
+        tourPlanId: tourPlanId || undefined,
+      });
     } catch (e: any) {
       toast.error(e.message || "Swap failed");
     } finally {
