@@ -30,4 +30,19 @@ verify_jwt = false
 [functions.analyze-feedback]
 verify_jwt = false
 
+[functions.api-guides]
+verify_jwt = false
+
+[functions.api-bookings]
+verify_jwt = false
+
+[functions.api-destinations]
+verify_jwt = false
+
+[functions.api-reviews]
+verify_jwt = false
+
+[functions.api-auth-status]
+verify_jwt = false
+
 
