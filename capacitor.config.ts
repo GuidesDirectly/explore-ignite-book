@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "app.lovable.3ddde744d4c5403da1791a35102805bc",
+  appId: "com.guidesdirectly.app",
   appName: "Guides Directly",
   webDir: "dist",
   server: {
