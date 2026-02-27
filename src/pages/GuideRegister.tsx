@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -611,21 +612,27 @@ const GuideRegister = () => {
             return (
               <div key={idx} className="flex items-center flex-1 last:flex-none">
                 <div className="flex flex-col items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentStep(idx)}
-                    disabled={false}
-                    className={`relative w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-300 cursor-pointer ${
-                      isDone
-                        ? "bg-primary border-primary text-primary-foreground hover:scale-105 hover:shadow-lg shadow-primary/25"
-                        : isActive
-                        ? "border-primary text-primary bg-primary/10 ring-4 ring-primary/20 shadow-md"
-                        : "border-border text-muted-foreground hover:border-primary/40 hover:text-primary/60 hover:scale-105 opacity-60 hover:opacity-100"
-                    }`}
-                    aria-label={`Go to step: ${step.label}`}
-                  >
-                    {isDone ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
-                  </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => setCurrentStep(idx)}
+                        className={`relative w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-300 cursor-pointer ${
+                          isDone
+                            ? "bg-primary border-primary text-primary-foreground hover:scale-105 hover:shadow-lg shadow-primary/25"
+                            : isActive
+                            ? "border-primary text-primary bg-primary/10 ring-4 ring-primary/20 shadow-md"
+                            : "border-border text-muted-foreground hover:border-primary/40 hover:text-primary/60 hover:scale-105 opacity-60 hover:opacity-100"
+                        }`}
+                        aria-label={`Go to step: ${step.label}`}
+                      >
+                        {isDone ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">
+                      {isDone ? `✓ ${step.label} — Completed` : isActive ? `${step.label} — Current step` : `${step.label} — Click to jump`}
+                    </TooltipContent>
+                  </Tooltip>
                   <span
                     className={`text-[11px] font-semibold text-center hidden sm:block leading-tight max-w-[72px] transition-colors cursor-pointer ${
                       isActive ? "text-primary" : isDone ? "text-primary/80 hover:text-primary" : "text-muted-foreground/60 hover:text-primary/60"
