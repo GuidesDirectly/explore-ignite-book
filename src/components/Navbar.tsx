@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 import DestinationsModal from "./DestinationsModal";
 import TravelerProfileForm from "./TravelerProfileForm";
+import NavbarUserMenu from "./NavbarUserMenu";
 import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
@@ -19,13 +20,16 @@ const Navbar = () => {
   const navigate = useNavigate();
   const destBtnRef = useRef<HTMLDivElement>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | undefined>();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsLoggedIn(!!session?.user);
+      setUserEmail(session?.user?.email ?? undefined);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsLoggedIn(!!session?.user);
+      setUserEmail(session?.user?.email ?? undefined);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -40,9 +44,9 @@ const Navbar = () => {
   const isHome = location.pathname === "/" || location.pathname === "/home";
 
   const navLinks = [
-    { label: t("nav.forTravelers", "Find Guides"), href: "#meet-guides", icon: Search },
+    { label: "Destinations", href: "#destinations", isDestinations: true },
+    { label: "Guides", href: "#meet-guides" },
     { label: "Browse Tours", href: "/tours", isRoute: true },
-    { label: t("nav.destinations", "Destinations"), href: "#destinations", isDestinations: true },
     { label: t("nav.services", "How it Works"), href: "#how-it-works" },
     { label: t("nav.contact", "About"), href: "#about" },
   ];
@@ -61,9 +65,7 @@ const Navbar = () => {
       : "bg-header/95 backdrop-blur-md";
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${headerBg}`}
-    >
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${headerBg}`}>
       <div className="container mx-auto flex items-center justify-between h-[72px] px-4 lg:px-10">
         {/* Logo */}
         <a
@@ -84,7 +86,6 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-7 ml-8">
           {navLinks.map((link) => {
             const isDest = (link as any).isDestinations;
-            const LinkIcon = (link as any).icon;
 
             if (isDest) {
               return (
@@ -118,16 +119,15 @@ const Navbar = () => {
                 key={link.href}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200 inline-flex items-center gap-1.5"
+                className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200"
               >
-                {LinkIcon && <LinkIcon className="w-3.5 h-3.5" />}
                 {link.label}
               </a>
             );
           })}
         </div>
 
-        {/* Desktop right section: utilities + dual CTAs */}
+        {/* Desktop right section */}
         <div className="hidden lg:flex items-center gap-3 ml-auto">
           {isLoggedIn && (
             <>
@@ -149,24 +149,10 @@ const Navbar = () => {
             </>
           )}
 
-          {/* Divider */}
           <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
 
-          <LanguageSwitcher />
-
-          <a
-            href="tel:+12022438336"
-            className="flex items-center gap-1.5 text-sm text-header-muted hover:text-header-foreground transition-colors"
-          >
-            <Phone className="w-3.5 h-3.5" />
-            <span className="hidden xl:inline">(202) 243-8336</span>
-          </a>
-
-          {/* Divider */}
-          <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
-
-          {/* Login */}
-          {!isLoggedIn && (
+          {/* Login or Avatar */}
+          {!isLoggedIn ? (
             <Button
               size="sm"
               variant="ghost"
@@ -176,9 +162,27 @@ const Navbar = () => {
               <LogIn className="w-3.5 h-3.5" />
               Login
             </Button>
+          ) : (
+            <NavbarUserMenu email={userEmail} />
           )}
 
-          {/* Dual CTAs */}
+          <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
+
+          {/* CTA Group: Find a Guide + Book a Guide */}
+          <Button
+            size="sm"
+            className="bg-cta-find text-cta-find-foreground hover:bg-cta-find-hover font-semibold shadow-md border border-cta-find-foreground/10"
+            onClick={() => {
+              if (isHome) {
+                document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
+              } else {
+                navigate("/home#meet-guides");
+              }
+            }}
+          >
+            <Search className="w-3.5 h-3.5 mr-1" />
+            Find a Guide
+          </Button>
           <Button
             size="sm"
             className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold shadow-md animate-cta-pulse"
@@ -192,14 +196,30 @@ const Navbar = () => {
           >
             Book a Guide
           </Button>
+
+          {/* Join as Guide */}
           <Button
             size="sm"
             variant="outline"
-            className="border-header-foreground/40 text-header-foreground bg-transparent hover:bg-white/10 hover:border-header-foreground/70 font-semibold"
+            className="border-cta-join text-cta-join bg-transparent hover:bg-white/10 hover:border-header-foreground/70 font-semibold"
             onClick={() => navigate("/guide-register")}
           >
-            Become a Guide
+            Join as Guide
           </Button>
+
+          {/* Phone + Language on far right */}
+          <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
+
+          <a
+            href="tel:+12022438336"
+            className="flex items-center gap-1.5 text-sm text-header-muted hover:text-header-foreground transition-colors"
+          >
+            <span className="text-base">🇺🇸</span>
+            <Phone className="w-3.5 h-3.5" />
+            <span className="hidden xl:inline">(202) 243-8336</span>
+          </a>
+
+          <LanguageSwitcher />
         </div>
 
         {/* Mobile toggle */}
@@ -275,7 +295,7 @@ const Navbar = () => {
                 </a>
               )}
 
-              {!isLoggedIn && (
+              {!isLoggedIn ? (
                 <Button
                   size="sm"
                   variant="ghost"
@@ -285,8 +305,33 @@ const Navbar = () => {
                   <LogIn className="w-4 h-4" />
                   Login
                 </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-header-foreground/80 hover:text-header-foreground hover:bg-white/10 font-medium w-full justify-start gap-2"
+                  onClick={() => { setIsOpen(false); navigate("/guide-dashboard"); }}
+                >
+                  Dashboard
+                </Button>
               )}
+
               <div className="flex flex-col gap-2 pt-3">
+                <Button
+                  size="sm"
+                  className="bg-cta-find text-cta-find-foreground hover:bg-cta-find-hover font-semibold w-full"
+                  onClick={() => {
+                    setIsOpen(false);
+                    if (isHome) {
+                      document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
+                    } else {
+                      navigate("/home#meet-guides");
+                    }
+                  }}
+                >
+                  <Search className="w-4 h-4 mr-1" />
+                  Find a Guide
+                </Button>
                 <Button
                   size="sm"
                   className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold w-full"
@@ -304,16 +349,17 @@ const Navbar = () => {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-header-foreground/40 text-header-foreground bg-transparent hover:bg-white/10 font-semibold w-full"
+                  className="border-cta-join text-cta-join bg-transparent hover:bg-white/10 font-semibold w-full"
                   onClick={() => { setIsOpen(false); navigate("/guide-register"); }}
                 >
-                  Become a Guide
+                  Join as Guide
                 </Button>
               </div>
               <a
                 href="tel:+12022438336"
                 className="flex items-center gap-2 text-sm text-header-muted hover:text-header-foreground transition-colors pt-2"
               >
+                <span>🇺🇸</span>
                 <Phone className="w-4 h-4" />
                 (202) 243-8336
               </a>
