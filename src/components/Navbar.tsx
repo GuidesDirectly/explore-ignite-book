@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, ChevronDown, Heart, Sparkles } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, Heart, Sparkles, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [destOpen, setDestOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,46 +30,66 @@ const Navbar = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const isHome = location.pathname === "/" || location.pathname === "/home";
+
   const navLinks = [
-    { label: t("nav.home"), href: "#home" },
-    { label: "Tours", href: "/tours", isRoute: true },
-    { label: t("nav.forTravelers"), href: "#meet-guides" },
-    { label: t("nav.destinations"), href: "#destinations", isDestinations: true },
-    { label: t("nav.services"), href: "#how-it-works" },
-    { label: t("nav.contact"), href: "#about" },
+    { label: t("nav.forTravelers", "Find Guides"), href: "#meet-guides", icon: Search },
+    { label: "Browse Tours", href: "/tours", isRoute: true },
+    { label: t("nav.destinations", "Destinations"), href: "#destinations", isDestinations: true },
+    { label: t("nav.services", "How it Works"), href: "#how-it-works" },
+    { label: t("nav.contact", "About"), href: "#about" },
   ];
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (location.pathname !== "/home") {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, href: string) => {
+    if (location.pathname !== "/home" && location.pathname !== "/") {
       e.preventDefault();
       navigate(`/home${href}`);
     }
   };
 
+  const headerBg = scrolled || !isHome
+    ? "bg-header shadow-[0_2px_10px_rgba(0,0,0,0.15)]"
+    : "bg-header/95 backdrop-blur-md";
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border/40 shadow-sm">
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg}`}
+    >
+      <div className="container mx-auto flex items-center justify-between h-[72px] px-4 lg:px-10">
         {/* Logo */}
-        <a href="#home" onClick={(e) => handleNavClick(e, "#home")} className="flex items-baseline gap-1.5 shrink-0">
+        <a
+          href="#home"
+          onClick={(e) => handleNavClick(e, "#home")}
+          className="flex items-baseline gap-1.5 shrink-0"
+        >
           <span className="font-display text-2xl font-bold tracking-tight">
-            <span className="text-foreground">Guides</span>
-            <span className="text-primary">Directly</span>
+            <span className="text-header-foreground">Guides</span>
+            <span className="text-cta-book">Directly</span>
           </span>
-          <span className="text-[10px] text-muted-foreground font-medium hidden sm:inline">by iGuide Tours</span>
+          <span className="text-[10px] text-header-muted font-medium hidden sm:inline">
+            by iGuide Tours
+          </span>
         </a>
 
         {/* Desktop nav links */}
-        <div className="hidden lg:flex items-center gap-6 ml-8">
+        <div className="hidden lg:flex items-center gap-7 ml-8">
           {navLinks.map((link) => {
-            const isFind = link.href === "#meet-guides";
             const isDest = (link as any).isDestinations;
+            const LinkIcon = (link as any).icon;
 
             if (isDest) {
               return (
                 <div key={link.href} ref={destBtnRef} className="relative">
                   <button
                     onClick={() => setDestOpen(true)}
-                    className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors duration-200 inline-flex items-center gap-1"
+                    className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200 inline-flex items-center gap-1"
                   >
                     {link.label}
                     <ChevronDown className="w-3.5 h-3.5" />
@@ -83,7 +104,7 @@ const Navbar = () => {
                   key={link.href}
                   href={link.href}
                   onClick={(e) => { e.preventDefault(); navigate(link.href); }}
-                  className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors duration-200"
+                  className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200"
                 >
                   {link.label}
                 </a>
@@ -95,25 +116,22 @@ const Navbar = () => {
                 key={link.href}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className={
-                  isFind
-                    ? "text-sm font-semibold bg-primary text-primary-foreground px-4 py-2 rounded-md shadow-sm hover:bg-primary/85 transition-all duration-200"
-                    : "text-sm font-medium text-foreground/70 hover:text-primary transition-colors duration-200"
-                }
+                className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200 inline-flex items-center gap-1.5"
               >
+                {LinkIcon && <LinkIcon className="w-3.5 h-3.5" />}
                 {link.label}
               </a>
             );
           })}
         </div>
 
-        {/* Desktop right section: CTAs + utility */}
+        {/* Desktop right section: utilities + dual CTAs */}
         <div className="hidden lg:flex items-center gap-3 ml-auto">
           {isLoggedIn && (
             <>
               <button
                 onClick={() => setProfileOpen(true)}
-                className="relative p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                className="relative p-2 rounded-full text-header-muted hover:text-cta-book hover:bg-white/10 transition-colors"
                 aria-label="Travel Preferences"
                 title="My Travel Preferences"
               >
@@ -121,35 +139,52 @@ const Navbar = () => {
               </button>
               <button
                 onClick={() => navigate("/saved-guides")}
-                className="relative p-2 rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors"
+                className="relative p-2 rounded-full text-header-muted hover:text-red-400 hover:bg-white/10 transition-colors"
                 aria-label="Saved Guides"
               >
                 <Heart className="w-4 h-4" />
               </button>
             </>
           )}
-          <Button
-            variant="hero"
-            size="sm"
-            asChild
-          >
-            <a href="/guide-register">{t("nav.becomeGuide_action", "Become a Guide")}</a>
-          </Button>
-          <Button
-            size="sm"
-            asChild
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            <a href="#meet-guides" onClick={(e) => handleNavClick(e, "#meet-guides")}>{t("nav.becomeGuide", "Join Free")}</a>
-          </Button>
+
+          {/* Divider */}
+          <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
+
           <LanguageSwitcher />
+
           <a
             href="tel:+12022438336"
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors ml-1"
+            className="flex items-center gap-1.5 text-sm text-header-muted hover:text-header-foreground transition-colors"
           >
             <Phone className="w-3.5 h-3.5" />
             <span className="hidden xl:inline">(202) 243-8336</span>
           </a>
+
+          {/* Divider */}
+          <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
+
+          {/* Dual CTAs */}
+          <Button
+            size="sm"
+            className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold shadow-md animate-cta-pulse"
+            onClick={() => {
+              if (isHome) {
+                document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
+              } else {
+                navigate("/home#meet-guides");
+              }
+            }}
+          >
+            Book a Guide
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-header-foreground/40 text-header-foreground bg-transparent hover:bg-white/10 hover:border-header-foreground/70 font-semibold"
+            onClick={() => navigate("/guide-register")}
+          >
+            Become a Guide
+          </Button>
         </div>
 
         {/* Mobile toggle */}
@@ -157,7 +192,7 @@ const Navbar = () => {
           <LanguageSwitcher />
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="text-foreground/70 hover:text-primary transition-colors p-1"
+            className="text-header-foreground/80 hover:text-header-foreground transition-colors p-1"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -171,11 +206,10 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white border-t border-border/40 overflow-hidden"
+            className="lg:hidden bg-header border-t border-[hsl(var(--header-divider))] overflow-hidden"
           >
             <div className="container mx-auto px-4 py-4 flex flex-col gap-2">
               {navLinks.map((link) => {
-                const isFind = link.href === "#meet-guides";
                 const isDest = (link as any).isDestinations;
 
                 if (isDest) {
@@ -183,7 +217,7 @@ const Navbar = () => {
                     <button
                       key={link.href}
                       onClick={() => { setIsOpen(false); navigate("/explore"); }}
-                      className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2.5 border-b border-border/20 text-left"
+                      className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors py-2.5 border-b border-[hsl(var(--header-divider))] text-left"
                     >
                       {link.label} →
                     </button>
@@ -196,7 +230,7 @@ const Navbar = () => {
                       key={link.href}
                       href={link.href}
                       onClick={(e) => { e.preventDefault(); navigate(link.href); setIsOpen(false); }}
-                      className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2.5 border-b border-border/20"
+                      className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors py-2.5 border-b border-[hsl(var(--header-divider))]"
                     >
                       {link.label}
                     </a>
@@ -208,41 +242,51 @@ const Navbar = () => {
                     key={link.href}
                     href={link.href}
                     onClick={(e) => { handleNavClick(e, link.href); setIsOpen(false); }}
-                    className={
-                      isFind
-                        ? "text-sm font-semibold bg-primary text-primary-foreground px-4 py-2.5 rounded-md shadow-sm text-center hover:bg-primary/85 transition-all duration-200"
-                        : "text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2.5 border-b border-border/20 last:border-0"
-                    }
+                    className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors py-2.5 border-b border-[hsl(var(--header-divider))]"
                   >
                     {link.label}
                   </a>
                 );
               })}
+
               {isLoggedIn && (
                 <a
                   href="/saved-guides"
                   onClick={() => setIsOpen(false)}
-                  className="text-sm font-medium text-foreground/70 hover:text-red-500 transition-colors py-2.5 border-b border-border/20 flex items-center gap-2"
+                  className="text-sm font-medium text-header-foreground/80 hover:text-red-400 transition-colors py-2.5 border-b border-[hsl(var(--header-divider))] flex items-center gap-2"
                 >
                   <Heart className="w-4 h-4" />
                   Saved Guides
                 </a>
               )}
+
               <div className="flex flex-col gap-2 pt-3">
-                <Button variant="hero" size="sm" asChild>
-                  <a href="/guide-register" onClick={() => setIsOpen(false)}>
-                    {t("nav.becomeGuide_action", "Become a Guide")}
-                  </a>
+                <Button
+                  size="sm"
+                  className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold w-full"
+                  onClick={() => {
+                    setIsOpen(false);
+                    if (isHome) {
+                      document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
+                    } else {
+                      navigate("/home#meet-guides");
+                    }
+                  }}
+                >
+                  Book a Guide
                 </Button>
-                <Button size="sm" asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  <a href="#meet-guides" onClick={(e) => { handleNavClick(e, "#meet-guides"); setIsOpen(false); }}>
-                    {t("nav.becomeGuide", "Join Free")}
-                  </a>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-header-foreground/40 text-header-foreground bg-transparent hover:bg-white/10 font-semibold w-full"
+                  onClick={() => { setIsOpen(false); navigate("/guide-register"); }}
+                >
+                  Become a Guide
                 </Button>
               </div>
               <a
                 href="tel:+12022438336"
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors pt-2"
+                className="flex items-center gap-2 text-sm text-header-muted hover:text-header-foreground transition-colors pt-2"
               >
                 <Phone className="w-4 h-4" />
                 (202) 243-8336
@@ -251,6 +295,10 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Bottom gradient glow */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cta-book/30 to-transparent" />
+
       <DestinationsModal
         open={destOpen}
         onClose={() => setDestOpen(false)}
