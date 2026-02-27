@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, ChevronDown, Heart, Sparkles, Search } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, Heart, Sparkles, Search, LogIn } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -54,13 +54,15 @@ const Navbar = () => {
     }
   };
 
-  const headerBg = scrolled || !isHome
+  const headerBg = scrolled
     ? "bg-header shadow-[0_2px_10px_rgba(0,0,0,0.15)]"
-    : "bg-header/95 backdrop-blur-md";
+    : isHome
+      ? "bg-transparent"
+      : "bg-header/95 backdrop-blur-md";
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${headerBg}`}
     >
       <div className="container mx-auto flex items-center justify-between h-[72px] px-4 lg:px-10">
         {/* Logo */}
@@ -163,6 +165,19 @@ const Navbar = () => {
           {/* Divider */}
           <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
 
+          {/* Login */}
+          {!isLoggedIn && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-header-foreground/80 hover:text-header-foreground hover:bg-white/10 font-medium gap-1.5"
+              onClick={() => navigate("/guide-register")}
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              Login
+            </Button>
+          )}
+
           {/* Dual CTAs */}
           <Button
             size="sm"
@@ -260,6 +275,17 @@ const Navbar = () => {
                 </a>
               )}
 
+              {!isLoggedIn && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-header-foreground/80 hover:text-header-foreground hover:bg-white/10 font-medium w-full justify-start gap-2"
+                  onClick={() => { setIsOpen(false); navigate("/guide-register"); }}
+                >
+                  <LogIn className="w-4 h-4" />
+                  Login
+                </Button>
+              )}
               <div className="flex flex-col gap-2 pt-3">
                 <Button
                   size="sm"
