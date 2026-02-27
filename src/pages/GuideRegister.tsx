@@ -606,31 +606,31 @@ const GuideRegister = () => {
             const Icon = step.icon;
             const isActive = idx === currentStep;
             const isDone = idx < currentStep;
-            const isClickable = isDone || isActive;
+            const isClickable = true;
             const isLast = idx === STEPS.length - 1;
             return (
               <div key={idx} className="flex items-center flex-1 last:flex-none">
                 <div className="flex flex-col items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => { if (isClickable) setCurrentStep(idx); }}
-                    disabled={!isClickable}
-                    className={`relative w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                    onClick={() => setCurrentStep(idx)}
+                    disabled={false}
+                    className={`relative w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-300 cursor-pointer ${
                       isDone
-                        ? "bg-primary border-primary text-primary-foreground cursor-pointer hover:scale-105 hover:shadow-lg shadow-primary/25"
+                        ? "bg-primary border-primary text-primary-foreground hover:scale-105 hover:shadow-lg shadow-primary/25"
                         : isActive
-                        ? "border-primary text-primary bg-primary/10 cursor-pointer ring-4 ring-primary/20 shadow-md"
-                        : "border-border text-muted-foreground cursor-not-allowed opacity-40"
+                        ? "border-primary text-primary bg-primary/10 ring-4 ring-primary/20 shadow-md"
+                        : "border-border text-muted-foreground hover:border-primary/40 hover:text-primary/60 hover:scale-105 opacity-60 hover:opacity-100"
                     }`}
                     aria-label={`Go to step: ${step.label}`}
                   >
                     {isDone ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
                   </button>
                   <span
-                    className={`text-[11px] font-semibold text-center hidden sm:block leading-tight max-w-[72px] transition-colors ${
-                      isActive ? "text-primary" : isDone ? "text-primary/80 cursor-pointer hover:text-primary" : "text-muted-foreground/60"
+                    className={`text-[11px] font-semibold text-center hidden sm:block leading-tight max-w-[72px] transition-colors cursor-pointer ${
+                      isActive ? "text-primary" : isDone ? "text-primary/80 hover:text-primary" : "text-muted-foreground/60 hover:text-primary/60"
                     }`}
-                    onClick={() => { if (isClickable) setCurrentStep(idx); }}
+                    onClick={() => setCurrentStep(idx)}
                   >
                     {step.label}
                   </span>
