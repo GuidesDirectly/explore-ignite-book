@@ -457,6 +457,124 @@ const handler = async (req: Request): Promise<Response> => {
         </div>
       `;
       toEmails = [travelerEmail];
+    } else if (type === "booking_request") {
+      const travelerName = data.travelerName as string;
+      const travelerEmail = data.travelerEmail as string;
+      const gName = data.guideName as string;
+      const tourType = data.tourType as string;
+      const date = data.date as string;
+      const time = data.time as string;
+      const location = data.location as string | undefined;
+      const groupSize = data.groupSize as number | undefined;
+
+      // --- Email to traveler (confirmation) ---
+      subject = `📋 Booking Request Received — ${escapeHtml(tourType)} with ${escapeHtml(gName)}`;
+      html = `
+        <div style="font-family:'Georgia',serif;max-width:600px;margin:0 auto;border:1px solid #e8e0d0;">
+          <div style="background:linear-gradient(135deg,#1a1f2e 0%,#2a2f3e 100%);padding:40px 30px;text-align:center;">
+            <h1 style="color:#d4a843;margin:0;font-size:28px;letter-spacing:1px;">iGuide Tours</h1>
+            <p style="color:#8a8fa0;margin:8px 0 0;font-size:13px;letter-spacing:2px;text-transform:uppercase;">Booking Confirmation</p>
+          </div>
+          <div style="padding:40px 35px;background:#faf9f7;">
+            <h2 style="color:#1a1f2e;font-size:22px;margin:0 0 20px;">Hi ${escapeHtml(travelerName)},</h2>
+            <p style="color:#333;line-height:1.8;font-size:15px;">Thank you for booking with <strong>iGuide Tours</strong>! Your request has been sent to <strong>${escapeHtml(gName)}</strong>, who will review and confirm shortly.</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;background:white;border-radius:8px;border:1px solid #e8e0d0;">
+              <tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Tour</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(tourType)}</td></tr>
+              <tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Date</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(date)}</td></tr>
+              <tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Time</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(time)}</td></tr>
+              ${location ? `<tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Location</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(location)}</td></tr>` : ""}
+              ${groupSize ? `<tr><td style="padding:12px 15px;font-weight:bold;color:#555;">Group Size</td><td style="padding:12px 15px;">${escapeHtml(String(groupSize))}</td></tr>` : ""}
+            </table>
+            <p style="color:#333;line-height:1.8;font-size:15px;">You'll receive another email once your guide confirms the booking. If you have questions, reply to this email or contact us at <a href="mailto:michael@iguidetours.net" style="color:#d4a843;">michael@iguidetours.net</a>.</p>
+            <div style="text-align:center;margin:25px 0;">
+              <a href="https://iguidetours.net" style="display:inline-block;background:linear-gradient(135deg,#d4a843,#c49a3a);color:#1a1f2e;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;">Visit iGuide Tours</a>
+            </div>
+          </div>
+          <div style="padding:20px;text-align:center;background:#1a1f2e;">
+            <p style="color:#8a8fa0;font-size:11px;margin:0;letter-spacing:1px;">iGuide Tours — Premium Private Tours Across North America</p>
+          </div>
+        </div>
+      `;
+
+      if (travelerEmail) {
+        toEmails = [travelerEmail];
+      } else {
+        toEmails = [NOTIFY_EMAIL];
+      }
+
+      // --- Also notify admin + guide ---
+      // Notify admin
+      try {
+        await resend.emails.send({
+          from: "iGuide Tours <noreply@iguidetours.net>",
+          to: [NOTIFY_EMAIL],
+          subject: `🔔 New Booking Request: ${escapeHtml(travelerName)} — ${escapeHtml(tourType)}`,
+          html: `
+            <h2>New Booking Request</h2>
+            <table style="border-collapse:collapse;width:100%;max-width:500px;">
+              <tr><td style="padding:8px;font-weight:bold;">Traveler</td><td style="padding:8px;">${escapeHtml(travelerName)}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold;">Email</td><td style="padding:8px;"><a href="mailto:${escapeHtml(travelerEmail)}">${escapeHtml(travelerEmail)}</a></td></tr>
+              <tr><td style="padding:8px;font-weight:bold;">Guide</td><td style="padding:8px;">${escapeHtml(gName)}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold;">Tour</td><td style="padding:8px;">${escapeHtml(tourType)}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold;">Date</td><td style="padding:8px;">${escapeHtml(date)}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold;">Time</td><td style="padding:8px;">${escapeHtml(time)}</td></tr>
+              ${location ? `<tr><td style="padding:8px;font-weight:bold;">Location</td><td style="padding:8px;">${escapeHtml(location)}</td></tr>` : ""}
+              ${groupSize ? `<tr><td style="padding:8px;font-weight:bold;">Group</td><td style="padding:8px;">${escapeHtml(String(groupSize))}</td></tr>` : ""}
+            </table>
+            <p style="margin-top:16px;color:#888;font-size:12px;">Sent from iGuide Tours website</p>
+          `,
+        });
+      } catch (e) {
+        console.error("Failed to notify admin:", e);
+      }
+
+      // Notify guide via email (look up guide email from guide_user_id if available)
+      const guideUserId = data.guideUserId as string | undefined;
+      if (guideUserId) {
+        try {
+          const supabaseAdmin = createClient(
+            Deno.env.get("SUPABASE_URL")!,
+            Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+          );
+          const { data: guideUser } = await supabaseAdmin.auth.admin.getUserById(guideUserId);
+          const guideEmail = guideUser?.user?.email;
+          if (guideEmail) {
+            await resend.emails.send({
+              from: "iGuide Tours <noreply@iguidetours.net>",
+              to: [guideEmail],
+              subject: `📅 New Booking Request from ${escapeHtml(travelerName)}`,
+              html: `
+                <div style="font-family:'Georgia',serif;max-width:600px;margin:0 auto;border:1px solid #e8e0d0;">
+                  <div style="background:linear-gradient(135deg,#1a1f2e 0%,#2a2f3e 100%);padding:40px 30px;text-align:center;">
+                    <h1 style="color:#d4a843;margin:0;font-size:28px;letter-spacing:1px;">iGuide Tours</h1>
+                    <p style="color:#8a8fa0;margin:8px 0 0;font-size:13px;letter-spacing:2px;text-transform:uppercase;">New Booking</p>
+                  </div>
+                  <div style="padding:40px 35px;background:#faf9f7;">
+                    <h2 style="color:#1a1f2e;font-size:22px;margin:0 0 20px;">Hi ${escapeHtml(gName)},</h2>
+                    <p style="color:#333;line-height:1.8;font-size:15px;">Great news! You have a new booking request from <strong>${escapeHtml(travelerName)}</strong>.</p>
+                    <table style="width:100%;border-collapse:collapse;margin:20px 0;background:white;border-radius:8px;border:1px solid #e8e0d0;">
+                      <tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Tour</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(tourType)}</td></tr>
+                      <tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Date</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(date)}</td></tr>
+                      <tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Time</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(time)}</td></tr>
+                      ${location ? `<tr><td style="padding:12px 15px;font-weight:bold;border-bottom:1px solid #e8e0d0;color:#555;">Location</td><td style="padding:12px 15px;border-bottom:1px solid #e8e0d0;">${escapeHtml(location)}</td></tr>` : ""}
+                      ${groupSize ? `<tr><td style="padding:12px 15px;font-weight:bold;color:#555;">Group Size</td><td style="padding:12px 15px;">${escapeHtml(String(groupSize))}</td></tr>` : ""}
+                    </table>
+                    <p style="color:#333;line-height:1.8;font-size:15px;">Please log in to your dashboard to review and confirm this booking.</p>
+                    <div style="text-align:center;margin:25px 0;">
+                      <a href="https://iguidetours.net/guide-dashboard" style="display:inline-block;background:linear-gradient(135deg,#d4a843,#c49a3a);color:#1a1f2e;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;">Go to Dashboard</a>
+                    </div>
+                  </div>
+                  <div style="padding:20px;text-align:center;background:#1a1f2e;">
+                    <p style="color:#8a8fa0;font-size:11px;margin:0;letter-spacing:1px;">iGuide Tours — Premium Private Tours Across North America</p>
+                  </div>
+                </div>
+              `,
+            });
+          }
+        } catch (e) {
+          console.error("Failed to notify guide:", e);
+        }
+      }
     } else {
       throw new Error("Invalid notification type");
     }
