@@ -46,6 +46,14 @@
     --shadow-card: 0 4px 24px -4px hsla(220, 30%, 15%, 0.08);
     --shadow-card-hover: 0 12px 40px -8px hsla(220, 30%, 15%, 0.15);
 
+    --header: 210 50% 16%;
+    --header-foreground: 0 0% 100%;
+    --header-muted: 210 20% 70%;
+    --cta-book: 145 63% 49%;
+    --cta-book-hover: 145 63% 42%;
+    --cta-book-foreground: 0 0% 100%;
+    --header-divider: 0 0% 100% / 0.15;
+
     --font-display: 'Playfair Display', serif;
     --font-body: 'DM Sans', sans-serif;
 
