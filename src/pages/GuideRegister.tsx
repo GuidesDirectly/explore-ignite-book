@@ -606,23 +606,29 @@ const GuideRegister = () => {
             const Icon = step.icon;
             const isActive = idx === currentStep;
             const isDone = idx < currentStep;
+            const isClickable = isDone || isActive;
             return (
               <div key={idx} className="flex flex-col items-center gap-1.5 flex-1">
-                <div
+                <button
+                  type="button"
+                  onClick={() => { if (isClickable) setCurrentStep(idx); }}
+                  disabled={!isClickable}
                   className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
                     isDone
-                      ? "bg-primary border-primary text-secondary"
+                      ? "bg-primary border-primary text-secondary cursor-pointer hover:opacity-80"
                       : isActive
-                      ? "border-primary text-primary bg-primary/10"
-                      : "border-border text-muted-foreground"
+                      ? "border-primary text-primary bg-primary/10 cursor-pointer"
+                      : "border-border text-muted-foreground cursor-not-allowed opacity-50"
                   }`}
+                  aria-label={`Go to step: ${step.label}`}
                 >
                   {isDone ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
-                </div>
+                </button>
                 <span
                   className={`text-[10px] font-medium text-center hidden sm:block ${
-                    isActive ? "text-primary" : "text-muted-foreground"
+                    isActive ? "text-primary" : isDone ? "text-primary cursor-pointer" : "text-muted-foreground"
                   }`}
+                  onClick={() => { if (isClickable) setCurrentStep(idx); }}
                 >
                   {step.label}
                 </span>
