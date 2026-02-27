@@ -41,7 +41,7 @@ const expansionCities = [
 const DestinationsSection = () => {
   const { t } = useTranslation();
   return (
-    <section id="destinations" className="bg-background overflow-hidden">
+    <section id="destinations" className="bg-background overflow-hidden scroll-mt-20">
 
       {/* ── Section 1: Origin Story ── */}
       <div className="py-24 bg-secondary text-secondary-foreground relative overflow-hidden">
