@@ -601,37 +601,50 @@ const GuideRegister = () => {
 
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         {/* Step indicators */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center mb-10">
           {STEPS.map((step, idx) => {
             const Icon = step.icon;
             const isActive = idx === currentStep;
             const isDone = idx < currentStep;
             const isClickable = isDone || isActive;
+            const isLast = idx === STEPS.length - 1;
             return (
-              <div key={idx} className="flex flex-col items-center gap-1.5 flex-1">
-                <button
-                  type="button"
-                  onClick={() => { if (isClickable) setCurrentStep(idx); }}
-                  disabled={!isClickable}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
-                    isDone
-                      ? "bg-primary border-primary text-secondary cursor-pointer hover:opacity-80"
-                      : isActive
-                      ? "border-primary text-primary bg-primary/10 cursor-pointer"
-                      : "border-border text-muted-foreground cursor-not-allowed opacity-50"
-                  }`}
-                  aria-label={`Go to step: ${step.label}`}
-                >
-                  {isDone ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
-                </button>
-                <span
-                  className={`text-[10px] font-medium text-center hidden sm:block ${
-                    isActive ? "text-primary" : isDone ? "text-primary cursor-pointer" : "text-muted-foreground"
-                  }`}
-                  onClick={() => { if (isClickable) setCurrentStep(idx); }}
-                >
-                  {step.label}
-                </span>
+              <div key={idx} className="flex items-center flex-1 last:flex-none">
+                <div className="flex flex-col items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { if (isClickable) setCurrentStep(idx); }}
+                    disabled={!isClickable}
+                    className={`relative w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                      isDone
+                        ? "bg-primary border-primary text-primary-foreground cursor-pointer hover:scale-105 hover:shadow-lg shadow-primary/25"
+                        : isActive
+                        ? "border-primary text-primary bg-primary/10 cursor-pointer ring-4 ring-primary/20 shadow-md"
+                        : "border-border text-muted-foreground cursor-not-allowed opacity-40"
+                    }`}
+                    aria-label={`Go to step: ${step.label}`}
+                  >
+                    {isDone ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                  </button>
+                  <span
+                    className={`text-[11px] font-semibold text-center hidden sm:block leading-tight max-w-[72px] transition-colors ${
+                      isActive ? "text-primary" : isDone ? "text-primary/80 cursor-pointer hover:text-primary" : "text-muted-foreground/60"
+                    }`}
+                    onClick={() => { if (isClickable) setCurrentStep(idx); }}
+                  >
+                    {step.label}
+                  </span>
+                </div>
+                {/* Connector line */}
+                {!isLast && (
+                  <div className="flex-1 mx-1 sm:mx-2 h-0.5 rounded-full mt-[-20px] sm:mt-[-24px]">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        idx < currentStep ? "bg-primary" : "bg-border"
+                      }`}
+                    />
+                  </div>
+                )}
               </div>
             );
           })}
