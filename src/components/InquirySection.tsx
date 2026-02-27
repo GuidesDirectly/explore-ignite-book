@@ -1,15 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Send, CheckCircle } from "lucide-react";
+import { Send, CheckCircle, Search, MapPin, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { inquirySchema } from "@/lib/formSchemas";
+import { ALL_DESTINATIONS, PILOT_CITY } from "@/data/destinations";
+
+const DEST_NAMES = ALL_DESTINATIONS.map((d) => d.name);
 
 const InquirySection = () => {
   const { t } = useTranslation();
@@ -17,6 +20,9 @@ const InquirySection = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [destQuery, setDestQuery] = useState("");
+  const [destOpen, setDestOpen] = useState(false);
+  const destRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -45,14 +51,39 @@ const InquirySection = () => {
     }
   }, [location.hash]);
 
+  // Close destination dropdown on click outside
+  useEffect(() => {
+    if (!destOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (destRef.current && !destRef.current.contains(e.target as Node)) setDestOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [destOpen]);
+
+  const filteredDests = useMemo(() => {
+    if (!destQuery.trim()) return DEST_NAMES.slice(0, 20);
+    const q = destQuery.toLowerCase();
+    return DEST_NAMES.filter((d) => d.toLowerCase().includes(q)).slice(0, 20);
+  }, [destQuery]);
+
+  const destHasNoMatch = useMemo(() => {
+    if (!destQuery.trim()) return false;
+    return !DEST_NAMES.some((d) => d.toLowerCase() === destQuery.trim().toLowerCase());
+  }, [destQuery]);
+
+  const selectDestination = (name: string) => {
+    setFormData((prev) => ({ ...prev, destination: name }));
+    setDestQuery("");
+    setDestOpen(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
-    // Resolve destination: use custom text if "other" is selected
-    const resolvedDestination = formData.destination === "other" && formData.customDestination.trim()
-      ? `other: ${formData.customDestination.trim()}`
-      : formData.destination;
+    // Destination is now set directly (no "other" dropdown needed)
+    const resolvedDestination = formData.destination.trim();
 
     const result = inquirySchema.safeParse({ ...formData, destination: resolvedDestination });
     if (!result.success) {
@@ -223,30 +254,67 @@ const InquirySection = () => {
               </div>
             </div>
 
-            <div>
+            <div ref={destRef} className="relative">
               <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>{t("inquiry.destination")} *</label>
-              <Select value={formData.destination} onValueChange={(val) => setFormData({ ...formData, destination: val })}>
-                <SelectTrigger className="bg-secondary/50 border-primary/20 text-primary-foreground">
-                  <SelectValue placeholder={t("inquiry.chooseDest")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="washington-dc">Washington DC</SelectItem>
-                  <SelectItem value="new-york">New York City</SelectItem>
-                  <SelectItem value="niagara-falls">Niagara Falls</SelectItem>
-                  <SelectItem value="toronto">Toronto</SelectItem>
-                  <SelectItem value="boston">Boston</SelectItem>
-                  <SelectItem value="chicago">Chicago</SelectItem>
-                  <SelectItem value="other">{t("inquiry.other", "Other")}</SelectItem>
-                </SelectContent>
-              </Select>
-              {formData.destination === "other" && (
-                <Input
-                  placeholder={t("inquiry.customDestPlaceholder", "Enter your desired destination...")}
-                  className="mt-2 bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
-                  value={formData.customDestination || ""}
-                  onChange={(e) => setFormData({ ...formData, customDestination: e.target.value })}
-                  maxLength={100}
-                />
+              {/* Selected destination chip */}
+              {formData.destination && !destOpen ? (
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1 bg-primary text-primary-foreground text-sm font-semibold pl-3 pr-1.5 py-1.5 rounded-full">
+                    <Check className="w-3 h-3" />
+                    {formData.destination}
+                    <button type="button" onClick={() => setFormData({ ...formData, destination: "" })} className="ml-1 hover:bg-primary-foreground/20 rounded-full p-0.5 transition-colors">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                  <button type="button" onClick={() => setDestOpen(true)} className="text-xs text-primary hover:underline">Change</button>
+                </div>
+              ) : (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder={t("inquiry.searchDest", "Search country, city, or type your own...")}
+                    className="pl-9 bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                    value={destQuery}
+                    onChange={(e) => { setDestQuery(e.target.value); setDestOpen(true); }}
+                    onFocus={() => setDestOpen(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && destQuery.trim()) {
+                        e.preventDefault();
+                        selectDestination(destQuery.trim());
+                      }
+                    }}
+                    maxLength={100}
+                  />
+                </div>
+              )}
+              {/* Dropdown results */}
+              {destOpen && (
+                <div className="absolute z-50 mt-1 w-full bg-popover border border-border rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                  {filteredDests.map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => selectDestination(d)}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground/80 hover:bg-primary/5 transition-colors text-left"
+                    >
+                      <MapPin className="w-3.5 h-3.5 text-primary/60 flex-shrink-0" />
+                      {d}
+                    </button>
+                  ))}
+                  {destHasNoMatch && destQuery.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => selectDestination(destQuery.trim())}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg border-t border-border bg-primary/5 hover:bg-primary/10 transition-colors text-foreground"
+                    >
+                      <MapPin className="w-3.5 h-3.5 text-primary" />
+                      <span>Add "<strong>{destQuery.trim()}</strong>"</span>
+                    </button>
+                  )}
+                  {filteredDests.length === 0 && !destQuery.trim() && (
+                    <p className="text-sm text-muted-foreground text-center py-3">Type to search…</p>
+                  )}
+                </div>
               )}
               {fieldError("destination")}
             </div>
