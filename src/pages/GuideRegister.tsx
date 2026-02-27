@@ -11,6 +11,8 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  X,
+  Search,
   MapPin,
   Globe,
   Briefcase,
@@ -26,14 +28,9 @@ import { checkPasswordBreached } from "@/lib/hibp";
 import { scanFileForViruses } from "@/lib/scanUpload";
 
 
-const AREA_OPTIONS = [
-  "Washington DC",
-  "New York City",
-  "Niagara Falls",
-  "Toronto",
-  "Boston",
-  "Chicago",
-];
+// Service area presets now come from the shared destinations data
+import { ALL_DESTINATIONS, CONTINENTS, PILOT_CITY } from "@/data/destinations";
+const AREA_OPTIONS = ALL_DESTINATIONS.map((d) => d.name);
 
 const LANGUAGE_OPTIONS = [
   "English",
@@ -132,6 +129,7 @@ const GuideRegister = () => {
   const [licenseDocName, setLicenseDocName] = useState<string | null>(null);
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [areaSearchQuery, setAreaSearchQuery] = useState("");
 
   // Auth check
   const [authEmail, setAuthEmail] = useState("");
@@ -714,26 +712,97 @@ const GuideRegister = () => {
               <p className="text-sm text-muted-foreground">
                 {t("guideRegister.serviceAreasDesc")}
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {AREA_OPTIONS.map((area) => {
-                  const selected = serviceAreas.includes(area);
-                  return (
-                    <button
-                      key={area}
-                      type="button"
-                      onClick={() => toggleItem(serviceAreas, setServiceAreas, area)}
-                      className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all text-sm font-medium ${
-                        selected
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border text-foreground hover:border-primary/30"
-                      }`}
-                    >
-                      <MapPin className="w-4 h-4 flex-shrink-0" />
-                      {translateOption(t, area)}
-                    </button>
-                  );
-                })}
+
+              {/* Selected chips */}
+              {serviceAreas.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {serviceAreas.map((area) => (
+                    <span key={area} className="inline-flex items-center gap-1 bg-primary text-primary-foreground text-xs font-semibold pl-2.5 pr-1.5 py-1 rounded-full">
+                      <Check className="w-3 h-3" />
+                      {area}
+                      <button type="button" onClick={() => setServiceAreas(serviceAreas.filter((a) => a !== area))} className="ml-0.5 hover:bg-primary-foreground/20 rounded-full p-0.5 transition-colors">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Search input for areas */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={t("guideRegister.searchArea", "Search country, city, or type your own...")}
+                  className="pl-9"
+                  value={areaSearchQuery}
+                  onChange={(e) => setAreaSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      const val = areaSearchQuery.trim();
+                      if (val && !serviceAreas.includes(val)) {
+                        setServiceAreas([...serviceAreas, val]);
+                        setAreaSearchQuery("");
+                      }
+                    }
+                  }}
+                />
               </div>
+
+              {/* Filterable area list */}
+              {(() => {
+                const q = areaSearchQuery.toLowerCase();
+                const filteredAreas = q
+                  ? AREA_OPTIONS.filter((a) => a.toLowerCase().includes(q))
+                  : AREA_OPTIONS.filter((a) => a === PILOT_CITY || ["Washington D.C.", "USA", "Canada", "United Kingdom", "France", "Germany", "Italy", "Spain", "Japan", "Australia", "Brazil", "Mexico"].includes(a));
+                const showAddCustom = q && !AREA_OPTIONS.some((a) => a.toLowerCase() === q);
+
+                return (
+                  <div className="max-h-48 overflow-y-auto border border-border rounded-xl p-1">
+                    {filteredAreas.slice(0, 30).map((area) => {
+                      const isSel = serviceAreas.includes(area);
+                      return (
+                        <button
+                          key={area}
+                          type="button"
+                          onClick={() => toggleItem(serviceAreas, setServiceAreas, area)}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors hover:bg-primary/5 ${
+                            isSel ? "bg-primary/10 text-primary font-medium" : "text-foreground/80"
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                            {area}
+                          </span>
+                          {isSel && <Check className="w-4 h-4 text-primary" />}
+                        </button>
+                      );
+                    })}
+                    {q && filteredAreas.length > 30 && (
+                      <p className="text-xs text-muted-foreground text-center py-2">Keep typing to narrow results…</p>
+                    )}
+                    {showAddCustom && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const val = areaSearchQuery.trim();
+                          if (val && !serviceAreas.includes(val)) {
+                            setServiceAreas([...serviceAreas, val]);
+                            setAreaSearchQuery("");
+                          }
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors text-foreground mt-1"
+                      >
+                        <MapPin className="w-3.5 h-3.5 text-primary" />
+                        <span>Add "<strong>{areaSearchQuery.trim()}</strong>"</span>
+                      </button>
+                    )}
+                    {filteredAreas.length === 0 && !showAddCustom && (
+                      <p className="text-sm text-muted-foreground text-center py-4">Type to search destinations</p>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           )}
 
