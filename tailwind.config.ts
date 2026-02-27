@@ -109,6 +109,15 @@ export default {
 				DEFAULT: 'hsl(var(--cta-book))',
 				hover: 'hsl(var(--cta-book-hover))',
 				foreground: 'hsl(var(--cta-book-foreground))'
+			},
+			'cta-find': {
+				DEFAULT: 'hsl(var(--cta-find))',
+				hover: 'hsl(var(--cta-find-hover))',
+				foreground: 'hsl(var(--cta-find-foreground))'
+			},
+			'cta-join': {
+				DEFAULT: 'hsl(var(--cta-join))',
+				foreground: 'hsl(var(--cta-join-foreground))'
 			}
   		},
   		borderRadius: {
