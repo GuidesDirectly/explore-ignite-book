@@ -1,52 +1,8 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { X, Search, Check, MapPin, Globe, Clock, ArrowRight } from "lucide-react";
+import { X, Search, Check, MapPin, Globe, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-
-interface Destination {
-  name: string;
-  region: string;
-  status: "active" | "coming-soon" | "international";
-}
-
-const ALL_DESTINATIONS: Destination[] = [
-  { name: "Washington D.C.", region: "USA", status: "active" },
-  { name: "New York City", region: "USA", status: "coming-soon" },
-  { name: "Boston", region: "USA", status: "coming-soon" },
-  { name: "Chicago", region: "USA", status: "coming-soon" },
-  { name: "Los Angeles", region: "USA", status: "coming-soon" },
-  { name: "San Francisco", region: "USA", status: "coming-soon" },
-  { name: "Miami", region: "USA", status: "coming-soon" },
-  { name: "Philadelphia", region: "USA", status: "coming-soon" },
-  { name: "Phoenix", region: "USA", status: "coming-soon" },
-  { name: "San Diego", region: "USA", status: "coming-soon" },
-  { name: "Denver", region: "USA", status: "coming-soon" },
-  { name: "Las Vegas", region: "USA", status: "coming-soon" },
-  { name: "Houston", region: "USA", status: "coming-soon" },
-  { name: "San Antonio", region: "USA", status: "coming-soon" },
-  { name: "Toronto", region: "Canada", status: "coming-soon" },
-  { name: "Montreal", region: "Canada", status: "coming-soon" },
-  { name: "Paris", region: "France", status: "international" },
-  { name: "London", region: "UK", status: "international" },
-  { name: "Tokyo", region: "Japan", status: "international" },
-  { name: "Rome", region: "Italy", status: "international" },
-  { name: "Barcelona", region: "Spain", status: "international" },
-  { name: "Berlin", region: "Germany", status: "international" },
-  { name: "Prague", region: "Czech Republic", status: "international" },
-  { name: "Istanbul", region: "Turkey", status: "international" },
-  { name: "Buenos Aires", region: "Argentina", status: "international" },
-  { name: "Bangkok", region: "Thailand", status: "international" },
-  { name: "Dubai", region: "UAE", status: "international" },
-  { name: "Sydney", region: "Australia", status: "international" },
-  { name: "Amsterdam", region: "Netherlands", status: "international" },
-  { name: "Lisbon", region: "Portugal", status: "international" },
-  { name: "Seoul", region: "South Korea", status: "international" },
-  { name: "Mexico City", region: "Mexico", status: "international" },
-  { name: "Cairo", region: "Egypt", status: "international" },
-  { name: "Athens", region: "Greece", status: "international" },
-  { name: "Vienna", region: "Austria", status: "international" },
-  { name: "Marrakech", region: "Morocco", status: "international" },
-];
+import { ALL_DESTINATIONS, CONTINENTS, PILOT_CITY, type DestinationEntry } from "@/data/destinations";
 
 interface DestinationsModalProps {
   open: boolean;
@@ -54,25 +10,18 @@ interface DestinationsModalProps {
   onDone?: (selected: string[]) => void;
 }
 
-const statusConfig = {
-  active: { label: "Available Now", icon: MapPin, color: "text-primary" },
-  "coming-soon": { label: "Coming Soon — North America", icon: Clock, color: "text-muted-foreground" },
-  international: { label: "International", icon: Globe, color: "text-muted-foreground" },
-} as const;
-
 const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) => {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
-  const [customDestinations, setCustomDestinations] = useState<Destination[]>([]);
+  const [customDestinations, setCustomDestinations] = useState<DestinationEntry[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 150);
-    else { setQuery(""); }
+    else setQuery("");
   }, [open]);
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -86,7 +35,7 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
     if (!query.trim()) return allDests;
     const q = query.toLowerCase();
     return allDests.filter(
-      (d) => d.name.toLowerCase().includes(q) || d.region.toLowerCase().includes(q)
+      (d) => d.name.toLowerCase().includes(q) || d.continent.toLowerCase().includes(q)
     );
   }, [query, allDests]);
 
@@ -99,23 +48,27 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
   const addCustomDestination = () => {
     const trimmed = query.trim();
     if (!trimmed) return;
-    const exists = allDests.some((d) => d.name.toLowerCase() === trimmed.toLowerCase());
-    if (exists) return;
-    const newDest: Destination = { name: trimmed, region: "Custom", status: "international" };
-    setCustomDestinations((prev) => [...prev, newDest]);
+    if (allDests.some((d) => d.name.toLowerCase() === trimmed.toLowerCase())) return;
+    setCustomDestinations((prev) => [...prev, { name: trimmed, continent: "Custom" }]);
     setSelected((prev) => [...prev, trimmed]);
     setQuery("");
   };
 
-  // Check if query matches no existing destinations (for showing "add custom" prompt)
   const queryHasNoExactMatch = useMemo(() => {
     if (!query.trim()) return false;
     return !allDests.some((d) => d.name.toLowerCase() === query.trim().toLowerCase());
   }, [query, allDests]);
 
+  // Group filtered by continent, pilot city first
   const grouped = useMemo(() => {
-    const groups: Record<string, Destination[]> = { active: [], "coming-soon": [], international: [] };
-    filtered.forEach((d) => groups[d.status]?.push(d));
+    const groups: Record<string, DestinationEntry[]> = {};
+    const pilotItems = filtered.filter((d) => d.name === PILOT_CITY);
+    const rest = filtered.filter((d) => d.name !== PILOT_CITY);
+    if (pilotItems.length > 0) groups["★ Available Now"] = pilotItems;
+    for (const c of [...CONTINENTS, "Custom"]) {
+      const items = rest.filter((d) => d.continent === c);
+      if (items.length > 0) groups[c] = items;
+    }
     return groups;
   }, [filtered]);
 
@@ -141,10 +94,7 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
             {/* Header */}
             <div className="flex items-center justify-between px-5 pt-5 pb-3">
               <h2 className="font-display text-lg font-bold text-foreground">All Destinations</h2>
-              <button
-                onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-              >
+              <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -164,7 +114,7 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
                       addCustomDestination();
                     }
                   }}
-                  placeholder="Search or type your own destination..."
+                  placeholder="Search country, city, or type any destination..."
                   className="w-full pl-9 pr-3 py-2.5 text-sm bg-background border border-input rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
@@ -174,16 +124,10 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
             {selected.length > 0 && (
               <div className="px-5 pb-2 flex flex-wrap gap-1.5">
                 {selected.map((name) => (
-                  <span
-                    key={name}
-                    className="inline-flex items-center gap-1 bg-primary text-primary-foreground text-xs font-semibold pl-2.5 pr-1.5 py-1 rounded-full"
-                  >
+                  <span key={name} className="inline-flex items-center gap-1 bg-primary text-primary-foreground text-xs font-semibold pl-2.5 pr-1.5 py-1 rounded-full">
                     <Check className="w-3 h-3" />
                     {name}
-                    <button
-                      onClick={() => toggleSelect(name)}
-                      className="ml-0.5 hover:bg-primary-foreground/20 rounded-full p-0.5 transition-colors"
-                    >
+                    <button onClick={() => toggleSelect(name)} className="ml-0.5 hover:bg-primary-foreground/20 rounded-full p-0.5 transition-colors">
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -193,50 +137,46 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
 
             {/* Scrollable list */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-2">
-              {(["active", "coming-soon", "international"] as const).map((status) => {
-                const items = grouped[status];
-                if (!items || items.length === 0) return null;
-                const config = statusConfig[status];
-                const Icon = config.icon;
-                return (
-                  <div key={status} className="mb-2">
-                    <div className={`px-3 pt-3 pb-1.5 text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 ${config.color}`}>
-                      <Icon className="w-3 h-3" />
-                      {config.label}
-                    </div>
-                    {items.map((d) => {
-                      const isSel = selected.includes(d.name);
-                      return (
-                        <button
-                          key={d.name}
-                          onClick={() => {
-                            if (d.status === "active") {
-                              onClose();
-                              navigate("/home#guides");
-                            } else {
-                              toggleSelect(d.name);
-                            }
-                          }}
-                          className={`w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg transition-colors hover:bg-primary/5 ${
-                            isSel ? "bg-primary/10 text-foreground font-medium" : "text-foreground/80"
-                          }`}
-                        >
-                          <span className="flex items-center gap-2">
-                            {d.name}
-                            <span className="text-muted-foreground text-xs">{d.region}</span>
-                          </span>
-                          {isSel && <Check className="w-4 h-4 text-primary" />}
-                          {d.status === "active" && !isSel && (
-                            <span className="inline-flex items-center gap-1 text-xs text-primary font-medium">
-                              Browse Guides <ArrowRight className="w-3 h-3" />
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+              {Object.entries(grouped).map(([group, items]) => (
+                <div key={group} className="mb-2">
+                  <div className={`px-3 pt-3 pb-1.5 text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 ${
+                    group.startsWith("★") ? "text-primary" : "text-muted-foreground"
+                  }`}>
+                    {group.startsWith("★") ? <MapPin className="w-3 h-3" /> : <Globe className="w-3 h-3" />}
+                    {group}
                   </div>
-                );
-              })}
+                  {items.map((d) => {
+                    const isSel = selected.includes(d.name);
+                    return (
+                      <button
+                        key={d.name}
+                        onClick={() => {
+                          if (d.name === PILOT_CITY) {
+                            onClose();
+                            navigate("/home#guides");
+                          } else {
+                            toggleSelect(d.name);
+                          }
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg transition-colors hover:bg-primary/5 ${
+                          isSel ? "bg-primary/10 text-foreground font-medium" : "text-foreground/80"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          {d.name}
+                          <span className="text-muted-foreground text-xs">{d.continent}</span>
+                        </span>
+                        {isSel && <Check className="w-4 h-4 text-primary" />}
+                        {d.name === PILOT_CITY && !isSel && (
+                          <span className="inline-flex items-center gap-1 text-xs text-primary font-medium">
+                            Browse Guides <ArrowRight className="w-3 h-3" />
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
 
               {/* Add custom destination prompt */}
               {queryHasNoExactMatch && query.trim() && (
@@ -246,9 +186,7 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
                     className="w-full flex items-center gap-2 px-3 py-3 text-sm rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors text-foreground"
                   >
                     <MapPin className="w-4 h-4 text-primary" />
-                    <span>
-                      Add <strong>"{query.trim()}"</strong> as your destination
-                    </span>
+                    <span>Add <strong>"{query.trim()}"</strong> as your destination</span>
                     <span className="ml-auto text-xs text-muted-foreground">Press Enter</span>
                   </button>
                 </div>
@@ -268,9 +206,7 @@ const DestinationsModal = ({ open, onClose, onDone }: DestinationsModalProps) =>
               </span>
               <button
                 onClick={() => {
-                  if (onDone && selected.length > 0) {
-                    onDone(selected);
-                  }
+                  if (onDone && selected.length > 0) onDone(selected);
                   onClose();
                 }}
                 className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
