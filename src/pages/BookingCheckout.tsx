@@ -208,6 +208,7 @@ const BookingCheckout = () => {
               travelerName: form.traveler_name,
               travelerEmail: form.traveler_email,
               guideName,
+              guideUserId: guideId,
               tourType: form.tour_type,
               date: format(form.date, "PPP"),
               time: form.time,
