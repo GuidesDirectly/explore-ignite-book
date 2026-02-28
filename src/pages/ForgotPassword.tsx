@@ -23,7 +23,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `https://iguidetours.net/reset-password`,
     });
     setLoading(false);
 
