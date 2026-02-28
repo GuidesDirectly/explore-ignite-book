@@ -532,6 +532,14 @@ const GuideRegister = () => {
             <Button variant="hero" className="w-full" type="submit" disabled={checkingBreach}>
               {checkingBreach ? "Checking password safety…" : isSignUp ? t("guideRegister.signUp") : t("guideRegister.signIn")}
             </Button>
+            {!isSignUp && (
+              <a
+                href="/forgot-password"
+                className="block text-center text-primary/80 text-sm hover:text-primary hover:underline transition-colors"
+              >
+                Forgot password?
+              </a>
+            )}
             <p className="text-center text-sm text-muted-foreground">
               {isSignUp ? t("guideRegister.haveAccount") : t("guideRegister.noAccount")}{" "}
               <button
