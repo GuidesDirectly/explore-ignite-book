@@ -535,7 +535,7 @@ const GuideRegister = () => {
             {!isSignUp && (
               <a
                 href="/forgot-password"
-                className="block text-center text-primary/80 text-sm hover:text-primary hover:underline transition-colors"
+                className="block text-center text-primary text-sm font-medium hover:underline transition-colors"
               >
                 Forgot password?
               </a>
