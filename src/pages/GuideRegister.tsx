@@ -533,12 +533,14 @@ const GuideRegister = () => {
               {checkingBreach ? "Checking password safety…" : isSignUp ? t("guideRegister.signUp") : t("guideRegister.signIn")}
             </Button>
             {!isSignUp && (
-              <a
-                href="/forgot-password"
-                className="block text-center text-primary text-sm font-medium hover:underline transition-colors"
-              >
-                Forgot password?
-              </a>
+              <div className="text-center mt-1">
+                <a
+                  href="/forgot-password"
+                  className="text-primary-foreground/90 text-sm font-medium underline underline-offset-2 hover:text-primary transition-colors"
+                >
+                  Forgot your password?
+                </a>
+              </div>
             )}
             <p className="text-center text-sm text-muted-foreground">
               {isSignUp ? t("guideRegister.haveAccount") : t("guideRegister.noAccount")}{" "}
