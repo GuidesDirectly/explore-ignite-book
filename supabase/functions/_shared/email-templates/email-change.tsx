@@ -1,6 +1,6 @@
 /// <reference types="npm:@types/react@18.3.1" />
 import * as React from 'npm:react@18.3.1';
-import { Html, Head, Body, Container, Section, Text, Button, Hr } from 'npm:@react-email/components@0.0.22';
+import { Html, Head, Body, Container, Section, Text, Button, Hr, Img } from 'npm:@react-email/components@0.0.22';
 
 interface EmailChangeProps {
   siteName: string;
@@ -19,6 +19,7 @@ export default function EmailChangeEmail({ siteName = 'iGuide Tours', siteUrl = 
       <Body style={main}>
         <Container style={container}>
           <Section style={headerBar}>
+            <Img src="https://iguidetours.net/logo.jpg" alt="iGuide Tours" width="80" height="80" style={logoImg} />
             <Text style={headerLogo}>
               <span style={{ color: '#ffffff' }}>Guides</span>
               <span style={{ color: '#2ECC71' }}>Directly</span>
@@ -52,6 +53,7 @@ export default function EmailChangeEmail({ siteName = 'iGuide Tours', siteUrl = 
 const main = { backgroundColor: '#ffffff', fontFamily: "'DM Sans', Arial, sans-serif" };
 const container = { maxWidth: '520px', margin: '0 auto', padding: '0' };
 const headerBar = { backgroundColor: '#0E2A47', padding: '28px 32px 20px', borderRadius: '8px 8px 0 0', textAlign: 'center' as const };
+const logoImg = { margin: '0 auto 12px', borderRadius: '12px', display: 'block' };
 const headerLogo = { fontSize: '26px', fontWeight: '700' as const, fontFamily: "'Playfair Display', Georgia, serif", margin: '0', lineHeight: '1.2' };
 const headerSub = { fontSize: '11px', color: '#8AACCA', margin: '4px 0 0', letterSpacing: '0.5px' };
 const content = { padding: '36px 32px 28px' };
