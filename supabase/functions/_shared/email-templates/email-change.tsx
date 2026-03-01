@@ -14,25 +14,35 @@ export default function EmailChangeEmail({ siteName = 'iGuide Tours', siteUrl = 
   return (
     <Html>
       <Head>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');`}</style>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');`}</style>
       </Head>
       <Body style={main}>
         <Container style={container}>
-          <Text style={logo}>✦ {siteName}</Text>
-          <Text style={heading}>Confirm email change</Text>
-          <Text style={paragraph}>
-            We received a request to change your email{newEmail ? ` to ${newEmail}` : ''}. Confirm below to complete the update.
-          </Text>
-          <Section style={{ textAlign: 'center' as const, margin: '32px 0' }}>
-            <Button style={button} href={confirmationUrl}>
-              Confirm new email
-            </Button>
+          <Section style={headerBar}>
+            <Text style={headerLogo}>
+              <span style={{ color: '#ffffff' }}>Guides</span>
+              <span style={{ color: '#2ECC71' }}>Directly</span>
+            </Text>
+            <Text style={headerSub}>by iGuide Tours</Text>
           </Section>
-          <Text style={muted}>
-            If you didn't request this change, please secure your account immediately.
-          </Text>
+
+          <Section style={content}>
+            <Text style={heading}>Confirm email change</Text>
+            <Text style={paragraph}>
+              We received a request to change your email{newEmail ? ` to ${newEmail}` : ''}. Confirm below to complete the update.
+            </Text>
+            <Section style={ctaSection}>
+              <Button style={button} href={confirmationUrl}>
+                Confirm new email
+              </Button>
+            </Section>
+            <Text style={muted}>
+              If you didn't request this change, please secure your account immediately.
+            </Text>
+          </Section>
+
           <Hr style={hr} />
-          <Text style={footer}>© {siteName} · {siteUrl}</Text>
+          <Text style={footer}>© {siteName} · <a href={siteUrl} style={footerLink}>{siteUrl}</a></Text>
         </Container>
       </Body>
     </Html>
@@ -40,11 +50,16 @@ export default function EmailChangeEmail({ siteName = 'iGuide Tours', siteUrl = 
 }
 
 const main = { backgroundColor: '#ffffff', fontFamily: "'DM Sans', Arial, sans-serif" };
-const container = { maxWidth: '480px', margin: '0 auto', padding: '40px 24px' };
-const logo = { fontSize: '20px', fontWeight: '700' as const, color: 'hsl(200, 98%, 39%)', textAlign: 'center' as const, marginBottom: '32px' };
-const heading = { fontSize: '28px', fontWeight: '700' as const, color: 'hsl(222, 47%, 11%)', textAlign: 'center' as const, margin: '0 0 16px' };
-const paragraph = { fontSize: '16px', lineHeight: '26px', color: 'hsl(222, 47%, 11%)', textAlign: 'center' as const };
-const button = { backgroundColor: 'hsl(200, 98%, 39%)', color: '#f0f9ff', fontSize: '16px', fontWeight: '600' as const, padding: '14px 32px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block' };
+const container = { maxWidth: '520px', margin: '0 auto', padding: '0' };
+const headerBar = { backgroundColor: '#0E2A47', padding: '28px 32px 20px', borderRadius: '8px 8px 0 0', textAlign: 'center' as const };
+const headerLogo = { fontSize: '26px', fontWeight: '700' as const, fontFamily: "'Playfair Display', Georgia, serif", margin: '0', lineHeight: '1.2' };
+const headerSub = { fontSize: '11px', color: '#8AACCA', margin: '4px 0 0', letterSpacing: '0.5px' };
+const content = { padding: '36px 32px 28px' };
+const heading = { fontSize: '26px', fontWeight: '700' as const, color: '#0E2A47', textAlign: 'center' as const, margin: '0 0 16px', fontFamily: "'Playfair Display', Georgia, serif" };
+const paragraph = { fontSize: '16px', lineHeight: '26px', color: '#1B2A3D', textAlign: 'center' as const };
+const ctaSection = { textAlign: 'center' as const, margin: '32px 0' };
+const button = { backgroundColor: '#0891b2', color: '#f0f9ff', fontSize: '16px', fontWeight: '600' as const, padding: '14px 36px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block' };
 const muted = { fontSize: '13px', color: '#6b7280', textAlign: 'center' as const, marginTop: '24px' };
-const hr = { borderColor: '#e5e7eb', margin: '32px 0 16px' };
-const footer = { fontSize: '12px', color: '#9ca3af', textAlign: 'center' as const };
+const hr = { borderColor: '#e5e7eb', margin: '0 32px' };
+const footer = { fontSize: '12px', color: '#9ca3af', textAlign: 'center' as const, padding: '16px 32px' };
+const footerLink = { color: '#0891b2', textDecoration: 'none' };
