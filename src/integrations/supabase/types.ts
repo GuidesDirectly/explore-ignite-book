@@ -214,6 +214,8 @@ export type Database = {
           id: string
           service_areas: string[] | null
           status: string
+          stripe_account_id: string | null
+          stripe_onboarding_complete: boolean | null
           translations: Json | null
           updated_at: string
           user_id: string
@@ -225,6 +227,8 @@ export type Database = {
           id?: string
           service_areas?: string[] | null
           status?: string
+          stripe_account_id?: string | null
+          stripe_onboarding_complete?: boolean | null
           translations?: Json | null
           updated_at?: string
           user_id: string
@@ -236,6 +240,8 @@ export type Database = {
           id?: string
           service_areas?: string[] | null
           status?: string
+          stripe_account_id?: string | null
+          stripe_onboarding_complete?: boolean | null
           translations?: Json | null
           updated_at?: string
           user_id?: string
