@@ -94,6 +94,17 @@ const BookingCheckout = () => {
     notes: "",
   });
 
+  // Handle payment success/cancel return from Stripe
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    if (paymentStatus === "success") {
+      setSubmitted(true);
+      toast.success("Payment successful! Your booking is confirmed.");
+    } else if (paymentStatus === "cancelled") {
+      toast.info("Payment cancelled. Your booking is saved as pending.");
+    }
+  }, [searchParams]);
+
   const update = (key: string, value: any) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => {
@@ -165,6 +176,26 @@ const BookingCheckout = () => {
 
   const goBack = () => setStep(Math.max(0, step - 1));
 
+  const [tourPrice, setTourPrice] = useState<number>(0);
+
+  // Fetch tour price when tour_type changes
+  useEffect(() => {
+    const fetchPrice = async () => {
+      if (!guideId || !form.tour_type) return;
+      const { data } = await supabase
+        .from("tours")
+        .select("price_per_person")
+        .eq("guide_user_id", guideId)
+        .eq("title", form.tour_type)
+        .eq("status", "published")
+        .maybeSingle();
+      if (data) setTourPrice(Number(data.price_per_person) || 0);
+    };
+    fetchPrice();
+  }, [guideId, form.tour_type]);
+
+  const totalPrice = tourPrice * form.group_size;
+
   const handleSubmit = async () => {
     if (!validateStep(2)) {
       setStep(2);
@@ -173,7 +204,9 @@ const BookingCheckout = () => {
     if (!guideId || !form.date) return;
 
     setSubmitting(true);
-    const { error } = await supabase.from("bookings").insert({
+
+    // Create booking first
+    const { data: bookingData, error } = await supabase.from("bookings").insert({
       guide_user_id: guideId,
       traveler_name: form.traveler_name,
       traveler_email: form.traveler_email,
@@ -183,43 +216,80 @@ const BookingCheckout = () => {
       group_size: form.group_size,
       location: form.location || null,
       notes: form.notes || null,
+      price: totalPrice,
       status: "pending",
-    });
+    }).select("id").single();
 
     if (error) {
       toast.error("Failed to submit booking. Please try again.");
       console.error("Booking error:", error);
-    } else {
-      setSubmitted(true);
-      toast.success("Booking request submitted!");
-      trackEvent("booking_completed", {
-        guide_id: guideId,
-        tour_type: form.tour_type,
-        city: form.location,
-        group_size: form.group_size,
-      });
+      setSubmitting(false);
+      return;
+    }
 
-      // Send confirmation email
+    // If there's a price, redirect to Stripe checkout
+    if (totalPrice > 0) {
       try {
-        await supabase.functions.invoke("send-notification", {
-          body: {
-            type: "booking_request",
-            data: {
-              travelerName: form.traveler_name,
-              travelerEmail: form.traveler_email,
-              guideName,
-              guideUserId: guideId,
-              tourType: form.tour_type,
-              date: format(form.date, "PPP"),
+        const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
+          "create-checkout-session",
+          {
+            body: {
+              booking_id: bookingData?.id,
+              guide_user_id: guideId,
+              traveler_name: form.traveler_name,
+              traveler_email: form.traveler_email,
+              tour_type: form.tour_type,
+              amount_cents: Math.round(totalPrice * 100),
+              date: format(form.date, "yyyy-MM-dd"),
               time: form.time,
               location: form.location || null,
-              groupSize: form.group_size,
+              group_size: form.group_size,
+              success_url: `${window.location.origin}/book/${guideId}?payment=success&booking=${bookingData?.id}`,
+              cancel_url: `${window.location.origin}/book/${guideId}?payment=cancelled`,
             },
-          },
-        });
+          }
+        );
+
+        if (checkoutError) throw checkoutError;
+        if (checkoutData?.url) {
+          window.location.href = checkoutData.url;
+          return;
+        }
       } catch (e) {
-        console.error("Email send failed:", e);
+        console.error("Stripe checkout failed:", e);
+        toast.error("Payment setup failed. Booking saved as pending.");
       }
+    }
+
+    // Free tour or Stripe fallback — show confirmation
+    setSubmitted(true);
+    toast.success("Booking request submitted!");
+    trackEvent("booking_completed", {
+      guide_id: guideId,
+      tour_type: form.tour_type,
+      city: form.location,
+      group_size: form.group_size,
+    });
+
+    try {
+      await supabase.functions.invoke("send-notification", {
+        body: {
+          type: "booking_request",
+          data: {
+            travelerName: form.traveler_name,
+            travelerEmail: form.traveler_email,
+            guideName,
+            guideUserId: guideId,
+            tourType: form.tour_type,
+            date: format(form.date, "PPP"),
+            time: form.time,
+            location: form.location || null,
+            groupSize: form.group_size,
+          },
+        },
+      });
+    } catch (e) {
+      console.error("Email send failed:", e);
     }
     setSubmitting(false);
   };
@@ -558,6 +628,18 @@ const BookingCheckout = () => {
                       <span className="text-muted-foreground">Group Size</span>
                       <span className="font-medium text-foreground">{form.group_size}</span>
                     </div>
+                    {totalPrice > 0 && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Price per Person</span>
+                          <span className="font-medium text-foreground">${tourPrice.toFixed(2)}</span>
+                        </div>
+                        <div className="border-t border-border/50 pt-2 flex justify-between">
+                          <span className="font-semibold text-foreground">Total</span>
+                          <span className="font-bold text-primary text-lg">${totalPrice.toFixed(2)}</span>
+                        </div>
+                      </>
+                    )}
                     <div className="border-t border-border/50 pt-3">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Name</span>
@@ -578,7 +660,11 @@ const BookingCheckout = () => {
 
                   <div className="flex items-center gap-2 text-xs text-muted-foreground bg-primary/5 rounded-lg p-3">
                     <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
-                    <span>Your booking request goes directly to the guide. No commissions. No hidden fees. Free cancellation.</span>
+                    <span>
+                      {totalPrice > 0
+                        ? "Secure payment via Stripe. Your guide receives 85% directly. Transparent pricing."
+                        : "Your booking request goes directly to the guide. No hidden fees."}
+                    </span>
                   </div>
                 </motion.div>
               )}
@@ -602,7 +688,11 @@ const BookingCheckout = () => {
                 <Button variant="hero" onClick={handleSubmit} disabled={submitting}>
                   {submitting ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" /> Submitting...
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" /> Processing...
+                    </>
+                  ) : totalPrice > 0 ? (
+                    <>
+                      Pay ${totalPrice.toFixed(2)} <ArrowRight className="w-4 h-4 ml-2" />
                     </>
                   ) : (
                     <>
