@@ -2,20 +2,21 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { DollarSign, TrendingUp, CalendarCheck, Clock, BarChart3 } from "lucide-react";
 
-interface BookingEarnings {
+interface PaymentRecord {
   id: string;
-  date: string;
-  price: number;
+  amount_total: number;
+  platform_fee: number;
+  guide_payout: number;
   status: string;
-  tour_type: string;
-  traveler_name: string;
-  group_size: number;
+  created_at: string;
+  metadata: any;
+  booking_id: string | null;
 }
 
 interface EarningsStats {
   totalEarned: number;
   pendingEarnings: number;
-  completedBookings: number;
+  completedPayments: number;
   avgPerBooking: number;
   monthlyEarnings: { month: string; total: number }[];
 }
@@ -49,30 +50,30 @@ const EarningsDashboard = ({ userId }: { userId: string }) => {
   const [stats, setStats] = useState<EarningsStats>({
     totalEarned: 0,
     pendingEarnings: 0,
-    completedBookings: 0,
+    completedPayments: 0,
     avgPerBooking: 0,
     monthlyEarnings: [],
   });
-  const [recentBookings, setRecentBookings] = useState<BookingEarnings[]>([]);
+  const [recentPayments, setRecentPayments] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEarnings = async () => {
-      const { data: bookings } = await supabase
-        .from("bookings")
-        .select("id, date, price, status, tour_type, traveler_name, group_size")
+      const { data: payments } = await supabase
+        .from("payments")
+        .select("id, amount_total, platform_fee, guide_payout, status, created_at, metadata, booking_id")
         .eq("guide_user_id", userId)
-        .order("date", { ascending: false });
+        .order("created_at", { ascending: false });
 
-      if (!bookings) {
+      if (!payments) {
         setLoading(false);
         return;
       }
 
-      const completed = bookings.filter(b => b.status === "completed");
-      const confirmed = bookings.filter(b => b.status === "confirmed");
-      const totalEarned = completed.reduce((s, b) => s + (b.price || 0), 0);
-      const pendingEarnings = confirmed.reduce((s, b) => s + (b.price || 0), 0);
+      const completed = payments.filter(p => p.status === "completed");
+      const pending = payments.filter(p => p.status === "pending");
+      const totalEarned = completed.reduce((s, p) => s + (p.guide_payout || 0), 0);
+      const pendingEarnings = pending.reduce((s, p) => s + (p.guide_payout || 0), 0);
       const avgPerBooking = completed.length > 0 ? totalEarned / completed.length : 0;
 
       // Monthly breakdown (last 6 months)
@@ -84,31 +85,32 @@ const EarningsDashboard = ({ userId }: { userId: string }) => {
         monthlyMap.set(key, 0);
       }
 
-      completed.forEach(b => {
-        const d = new Date(b.date);
+      completed.forEach(p => {
+        const d = new Date(p.created_at);
         const key = d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
         if (monthlyMap.has(key)) {
-          monthlyMap.set(key, (monthlyMap.get(key) || 0) + (b.price || 0));
+          monthlyMap.set(key, (monthlyMap.get(key) || 0) + (p.guide_payout || 0));
         }
       });
 
       setStats({
         totalEarned,
         pendingEarnings,
-        completedBookings: completed.length,
+        completedPayments: completed.length,
         avgPerBooking,
         monthlyEarnings: Array.from(monthlyMap, ([month, total]) => ({ month, total })),
       });
 
-      setRecentBookings(bookings.slice(0, 8));
+      setRecentPayments(payments.slice(0, 8));
       setLoading(false);
     };
 
     fetchEarnings();
   }, [userId]);
 
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
+  // Amounts stored in cents
+  const formatCurrency = (cents: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 
   if (loading) {
     return (
@@ -136,14 +138,14 @@ const EarningsDashboard = ({ userId }: { userId: string }) => {
           icon={DollarSign}
           label="Total Earned"
           value={formatCurrency(stats.totalEarned)}
-          subValue={`${stats.completedBookings} completed tours`}
+          subValue={`${stats.completedPayments} completed payments`}
           accent
         />
         <StatCard
           icon={Clock}
           label="Pending"
           value={formatCurrency(stats.pendingEarnings)}
-          subValue="Confirmed bookings"
+          subValue="Awaiting payment"
         />
         <StatCard
           icon={TrendingUp}
@@ -153,12 +155,12 @@ const EarningsDashboard = ({ userId }: { userId: string }) => {
         <StatCard
           icon={CalendarCheck}
           label="Completed"
-          value={String(stats.completedBookings)}
-          subValue="Total tours"
+          value={String(stats.completedPayments)}
+          subValue="Total paid tours"
         />
       </div>
 
-      {/* Monthly chart (simple bar chart) */}
+      {/* Monthly chart */}
       {stats.monthlyEarnings.some(m => m.total > 0) && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
@@ -187,39 +189,47 @@ const EarningsDashboard = ({ userId }: { userId: string }) => {
         </div>
       )}
 
-      {/* Recent bookings */}
-      {recentBookings.length > 0 && (
+      {/* Recent payments */}
+      {recentPayments.length > 0 && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-            Recent Bookings
+            Recent Payments
           </h3>
           <div className="divide-y divide-border/30">
-            {recentBookings.map(b => (
-              <div key={b.id} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="text-sm font-medium text-foreground">{b.traveler_name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {b.tour_type} · {new Date(b.date).toLocaleDateString()} · {b.group_size} guest{b.group_size !== 1 ? "s" : ""}
-                  </p>
+            {recentPayments.map(p => {
+              const meta = (p.metadata || {}) as any;
+              return (
+                <div key={p.id} className="flex items-center justify-between py-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{meta.traveler_name || "Traveler"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {meta.tour_type || "Tour"} · {new Date(p.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-foreground">{formatCurrency(p.guide_payout)}</p>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-muted-foreground">
+                        of {formatCurrency(p.amount_total)}
+                      </span>
+                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                        p.status === "completed" ? "bg-green-100 text-green-700" :
+                        p.status === "pending" ? "bg-yellow-100 text-yellow-700" :
+                        p.status === "expired" ? "bg-red-100 text-red-700" :
+                        "bg-muted text-muted-foreground"
+                      }`}>
+                        {p.status}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-foreground">{formatCurrency(b.price)}</p>
-                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                    b.status === "completed" ? "bg-green-100 text-green-700" :
-                    b.status === "confirmed" ? "bg-blue-100 text-blue-700" :
-                    b.status === "pending" ? "bg-yellow-100 text-yellow-700" :
-                    "bg-muted text-muted-foreground"
-                  }`}>
-                    {b.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
 
-      {stats.totalEarned === 0 && recentBookings.length === 0 && (
+      {stats.totalEarned === 0 && recentPayments.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
           <DollarSign className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
           <p>No earnings yet. Complete bookings to see your revenue here.</p>

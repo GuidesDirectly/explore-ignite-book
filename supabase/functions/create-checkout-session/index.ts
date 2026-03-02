@@ -44,8 +44,17 @@ serve(async (req) => {
     const totalAmount = Math.round(Number(amount_cents));
     const platformFee = Math.round(totalAmount * 0.15);
 
-    // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    // Check if guide has a Stripe Connect account
+    const { data: guideProfile } = await supabase
+      .from("guide_profiles")
+      .select("stripe_account_id, stripe_onboarding_complete")
+      .eq("user_id", guide_user_id)
+      .single();
+
+    const hasConnectedAccount = guideProfile?.stripe_account_id && guideProfile?.stripe_onboarding_complete;
+
+    // Build session params
+    const sessionParams: any = {
       payment_method_types: ["card"],
       mode: "payment",
       customer_email: traveler_email,
@@ -76,7 +85,20 @@ serve(async (req) => {
       },
       success_url: success_url || "https://explore-ignite-book.lovable.app/home?payment=success",
       cancel_url: cancel_url || "https://explore-ignite-book.lovable.app/home?payment=cancelled",
-    });
+    };
+
+    // If guide has Connect, use destination charges for automatic split
+    if (hasConnectedAccount) {
+      sessionParams.payment_intent_data = {
+        application_fee_amount: platformFee,
+        transfer_data: {
+          destination: guideProfile.stripe_account_id,
+        },
+      };
+    }
+
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     // Create payment record
     await supabase.from("payments").insert({
