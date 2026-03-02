@@ -490,72 +490,78 @@ const GuideRegister = () => {
   // Auth screen
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-navy flex items-center justify-center p-4">
-        <div className="max-w-sm w-full">
-          <div className="text-center mb-8">
-            <img
-              src={logoImg}
-              alt="iGuide Tours"
-              className="h-16 w-16 rounded-full object-cover mx-auto mb-4"
-            />
-            <h1 className="font-display text-2xl font-bold text-primary">
-              {t("guideRegister.title")}
-            </h1>
-            <p className="text-muted-foreground text-sm mt-2">
-              {t("guideRegister.authSubtitle")}
-            </p>
-          </div>
-          <form
-            onSubmit={handleAuth}
-            className="space-y-4 bg-card/10 backdrop-blur-sm rounded-2xl p-6 border border-primary/10"
-          >
-            <Input
-              type="email"
-              placeholder="Email"
-              value={authEmail}
-              onChange={(e) => setAuthEmail(e.target.value)}
-              className="bg-secondary/50 border-primary/20 text-primary-foreground"
-            />
-            <Input
-              type="password"
-              placeholder={isSignUp ? "Min 10 chars, mixed case, number & symbol" : "Password"}
-              value={authPassword}
-              onChange={(e) => setAuthPassword(e.target.value)}
-              className="bg-secondary/50 border-primary/20 text-primary-foreground"
-              minLength={isSignUp ? 10 : undefined}
-            />
-            {isSignUp && (
-              <div className="bg-card/20 rounded-lg px-3 py-2">
-                <PasswordStrengthMeter password={authPassword} />
+      <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          {/* Bright white card */}
+          <div className="bg-background rounded-2xl shadow-xl border border-border p-8">
+            <div className="text-center mb-8">
+              <img
+                src={logoImg}
+                alt="iGuide Tours"
+                className="h-16 w-16 rounded-full object-cover mx-auto mb-4 ring-4 ring-primary/20"
+              />
+              <h1 className="font-display text-3xl font-bold text-foreground">
+                {t("guideRegister.title")}
+              </h1>
+              <p className="text-muted-foreground text-sm mt-2">
+                {t("guideRegister.authSubtitle")}
+              </p>
+            </div>
+            <form onSubmit={handleAuth} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Email Address</label>
+                <Input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  className="bg-accent border-border text-foreground placeholder:text-muted-foreground"
+                />
               </div>
-            )}
-            <Button variant="hero" className="w-full" type="submit" disabled={checkingBreach}>
-              {checkingBreach ? "Checking password safety…" : isSignUp ? t("guideRegister.signUp") : t("guideRegister.signIn")}
-            </Button>
-            {!isSignUp && (
-              <div className="text-center mt-1">
-                <a
-                  href="/forgot-password"
-                  className="text-primary-foreground/90 text-sm font-medium underline underline-offset-2 hover:text-primary transition-colors"
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Password</label>
+                <Input
+                  type="password"
+                  placeholder={isSignUp ? "Min 10 chars, mixed case, number & symbol" : "Enter your password"}
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  className="bg-accent border-border text-foreground placeholder:text-muted-foreground"
+                  minLength={isSignUp ? 10 : undefined}
+                />
+              </div>
+              {isSignUp && (
+                <div className="bg-accent rounded-lg px-3 py-2 border border-border">
+                  <PasswordStrengthMeter password={authPassword} />
+                </div>
+              )}
+              <Button variant="hero" className="w-full text-base py-5 rounded-xl" type="submit" disabled={checkingBreach}>
+                {checkingBreach ? "Checking password safety…" : isSignUp ? t("guideRegister.signUp") : t("guideRegister.signIn")}
+              </Button>
+              {!isSignUp && (
+                <div className="text-center mt-1">
+                  <a
+                    href="/forgot-password"
+                    className="text-primary text-sm font-medium underline underline-offset-2 hover:text-primary/80 transition-colors"
+                  >
+                    Forgot your password?
+                  </a>
+                </div>
+              )}
+              <p className="text-center text-sm text-muted-foreground">
+                {isSignUp ? t("guideRegister.haveAccount") : t("guideRegister.noAccount")}{" "}
+                <button
+                  type="button"
+                  className="text-primary font-semibold hover:underline"
+                  onClick={() => setIsSignUp(!isSignUp)}
                 >
-                  Forgot your password?
-                </a>
-              </div>
-            )}
-            <p className="text-center text-sm text-muted-foreground">
-              {isSignUp ? t("guideRegister.haveAccount") : t("guideRegister.noAccount")}{" "}
-              <button
-                type="button"
-                className="text-primary hover:underline"
-                onClick={() => setIsSignUp(!isSignUp)}
-              >
-                {isSignUp ? t("guideRegister.signIn") : t("guideRegister.signUp")}
-              </button>
-            </p>
-          </form>
+                  {isSignUp ? t("guideRegister.signIn") : t("guideRegister.signUp")}
+                </button>
+              </p>
+            </form>
+          </div>
           <a
             href="/"
-            className="block text-center text-primary text-sm mt-4 hover:underline"
+            className="block text-center text-secondary-foreground/70 text-sm mt-6 hover:text-secondary-foreground transition-colors"
           >
             ← {t("guideRegister.backHome")}
           </a>
