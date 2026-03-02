@@ -94,7 +94,6 @@ const Review = () => {
     }
   };
 
-  // ... keep existing code (getScoreLabel, getScoreColor functions)
   const getScoreLabel = (value: number) => {
     if (value <= 2) return "😞";
     if (value <= 4) return "😐";
@@ -104,20 +103,20 @@ const Review = () => {
   };
 
   const getScoreColor = (value: number, selected: number | null) => {
-    if (selected === null) return "border-primary/20 bg-secondary/30 text-muted-foreground";
-    if (value !== selected) return "border-primary/10 bg-secondary/20 text-muted-foreground/50";
-    if (value <= 3) return "border-red-500 bg-red-500/20 text-red-300 ring-2 ring-red-500/30";
-    if (value <= 6) return "border-yellow-500 bg-yellow-500/20 text-yellow-300 ring-2 ring-yellow-500/30";
-    if (value <= 8) return "border-emerald-500 bg-emerald-500/20 text-emerald-300 ring-2 ring-emerald-500/30";
-    return "border-primary bg-primary/20 text-primary ring-2 ring-primary/30";
+    if (selected === null) return "border-border bg-accent text-muted-foreground";
+    if (value !== selected) return "border-border/50 bg-accent/50 text-muted-foreground/50";
+    if (value <= 3) return "border-destructive bg-destructive/10 text-destructive ring-2 ring-destructive/30";
+    if (value <= 6) return "border-yellow-500 bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 ring-2 ring-yellow-500/30";
+    if (value <= 8) return "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/30";
+    return "border-primary bg-primary/10 text-primary ring-2 ring-primary/30";
   };
 
   const fieldError = (field: string) =>
-    errors[field] ? <p className="text-red-400 text-xs mt-1">{errors[field]}</p> : null;
+    errors[field] ? <p className="text-destructive text-xs mt-1">{errors[field]}</p> : null;
 
   return (
-    <div className="min-h-screen bg-gradient-navy">
-      <div className="flex items-center justify-between px-6 py-4">
+    <div className="min-h-screen bg-background">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
         <a href="/" className="flex items-center gap-3">
           <img src={logoImg} alt="iGuide Tours" className="h-10 w-10 rounded-full object-cover" />
           <span className="font-display text-xl font-bold text-primary">iGuide Tours</span>
@@ -140,15 +139,15 @@ const Review = () => {
                   <MapPin className="w-4 h-4 text-primary" />
                   <span className="text-primary text-sm font-semibold">{t("review.label", "Share Your Experience")}</span>
                 </div>
-                <h1 className="font-display text-3xl md:text-4xl font-bold mb-3" style={{ color: "hsl(40, 33%, 97%)" }}>
+                <h1 className="font-display text-3xl md:text-4xl font-bold mb-3 text-foreground">
                   {t("review.npsQuestion", "How did you like our service?")}
                 </h1>
-                <p className="text-lg" style={{ color: "hsl(40, 33%, 80%)" }}>
+                <p className="text-lg text-muted-foreground">
                   {t("review.npsSubtitle", "Rate your experience from 1 to 10")}
                 </p>
               </div>
 
-              <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-primary/10">
+              <div className="bg-card rounded-2xl p-8 border border-border shadow-card">
                 <div className="grid grid-cols-5 gap-3 mb-6">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
                     <button
@@ -163,10 +162,10 @@ const Review = () => {
                 </div>
 
                 <div className="flex justify-between px-1 mb-6">
-                  <span className="text-xs" style={{ color: "hsl(40, 33%, 60%)" }}>
+                  <span className="text-xs text-muted-foreground">
                     {t("review.notLikely", "Not great")}
                   </span>
-                  <span className="text-xs" style={{ color: "hsl(40, 33%, 60%)" }}>
+                  <span className="text-xs text-muted-foreground">
                     {t("review.veryLikely", "Excellent!")}
                   </span>
                 </div>
@@ -178,7 +177,7 @@ const Review = () => {
                     className="text-center mb-6"
                   >
                     <span className="text-4xl">{getScoreLabel(score)}</span>
-                    <p className="text-sm mt-2" style={{ color: "hsl(40, 33%, 80%)" }}>
+                    <p className="text-sm mt-2 text-muted-foreground">
                       {t("review.youSelected", "You selected")} <strong className="text-primary">{score}/10</strong>
                     </p>
                   </motion.div>
@@ -206,12 +205,12 @@ const Review = () => {
               transition={{ duration: 0.4 }}
               className="text-center"
             >
-              <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-10 border border-primary/10">
+              <div className="bg-card rounded-2xl p-10 border border-border shadow-card">
                 <span className="text-6xl mb-6 block">🎉</span>
-                <h2 className="font-display text-3xl font-bold mb-4" style={{ color: "hsl(40, 33%, 97%)" }}>
+                <h2 className="font-display text-3xl font-bold mb-4 text-foreground">
                   {t("review.amazingTitle", "We're thrilled you loved it!")}
                 </h2>
-                <p className="text-lg mb-8" style={{ color: "hsl(40, 33%, 80%)" }}>
+                <p className="text-lg mb-8 text-muted-foreground">
                   {t("review.googleAsk", "Would you mind sharing your experience on Google? It helps other travelers find us!")}
                 </p>
 
@@ -219,7 +218,7 @@ const Review = () => {
                   href={GOOGLE_REVIEW_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-secondary font-bold text-lg hover:opacity-90 transition-opacity mb-4 w-full justify-center"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 transition-opacity mb-4 w-full justify-center"
                 >
                   <ExternalLink className="w-5 h-5" />
                   {t("review.leaveGoogleReview", "Leave a Google Review")}
@@ -227,8 +226,7 @@ const Review = () => {
 
                 <button
                   onClick={() => setStep("review-form")}
-                  className="block w-full text-sm mt-4 underline hover:no-underline"
-                  style={{ color: "hsl(40, 33%, 70%)" }}
+                  className="block w-full text-sm mt-4 underline hover:no-underline text-muted-foreground"
                 >
                   {t("review.orLeaveHere", "Or leave a review here instead")}
                 </button>
@@ -245,15 +243,15 @@ const Review = () => {
               transition={{ duration: 0.4 }}
             >
               <div className="text-center mb-8">
-                <h2 className="font-display text-2xl md:text-3xl font-bold mb-3" style={{ color: "hsl(40, 33%, 97%)" }}>
+                <h2 className="font-display text-2xl md:text-3xl font-bold mb-3 text-foreground">
                   {t("review.tellUsMore", "Tell us more about your experience")}
                 </h2>
-                <p style={{ color: "hsl(40, 33%, 80%)" }}>
+                <p className="text-muted-foreground">
                   {t("review.feedbackHelps", "Your feedback helps us improve our tours")}
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-primary/10 space-y-6">
+              <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 border border-border shadow-card space-y-6">
                 {/* Score badge */}
                 <div className="text-center">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5">
@@ -271,12 +269,12 @@ const Review = () => {
 
                 {/* Name */}
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>
+                  <label className="block text-sm font-medium mb-2 text-foreground">
                     {t("review.name", "Your Name")} *
                   </label>
                   <Input
                     placeholder="John Doe"
-                    className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                    className="bg-accent border-border text-foreground placeholder:text-muted-foreground"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     maxLength={100}
@@ -286,13 +284,13 @@ const Review = () => {
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>
+                  <label className="block text-sm font-medium mb-2 text-foreground">
                     {t("review.email", "Email (optional)")}
                   </label>
                   <Input
                     type="email"
                     placeholder="john@example.com"
-                    className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                    className="bg-accent border-border text-foreground placeholder:text-muted-foreground"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     maxLength={255}
@@ -302,13 +300,13 @@ const Review = () => {
 
                 {/* Comment */}
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>
+                  <label className="block text-sm font-medium mb-2 text-foreground">
                     {t("review.comment", "Your Review")}
                   </label>
                   <Textarea
                     placeholder={t("review.commentPlaceholder", "Tell us about your experience...")}
                     rows={4}
-                    className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground resize-none"
+                    className="bg-accent border-border text-foreground placeholder:text-muted-foreground resize-none"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     maxLength={2000}
@@ -332,10 +330,10 @@ const Review = () => {
               className="max-w-md w-full text-center mx-auto"
             >
               <CheckCircle className="w-20 h-20 text-primary mx-auto mb-6" />
-              <h2 className="font-display text-3xl font-bold mb-4" style={{ color: "hsl(40, 33%, 97%)" }}>
+              <h2 className="font-display text-3xl font-bold mb-4 text-foreground">
                 {t("review.thankYou", "Thank You!")}
               </h2>
-              <p className="text-lg mb-8" style={{ color: "hsl(40, 33%, 80%)" }}>
+              <p className="text-lg mb-8 text-muted-foreground">
                 {t("review.thankYouMsg", "Your feedback means the world to us.")}
               </p>
               <a href="/" className="text-primary underline hover:no-underline">

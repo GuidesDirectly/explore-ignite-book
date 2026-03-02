@@ -130,7 +130,7 @@ const InquirySection = () => {
 
   if (submitted) {
     return (
-      <section id="inquiry" className="py-24 bg-gradient-navy">
+      <section id="inquiry" className="py-24 bg-card">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -138,10 +138,10 @@ const InquirySection = () => {
             className="max-w-lg mx-auto text-center"
           >
             <CheckCircle className="w-16 h-16 text-primary mx-auto mb-6" />
-            <h2 className="font-display text-3xl font-bold mb-4" style={{ color: "hsl(40, 33%, 97%)" }}>
+            <h2 className="font-display text-3xl font-bold mb-4 text-foreground">
               {t("inquiry.thankYou")}
             </h2>
-            <p style={{ color: "hsl(40, 33%, 80%)" }}>
+            <p className="text-muted-foreground">
               {t("inquiry.thankYouMsg")}
             </p>
             <Button variant="hero" className="mt-8" onClick={() => setSubmitted(false)}>
@@ -154,10 +154,10 @@ const InquirySection = () => {
   }
 
   const fieldError = (field: string) =>
-    errors[field] ? <p className="text-red-400 text-xs mt-1">{errors[field]}</p> : null;
+    errors[field] ? <p className="text-destructive text-xs mt-1">{errors[field]}</p> : null;
 
   return (
-    <section id="inquiry" className="py-24 bg-gradient-navy">
+    <section id="inquiry" className="py-24 bg-card">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           <motion.div
@@ -169,24 +169,24 @@ const InquirySection = () => {
             <p className="text-primary font-body text-sm uppercase tracking-[0.2em] font-semibold mb-3">
               {t("inquiry.label")}
             </p>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6" style={{ color: "hsl(40, 33%, 97%)" }}>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-foreground">
               {t("inquiry.title")}
               <br />
               <span className="text-gradient-gold">{t("inquiry.titleGold")}</span>
             </h2>
-            <p className="text-lg leading-relaxed mb-6" style={{ color: "hsl(40, 33%, 80%)" }}>
+            <p className="text-lg leading-relaxed mb-6 text-muted-foreground">
               {t("inquiry.subtitle")}
             </p>
             <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 mb-6">
-              <p className="text-sm font-medium" style={{ color: "hsl(40, 33%, 90%)" }}>
+              <p className="text-sm font-medium text-foreground">
                 {t("inquiry.commissionFreeNote")}
               </p>
             </div>
-            <div className="space-y-4" style={{ color: "hsl(40, 33%, 75%)" }}>
+            <div className="space-y-4 text-muted-foreground">
               <p className="flex items-center gap-2">📧 michael@iguidetours.net</p>
               <p className="flex items-center gap-2">📞 +1 (202) 243-8336</p>
               <p className="flex items-center gap-2">📍 6100 Cheshire Dr, Bethesda, MD 20814, USA</p>
-              <p className="text-xs italic mt-2" style={{ color: "hsl(40, 33%, 65%)" }}>
+              <p className="text-xs italic mt-2">
                 {t("inquiry.directContact")}
               </p>
             </div>
@@ -198,14 +198,14 @@ const InquirySection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-primary/10 space-y-5"
+            className="bg-background rounded-2xl p-8 border border-border shadow-card space-y-5"
           >
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>{t("inquiry.fullName")} *</label>
+                <label className="block text-sm font-medium mb-2 text-foreground">{t("inquiry.fullName")} *</label>
                 <Input
                   placeholder="John Doe"
-                  className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                  className="bg-accent border-border text-foreground placeholder:text-muted-foreground"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   maxLength={100}
@@ -213,11 +213,11 @@ const InquirySection = () => {
                 {fieldError("name")}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>{t("inquiry.email")} *</label>
+                <label className="block text-sm font-medium mb-2 text-foreground">{t("inquiry.email")} *</label>
                 <Input
                   type="email"
                   placeholder="john@example.com"
-                  className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                  className="bg-accent border-border text-foreground placeholder:text-muted-foreground"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   maxLength={255}
@@ -228,10 +228,10 @@ const InquirySection = () => {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>{t("inquiry.phone")}</label>
+                <label className="block text-sm font-medium mb-2 text-foreground">{t("inquiry.phone")}</label>
                 <Input
                   placeholder="+1 (555) 000-0000"
-                  className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                  className="bg-accent border-border text-foreground placeholder:text-muted-foreground"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   maxLength={30}
@@ -239,9 +239,9 @@ const InquirySection = () => {
                 {fieldError("phone")}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>{t("inquiry.groupSize")}</label>
+                <label className="block text-sm font-medium mb-2 text-foreground">{t("inquiry.groupSize")}</label>
                 <Select onValueChange={(val) => setFormData({ ...formData, groupSize: val })}>
-                  <SelectTrigger className="bg-secondary/50 border-primary/20 text-primary-foreground">
+                  <SelectTrigger className="bg-accent border-border text-foreground">
                     <SelectValue placeholder={t("inquiry.selectSize")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -255,7 +255,7 @@ const InquirySection = () => {
             </div>
 
             <div ref={destRef} className="relative">
-              <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>{t("inquiry.destination")} *</label>
+              <label className="block text-sm font-medium mb-2 text-foreground">{t("inquiry.destination")} *</label>
               {/* Selected destination chip */}
               {formData.destination && !destOpen ? (
                 <div className="flex items-center gap-2">
@@ -273,7 +273,7 @@ const InquirySection = () => {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     placeholder={t("inquiry.searchDest", "Search country, city, or type your own...")}
-                    className="pl-9 bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground"
+                    className="pl-9 bg-accent border-border text-foreground placeholder:text-muted-foreground"
                     value={destQuery}
                     onChange={(e) => { setDestQuery(e.target.value); setDestOpen(true); }}
                     onFocus={() => setDestOpen(true)}
@@ -320,11 +320,11 @@ const InquirySection = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: "hsl(40, 33%, 85%)" }}>{t("inquiry.message")}</label>
+              <label className="block text-sm font-medium mb-2 text-foreground">{t("inquiry.message")}</label>
               <Textarea
                 placeholder={t("inquiry.messagePlaceholder")}
                 rows={4}
-                className="bg-secondary/50 border-primary/20 text-primary-foreground placeholder:text-muted-foreground resize-none"
+                className="bg-accent border-border text-foreground placeholder:text-muted-foreground resize-none"
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 maxLength={2000}
