@@ -408,6 +408,65 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount_total: number
+          booking_id: string | null
+          created_at: string
+          currency: string
+          guide_payout: number
+          guide_user_id: string
+          id: string
+          metadata: Json | null
+          platform_fee: number
+          status: string
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
+          traveler_email: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_total?: number
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          guide_payout?: number
+          guide_user_id: string
+          id?: string
+          metadata?: Json | null
+          platform_fee?: number
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          traveler_email?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_total?: number
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          guide_payout?: number
+          guide_user_id?: string
+          id?: string
+          metadata?: Json | null
+          platform_fee?: number
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          traveler_email?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           booking_id: string | null
