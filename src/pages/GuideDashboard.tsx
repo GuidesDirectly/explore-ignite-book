@@ -26,6 +26,7 @@ import GuideVerificationUpload from "@/components/dashboard/GuideVerificationUpl
 import EarningsDashboard from "@/components/dashboard/EarningsDashboard";
 import AiBanner from "@/components/dashboard/AiBanner";
 import FeedbackInsights from "@/components/dashboard/FeedbackInsights";
+import ToursManager from "@/components/dashboard/ToursManager";
 
 interface PhotoItem {
   name: string;
@@ -460,6 +461,9 @@ const GuideDashboard = () => {
             )}
           </section>
         )}
+
+        {/* Tours Manager */}
+        {user && <ToursManager userId={user.id} guideProfileId={guideProfileId} />}
 
         {/* AI Feedback Insights */}
         {user && <FeedbackInsights userId={user.id} />}

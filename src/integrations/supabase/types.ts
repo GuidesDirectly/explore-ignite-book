@@ -605,6 +605,111 @@ export type Database = {
         }
         Relationships: []
       }
+      tours: {
+        Row: {
+          cancellation_policy: string
+          category: string | null
+          city: string | null
+          country: string | null
+          cover_image_url: string | null
+          created_at: string
+          currency: string
+          detailed_itinerary: string | null
+          difficulty_level: number
+          duration_unit: string
+          duration_value: number
+          exclusions: string[] | null
+          guide_profile_id: string | null
+          guide_user_id: string
+          highlights: string[] | null
+          id: string
+          inclusions: string[] | null
+          languages: string[] | null
+          max_group_size: number
+          meeting_point: string | null
+          meeting_point_lat: number | null
+          meeting_point_lng: number | null
+          price_per_person: number
+          status: string
+          title: string
+          updated_at: string
+          what_to_bring: string[] | null
+        }
+        Insert: {
+          cancellation_policy?: string
+          category?: string | null
+          city?: string | null
+          country?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          currency?: string
+          detailed_itinerary?: string | null
+          difficulty_level?: number
+          duration_unit?: string
+          duration_value?: number
+          exclusions?: string[] | null
+          guide_profile_id?: string | null
+          guide_user_id: string
+          highlights?: string[] | null
+          id?: string
+          inclusions?: string[] | null
+          languages?: string[] | null
+          max_group_size?: number
+          meeting_point?: string | null
+          meeting_point_lat?: number | null
+          meeting_point_lng?: number | null
+          price_per_person?: number
+          status?: string
+          title: string
+          updated_at?: string
+          what_to_bring?: string[] | null
+        }
+        Update: {
+          cancellation_policy?: string
+          category?: string | null
+          city?: string | null
+          country?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          currency?: string
+          detailed_itinerary?: string | null
+          difficulty_level?: number
+          duration_unit?: string
+          duration_value?: number
+          exclusions?: string[] | null
+          guide_profile_id?: string | null
+          guide_user_id?: string
+          highlights?: string[] | null
+          id?: string
+          inclusions?: string[] | null
+          languages?: string[] | null
+          max_group_size?: number
+          meeting_point?: string | null
+          meeting_point_lat?: number | null
+          meeting_point_lng?: number | null
+          price_per_person?: number
+          status?: string
+          title?: string
+          updated_at?: string
+          what_to_bring?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tours_guide_profile_id_fkey"
+            columns: ["guide_profile_id"]
+            isOneToOne: false
+            referencedRelation: "guide_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tours_guide_profile_id_fkey"
+            columns: ["guide_profile_id"]
+            isOneToOne: false
+            referencedRelation: "guide_profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       traveler_profiles: {
         Row: {
           budget_preference: string | null
