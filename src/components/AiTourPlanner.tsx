@@ -1,9 +1,24 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Compass, Users, MapPin, Calendar, DollarSign, Globe, Sparkles,
-  ArrowRight, Mail, Lock, Star, MessageCircle,
-  Loader2, RefreshCw, User, Briefcase, Clock
+  Compass,
+  Users,
+  MapPin,
+  Calendar,
+  DollarSign,
+  Globe,
+  Sparkles,
+  ArrowRight,
+  Mail,
+  Lock,
+  Star,
+  MessageCircle,
+  Loader2,
+  RefreshCw,
+  User,
+  Briefcase,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +28,9 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const AI_TOUR_PLANNER_URL = "/api/ai-tour-planner";
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const GENERIC_PLANNER_ERROR = "Unable to generate itinerary. Please try again.";
 
 interface Activity {
   time: string;
@@ -29,18 +45,32 @@ interface ItineraryDay {
   activities: Activity[];
 }
 
+interface PlannerResponse {
+  status: "success";
+  itinerary: ItineraryDay[];
+}
+
 interface GuideCard {
   id: string;
   name: string;
-  languages: string;
-  specialties: string;
+  language: string;
+  price: string;
   userId: string;
 }
 
 const INTEREST_OPTIONS = [
-  "History & Heritage", "Food & Cuisine", "Art & Culture", "Nature & Parks",
-  "Architecture", "Nightlife", "Shopping", "Photography", "Adventure",
-  "Family-Friendly", "Romantic", "Local Experiences"
+  "History & Heritage",
+  "Food & Cuisine",
+  "Art & Culture",
+  "Nature & Parks",
+  "Architecture",
+  "Nightlife",
+  "Shopping",
+  "Photography",
+  "Adventure",
+  "Family-Friendly",
+  "Romantic",
+  "Local Experiences",
 ];
 
 const TRAVEL_STYLES = [
@@ -56,6 +86,51 @@ const BUDGET_OPTIONS = [
   { value: "premium", label: "Premium ($250–500/day)" },
   { value: "luxury", label: "Luxury ($500+/day)" },
 ];
+
+const isValidActivity = (activity: unknown): activity is Activity => {
+  if (!activity || typeof activity !== "object") return false;
+
+  const candidate = activity as Record<string, unknown>;
+  return (
+    typeof candidate.time === "string" &&
+    typeof candidate.title === "string" &&
+    typeof candidate.description === "string" &&
+    typeof candidate.durationMinutes === "number"
+  );
+};
+
+const isValidItineraryResponse = (value: unknown): value is PlannerResponse => {
+  if (!value || typeof value !== "object") return false;
+
+  const candidate = value as Record<string, unknown>;
+  if (candidate.status !== "success" || !Array.isArray(candidate.itinerary)) return false;
+
+  return candidate.itinerary.every((day) => {
+    if (!day || typeof day !== "object") return false;
+
+    const itineraryDay = day as Record<string, unknown>;
+    return (
+      typeof itineraryDay.day === "number" &&
+      typeof itineraryDay.title === "string" &&
+      Array.isArray(itineraryDay.activities) &&
+      itineraryDay.activities.every(isValidActivity)
+    );
+  });
+};
+
+const formatGuidePrice = (price?: number | null, currency?: string | null) => {
+  if (typeof price !== "number") return "Price on request";
+
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency || "USD",
+      maximumFractionDigits: 0,
+    }).format(price);
+  } catch {
+    return `${currency || "USD"} ${price}`;
+  }
+};
 
 const AiTourPlanner = () => {
   const navigate = useNavigate();
@@ -92,8 +167,8 @@ const AiTourPlanner = () => {
       prev.includes(interest)
         ? prev.filter((i) => i !== interest)
         : prev.length < 5
-        ? [...prev, interest]
-        : prev
+          ? [...prev, interest]
+          : prev,
     );
   };
 
@@ -106,7 +181,9 @@ const AiTourPlanner = () => {
       `Budget: ${BUDGET_OPTIONS.find((b) => b.value === budget)?.label || budget}`,
       selectedInterests.length > 0 ? `Interests: ${selectedInterests.join(", ")}` : "",
       languages !== "English" ? `Languages: ${languages}` : "",
-    ].filter(Boolean).join("\n");
+    ]
+      .filter(Boolean)
+      .join("\n");
   };
 
   const buildGuidePrompt = () => {
@@ -115,31 +192,73 @@ const AiTourPlanner = () => {
       `Base City: ${guideCity}`,
       guideSpecialty ? `Specialty: ${guideSpecialty}` : "",
       `Tour Duration: ${tourDuration} hours`,
-    ].filter(Boolean).join("\n");
+    ]
+      .filter(Boolean)
+      .join("\n");
   };
 
   const fetchMatchedGuides = async () => {
     try {
-      const { data } = await supabase
-        .from("guide_profiles")
-        .select("id, user_id, form_data, service_areas")
-        .eq("status", "approved")
-        .limit(5);
+      const [{ data: guideData }, { data: tourData }] = await Promise.all([
+        (supabase
+          .from("guide_profiles_public" as any)
+          .select("id, user_id, form_data, service_areas, status")
+          .eq("status", "approved")
+          .limit(12) as any),
+        (supabase
+          .from("tours")
+          .select("guide_user_id, price_per_person, currency")
+          .eq("status", "published")
+          .limit(100) as any),
+      ]);
 
-      if (data && data.length > 0) {
-        const cards: GuideCard[] = data.map((g) => {
-          const fd = g.form_data as any;
-          return {
-            id: g.id,
-            name: fd?.name || "Local Guide",
-            languages: fd?.languages || "English",
-            specialties: fd?.specialties || "General Tours",
-            userId: g.user_id,
-          };
-        });
-        setMatchedGuides(cards);
+      if (!guideData?.length) {
+        setMatchedGuides([]);
+        return;
       }
-    } catch { /* silent */ }
+
+      const lowestPriceByGuide = new Map<string, { price: number; currency: string | null }>();
+
+      for (const tour of tourData || []) {
+        const current = lowestPriceByGuide.get(tour.guide_user_id);
+        if (!current || tour.price_per_person < current.price) {
+          lowestPriceByGuide.set(tour.guide_user_id, {
+            price: tour.price_per_person,
+            currency: tour.currency,
+          });
+        }
+      }
+
+      const normalizedDestination = destination.trim().toLowerCase();
+      const destinationMatched = guideData.filter((guide: any) => {
+        const areas = Array.isArray(guide.service_areas) ? guide.service_areas : [];
+        if (!normalizedDestination) return true;
+        return areas.some((area: string) => area.toLowerCase().includes(normalizedDestination) || normalizedDestination.includes(area.toLowerCase()));
+      });
+
+      const selectedGuides = (destinationMatched.length > 0 ? destinationMatched : guideData).slice(0, 5);
+
+      const cards: GuideCard[] = selectedGuides.map((guide: any) => {
+        const formData = guide.form_data || {};
+        const guidePrice = lowestPriceByGuide.get(guide.user_id);
+        const name = [formData.firstName, formData.lastName].filter(Boolean).join(" ") || formData.name || "Local Guide";
+        const language = Array.isArray(formData.languages)
+          ? formData.languages.join(", ")
+          : formData.languages || "English";
+
+        return {
+          id: guide.id,
+          name,
+          language,
+          price: formatGuidePrice(guidePrice?.price, guidePrice?.currency),
+          userId: guide.user_id,
+        };
+      });
+
+      setMatchedGuides(cards);
+    } catch {
+      setMatchedGuides([]);
+    }
   };
 
   const handleGenerate = async () => {
@@ -147,12 +266,12 @@ const AiTourPlanner = () => {
       setError("Please enter a destination.");
       return;
     }
+
     if (mode === "guide" && (!guideName.trim() || !guideCity.trim())) {
       setError("Please fill in your name and city.");
       return;
     }
 
-    // Show email gate BEFORE generating (lead capture first)
     if (!emailCaptured && mode === "traveler") {
       setShowEmailGate(true);
       return;
@@ -162,18 +281,17 @@ const AiTourPlanner = () => {
   };
 
   const generateItinerary = async () => {
+    const description = mode === "traveler" ? buildTravelerPrompt() : buildGuidePrompt();
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 60000);
+
     setError("");
     setLoading(true);
     setItinerary([]);
-
-    const url = `${SUPABASE_URL}/functions/v1/plan-tour`;
-    const description = mode === "traveler" ? buildTravelerPrompt() : buildGuidePrompt();
+    setMatchedGuides([]);
 
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 60000);
-
-      const resp = await fetch(url, {
+      const resp = await fetch(AI_TOUR_PLANNER_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -183,46 +301,40 @@ const AiTourPlanner = () => {
         signal: controller.signal,
       });
 
-      clearTimeout(timeout);
+      const data = await resp.json().catch(() => null);
 
       if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData.error || `Request failed (${resp.status})`);
+        throw new Error((data && typeof data === "object" && "error" in data && typeof data.error === "string" && data.error) || GENERIC_PLANNER_ERROR);
       }
 
-      const data = await resp.json();
-
-      if (data.status !== "success" || !Array.isArray(data.itinerary)) {
-        throw new Error(data.error || "Invalid response from server.");
+      if (!isValidItineraryResponse(data)) {
+        throw new Error(GENERIC_PLANNER_ERROR);
       }
 
       setItinerary(data.itinerary);
 
-      // Fetch matched guides for traveler mode
       if (mode === "traveler") {
-        fetchMatchedGuides();
+        await fetchMatchedGuides();
       }
 
-      setTimeout(() => {
+      window.setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 300);
-    } catch (e: any) {
-      if (e.name === "AbortError") {
-        setError("Request timed out. Please try again.");
-      } else {
-        setError(e.message || "Unable to generate itinerary. Please try again.");
-      }
+    } catch {
+      setError(GENERIC_PLANNER_ERROR);
     } finally {
+      window.clearTimeout(timeoutId);
       setLoading(false);
     }
   };
 
   const handleEmailSubmit = async () => {
     if (!email.trim() || !email.includes("@")) return;
+
+    setError("");
     setEmailCaptured(true);
     setShowEmailGate(false);
 
-    // Store lead
     try {
       await supabase.from("inquiries").insert({
         name: "AI Planner Lead",
@@ -230,24 +342,26 @@ const AiTourPlanner = () => {
         destination: destination || guideCity || "AI Tour Planner",
         message: `Generated via AI Tour Planner (${mode} mode)`,
       });
-    } catch { /* silent */ }
+    } catch {
+      // Intentionally silent: lead capture should not block itinerary generation
+    }
 
-    // Now generate after email capture
     await generateItinerary();
   };
 
-  const handleSkipEmail = () => {
+  const handleSkipEmail = async () => {
     setEmailCaptured(true);
     setShowEmailGate(false);
-    generateItinerary();
+    await generateItinerary();
   };
 
   const handleBookGuide = (guideId?: string) => {
     if (guideId) {
       navigate(`/guide/${guideId}`);
-    } else {
-      navigate("/explore", { state: { destination } });
+      return;
     }
+
+    navigate("/explore", { state: { destination } });
   };
 
   return (
@@ -281,17 +395,16 @@ const AiTourPlanner = () => {
         >
           <Card className="shadow-lg border-border/50 overflow-hidden">
             <CardContent className="p-0">
-              {/* Mode Toggle */}
               <div className="bg-accent/50 p-4 border-b border-border/50">
-                <Tabs value={mode} onValueChange={(v) => setMode(v as "traveler" | "guide")}>
+                <Tabs value={mode} onValueChange={(value) => setMode(value as "traveler" | "guide")}>
                   <TabsList className="w-full max-w-sm mx-auto grid grid-cols-2">
                     <TabsTrigger value="traveler" className="gap-2 text-sm">
                       <User className="w-4 h-4" />
-                      I'm a Traveler
+                      I&apos;m a Traveler
                     </TabsTrigger>
                     <TabsTrigger value="guide" className="gap-2 text-sm">
                       <Briefcase className="w-4 h-4" />
-                      I'm a Tour Guide
+                      I&apos;m a Tour Guide
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
@@ -302,29 +415,39 @@ const AiTourPlanner = () => {
                   {mode === "traveler" ? (
                     <TravelerForm
                       key="traveler"
-                      destination={destination} setDestination={setDestination}
-                      tripDays={tripDays} setTripDays={setTripDays}
-                      adults={adults} setAdults={setAdults}
-                      children_={children} setChildren={setChildren}
-                      selectedInterests={selectedInterests} toggleInterest={toggleInterest}
-                      travelStyle={travelStyle} setTravelStyle={setTravelStyle}
-                      budget={budget} setBudget={setBudget}
-                      languages={languages} setLanguages={setLanguages}
+                      destination={destination}
+                      setDestination={setDestination}
+                      tripDays={tripDays}
+                      setTripDays={setTripDays}
+                      adults={adults}
+                      setAdults={setAdults}
+                      children_={children}
+                      setChildren={setChildren}
+                      selectedInterests={selectedInterests}
+                      toggleInterest={toggleInterest}
+                      travelStyle={travelStyle}
+                      setTravelStyle={setTravelStyle}
+                      budget={budget}
+                      setBudget={setBudget}
+                      languages={languages}
+                      setLanguages={setLanguages}
                     />
                   ) : (
                     <GuideForm
                       key="guide"
-                      guideName={guideName} setGuideName={setGuideName}
-                      guideCity={guideCity} setGuideCity={setGuideCity}
-                      guideSpecialty={guideSpecialty} setGuideSpecialty={setGuideSpecialty}
-                      tourDuration={tourDuration} setTourDuration={setTourDuration}
+                      guideName={guideName}
+                      setGuideName={setGuideName}
+                      guideCity={guideCity}
+                      setGuideCity={setGuideCity}
+                      guideSpecialty={guideSpecialty}
+                      setGuideSpecialty={setGuideSpecialty}
+                      tourDuration={tourDuration}
+                      setTourDuration={setTourDuration}
                     />
                   )}
                 </AnimatePresence>
 
-                {error && (
-                  <p className="text-destructive text-sm font-medium">{error}</p>
-                )}
+                {error && <p className="text-destructive text-sm font-medium">{error}</p>}
 
                 <Button
                   variant="hero"
@@ -358,7 +481,6 @@ const AiTourPlanner = () => {
             </CardContent>
           </Card>
 
-          {/* Email Gate Modal — BEFORE itinerary */}
           <AnimatePresence>
             {showEmailGate && !emailCaptured && (
               <motion.div
@@ -402,7 +524,6 @@ const AiTourPlanner = () => {
             )}
           </AnimatePresence>
 
-          {/* Results Section — Structured Itinerary */}
           {itinerary.length > 0 && (
             <motion.div
               ref={resultRef}
@@ -419,7 +540,10 @@ const AiTourPlanner = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => { setEmailCaptured(true); generateItinerary(); }}
+                      onClick={() => {
+                        setEmailCaptured(true);
+                        void generateItinerary();
+                      }}
                       disabled={loading}
                       className="gap-1.5"
                     >
@@ -437,8 +561,8 @@ const AiTourPlanner = () => {
                           </h4>
                         </div>
                         <div className="divide-y divide-border/30">
-                          {day.activities.map((act, j) => (
-                            <div key={j} className="px-5 py-3 flex gap-4 items-start">
+                          {day.activities.map((act, index) => (
+                            <div key={index} className="px-5 py-3 flex gap-4 items-start">
                               <div className="flex-shrink-0 text-center">
                                 <span className="text-sm font-semibold text-primary">{act.time}</span>
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
@@ -449,6 +573,15 @@ const AiTourPlanner = () => {
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-foreground text-sm">{act.title}</p>
                                 <p className="text-xs text-muted-foreground mt-0.5">{act.description}</p>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="mt-2 h-8 px-3 text-xs"
+                                  onClick={() => {}}
+                                >
+                                  Swap this activity
+                                </Button>
                               </div>
                             </div>
                           ))}
@@ -459,7 +592,6 @@ const AiTourPlanner = () => {
                 </CardContent>
               </Card>
 
-              {/* Available Local Guides — Traveler mode */}
               {mode === "traveler" && matchedGuides.length > 0 && (
                 <Card className="shadow-lg border-border/50">
                   <CardContent className="p-5 md:p-8">
@@ -475,10 +607,10 @@ const AiTourPlanner = () => {
                             </div>
                             <div>
                               <p className="font-semibold text-foreground text-sm">{guide.name}</p>
-                              <p className="text-xs text-muted-foreground">{guide.languages}</p>
+                              <p className="text-xs text-muted-foreground">Language: {guide.language}</p>
                             </div>
                           </div>
-                          <p className="text-xs text-muted-foreground">{guide.specialties}</p>
+                          <p className="text-sm font-medium text-foreground">Price: {guide.price}</p>
                           <div className="flex gap-2">
                             <Button
                               size="sm"
@@ -487,7 +619,7 @@ const AiTourPlanner = () => {
                               onClick={() => handleBookGuide(guide.id)}
                             >
                               <MessageCircle className="w-3 h-3 mr-1" />
-                              Contact
+                              Contact Guide
                             </Button>
                             <Button
                               size="sm"
@@ -504,7 +636,6 @@ const AiTourPlanner = () => {
                 </Card>
               )}
 
-              {/* Conversion Section — Book a Guide */}
               {mode === "traveler" && (
                 <Card className="shadow-lg border-2 border-primary/20 bg-primary/5">
                   <CardContent className="p-5 md:p-8">
@@ -559,7 +690,6 @@ const AiTourPlanner = () => {
                 </Card>
               )}
 
-              {/* Guide mode CTA */}
               {mode === "guide" && (
                 <Card className="shadow-lg border-2 border-primary/20 bg-primary/5">
                   <CardContent className="p-5 md:p-8 text-center space-y-4">
@@ -589,13 +719,23 @@ const AiTourPlanner = () => {
   );
 };
 
-/* ─── Traveler Form ─── */
 function TravelerForm({
-  destination, setDestination, tripDays, setTripDays,
-  adults, setAdults, children_, setChildren,
-  selectedInterests, toggleInterest,
-  travelStyle, setTravelStyle, budget, setBudget,
-  languages, setLanguages,
+  destination,
+  setDestination,
+  tripDays,
+  setTripDays,
+  adults,
+  setAdults,
+  children_,
+  setChildren,
+  selectedInterests,
+  toggleInterest,
+  travelStyle,
+  setTravelStyle,
+  budget,
+  setBudget,
+  languages,
+  setLanguages,
 }: any) {
   return (
     <motion.div
@@ -627,28 +767,38 @@ function TravelerForm({
 
       <FormField icon={<Compass className="w-4 h-4" />} label="Travel Style">
         <div className="flex flex-wrap gap-2">
-          {TRAVEL_STYLES.map((s) => (
-            <button key={s.value} type="button" onClick={() => setTravelStyle(s.value)}
+          {TRAVEL_STYLES.map((style) => (
+            <button
+              key={style.value}
+              type="button"
+              onClick={() => setTravelStyle(style.value)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-                travelStyle === s.value
+                travelStyle === style.value
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-accent text-accent-foreground hover:bg-accent/80"
               }`}
-            >{s.label}</button>
+            >
+              {style.label}
+            </button>
           ))}
         </div>
       </FormField>
 
       <FormField icon={<DollarSign className="w-4 h-4" />} label="Budget">
         <div className="flex flex-wrap gap-2">
-          {BUDGET_OPTIONS.map((b) => (
-            <button key={b.value} type="button" onClick={() => setBudget(b.value)}
+          {BUDGET_OPTIONS.map((budgetOption) => (
+            <button
+              key={budgetOption.value}
+              type="button"
+              onClick={() => setBudget(budgetOption.value)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-                budget === b.value
+                budget === budgetOption.value
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-accent text-accent-foreground hover:bg-accent/80"
               }`}
-            >{b.label}</button>
+            >
+              {budgetOption.label}
+            </button>
           ))}
         </div>
       </FormField>
@@ -656,13 +806,19 @@ function TravelerForm({
       <FormField icon={<Sparkles className="w-4 h-4" />} label="Interests (select up to 5)">
         <div className="flex flex-wrap gap-2">
           {INTEREST_OPTIONS.map((interest) => (
-            <button key={interest} type="button" onClick={() => toggleInterest(interest)}
+            <button
+              key={interest}
+              type="button"
+              onClick={() => toggleInterest(interest)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                 selectedInterests.includes(interest)
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-accent text-accent-foreground hover:bg-accent/80"
               }`}
-            >{selectedInterests.includes(interest) && "✓ "}{interest}</button>
+            >
+              {selectedInterests.includes(interest) && "✓ "}
+              {interest}
+            </button>
           ))}
         </div>
       </FormField>
@@ -670,10 +826,15 @@ function TravelerForm({
   );
 }
 
-/* ─── Guide Form ─── */
 function GuideForm({
-  guideName, setGuideName, guideCity, setGuideCity,
-  guideSpecialty, setGuideSpecialty, tourDuration, setTourDuration,
+  guideName,
+  setGuideName,
+  guideCity,
+  setGuideCity,
+  guideSpecialty,
+  setGuideSpecialty,
+  tourDuration,
+  setTourDuration,
 }: any) {
   return (
     <motion.div
@@ -705,8 +866,7 @@ function GuideForm({
   );
 }
 
-/* ─── Shared Components ─── */
-function FormField({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+function FormField({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
   return (
     <div className="space-y-1.5">
       <label className="flex items-center gap-1.5 text-sm font-medium text-foreground">
@@ -718,8 +878,16 @@ function FormField({ icon, label, children }: { icon: React.ReactNode; label: st
   );
 }
 
-function UpsellCard({ icon, title, description, onClick }: {
-  icon: React.ReactNode; title: string; description: string; onClick: () => void;
+function UpsellCard({
+  icon,
+  title,
+  description,
+  onClick,
+}: {
+  icon: ReactNode;
+  title: string;
+  description: string;
+  onClick: () => void;
 }) {
   return (
     <button

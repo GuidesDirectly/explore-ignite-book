@@ -4,13 +4,26 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
-// https://vitejs.dev/config/
+const aiTourPlannerProxy = {
+  target: "https://oegfwomloaihzwomwypx.supabase.co",
+  changeOrigin: true,
+  rewrite: (requestPath: string) => requestPath.replace(/^\/api\/ai-tour-planner$/, "/functions/v1/plan-tour"),
+};
+
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
     hmr: {
       overlay: false,
+    },
+    proxy: {
+      "/api/ai-tour-planner": aiTourPlannerProxy,
+    },
+  },
+  preview: {
+    proxy: {
+      "/api/ai-tour-planner": aiTourPlannerProxy,
     },
   },
   plugins: [
