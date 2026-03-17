@@ -83,58 +83,71 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Fetch approved guides from DB for matching context (traveler mode only)
-    let guidesContext = "";
-    if (mode !== "guide") {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: guides } = await supabase
-        .from("guide_profiles")
-        .select("form_data, user_id")
-        .eq("status", "approved");
-
-      if (guides && guides.length > 0) {
-        guidesContext = `\n\nAvailable guides in our network:\n${guides.map((g, i) => {
-          const fd = g.form_data as any;
-          return `Guide ${i + 1}: ${fd?.name || "Guide"} — Languages: ${fd?.languages || "English"}, Specialties: ${fd?.specialties || "General tours"}, Locations: ${fd?.locations || "Various"}`;
-        }).join("\n")}\n\nBased on the customer's preferences, suggest which guide(s) would be the best match and why. Include a section titled "🎯 Recommended Guides" with match percentages.`;
-      } else {
-        guidesContext = "\n\nNote: We don't have guide profiles loaded yet, so focus on creating an amazing tour plan. Mention that we'll personally match them with the perfect guide from our vetted network.";
-      }
-    }
-
     // Build system prompt based on mode
     let systemPrompt: string;
 
     if (mode === "guide") {
-      systemPrompt = `You are the AI Itinerary Builder for Guides Directly, a premium tour guide platform. A tour guide is requesting a professional itinerary template they can use as a foundation for their tours.
+      systemPrompt = `You are an itinerary generator for tour guides. A guide wants a professional itinerary template.
 
-Your job is to:
-1. Create a detailed, professional itinerary template based on their city, specialty, and tour duration
-2. Structure it as a time-blocked itinerary (e.g., 9:00 AM — 10:30 AM: Location / Activity)
-3. Include talking points, insider tips, and local knowledge they can use
-4. Suggest pricing tiers (budget, standard, premium)
-5. Include logistical notes (meeting points, rest stops, photo opportunities)
-6. Add a section for "Customization Ideas" so the guide can adapt it
+CRITICAL: You MUST respond with ONLY a valid JSON object. No text before or after. No markdown. No greetings. No explanations.
 
-Format using markdown with clear headers, bullet points, and emojis for visual appeal. Make it feel professional and ready to use. The guide should feel like they have a complete tour product they can start offering immediately.`;
+The JSON must follow this exact structure:
+{
+  "itinerary": [
+    {
+      "day": 1,
+      "title": "Day title",
+      "activities": [
+        {
+          "time": "09:00",
+          "title": "Activity name",
+          "description": "Short description with insider tips",
+          "durationMinutes": 60
+        }
+      ]
+    }
+  ]
+}
+
+Rules:
+- Create a single-day itinerary (day 1) with time-blocked activities based on the requested tour duration
+- Include 4-8 activities depending on duration
+- Include practical details: meeting points, photo spots, rest stops
+- Times must be in HH:MM format
+- durationMinutes must be a number
+- description should include talking points and local knowledge`;
     } else {
-      systemPrompt = `You are the AI Tour Planner for Guides Directly, a premium tour guide platform. The platform currently operates in Washington DC and is expanding to other cities across the USA, Canada, and globally. You can plan tours for ANY destination worldwide.
+      systemPrompt = `You are an itinerary generator for travelers. Create a detailed day-by-day itinerary.
 
-A traveler is describing their dream tour. Your job is to:
-1. Create a detailed, exciting day-by-day itinerary based on their preferences
-2. Include specific times, locations, and activities for each day
-3. Provide estimated costs for each major activity
-4. Include a daily budget breakdown
-5. Suggest the best restaurants and hidden gems
-6. Add practical tips (what to wear, best transport, etc.)
-7. Include a "📊 Budget Summary" section at the end with total estimated costs
+CRITICAL: You MUST respond with ONLY a valid JSON object. No text before or after. No markdown. No greetings. No explanations. No disclaimers.
 
-Keep the tone warm, professional, and exciting. Use markdown formatting with headers (##), bullet points, and emojis for readability. Make the traveler feel this will be an unforgettable experience.
+The JSON must follow this exact structure:
+{
+  "itinerary": [
+    {
+      "day": 1,
+      "title": "Day title",
+      "activities": [
+        {
+          "time": "09:00",
+          "title": "Activity name",
+          "description": "Short description with tips, costs, and insider info",
+          "durationMinutes": 60
+        }
+      ]
+    }
+  ]
+}
 
-IMPORTANT: Do NOT start your response with any disclaimer about which cities the platform covers. Jump straight into the exciting itinerary.${guidesContext}${profileContext ? `\n\nThis traveler has shared their personal preferences — tailor the plan accordingly:${profileContext}` : ""}`;
+Rules:
+- Create one object per day based on the trip length
+- Include 4-7 activities per day
+- Include specific times, locations, and practical tips in descriptions
+- Include estimated costs where relevant in descriptions
+- Times must be in HH:MM format
+- durationMinutes must be a number
+- Make it exciting and detailed but keep descriptions concise (1-2 sentences)
+${profileContext ? `\nTraveler preferences: ${profileContext}` : ""}`;
     }
 
     const response = await fetch(
@@ -151,7 +164,7 @@ IMPORTANT: Do NOT start your response with any disclaimer about which cities the
             { role: "system", content: systemPrompt },
             { role: "user", content: trimmed },
           ],
-          stream: true,
+          stream: false,
         }),
       }
     );
@@ -163,23 +176,47 @@ IMPORTANT: Do NOT start your response with any disclaimer about which cities the
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Service temporarily unavailable. Please try again later." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
       return new Response(
-        JSON.stringify({ error: "AI service unavailable" }),
+        JSON.stringify({ error: "AI service unavailable. Please try again later." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-    });
+    const aiResult = await response.json();
+    const rawContent = aiResult.choices?.[0]?.message?.content || "";
+
+    // Extract JSON from the response (handle potential markdown code fences)
+    let jsonStr = rawContent.trim();
+    if (jsonStr.startsWith("```")) {
+      jsonStr = jsonStr.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+    }
+
+    let parsed: any;
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch {
+      console.error("Failed to parse AI JSON:", jsonStr.slice(0, 500));
+      return new Response(
+        JSON.stringify({ error: "Unable to generate itinerary. Please try again." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate structure
+    if (!parsed.itinerary || !Array.isArray(parsed.itinerary)) {
+      console.error("Invalid itinerary structure:", JSON.stringify(parsed).slice(0, 500));
+      return new Response(
+        JSON.stringify({ error: "Unable to generate itinerary. Please try again." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ status: "success", itinerary: parsed.itinerary }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (e) {
     console.error("plan-tour error:", e);
     return new Response(
