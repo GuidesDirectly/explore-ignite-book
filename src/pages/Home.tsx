@@ -11,7 +11,7 @@ import WhyDirectSection from "@/components/WhyDirectSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import ForGuidesSection from "@/components/ForGuidesSection";
 import TravelerAiCta from "@/components/TravelerAiCta";
-import AiDemoWidget from "@/components/AiDemoWidget";
+import AiTourPlanner from "@/components/AiTourPlanner";
 import TrustSection from "@/components/TrustSection";
 import MonetizationSection from "@/components/MonetizationSection";
 import AboutSection from "@/components/AboutSection";
@@ -88,7 +88,7 @@ const Home = () => {
       <AboutSection />
 
       {/* AI Demo Widget */}
-      <AiDemoWidget />
+      <AiTourPlanner />
 
       {/* Section 13 — FAQ */}
       <FAQSection />
