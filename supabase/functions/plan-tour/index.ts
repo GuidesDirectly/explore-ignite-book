@@ -7,7 +7,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-// Simple in-memory rate limiter: max 5 requests per IP per minute (expensive AI + DB op)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 60_000;
@@ -28,7 +27,6 @@ serve(async (req) => {
   if (req.method === "OPTIONS")
     return new Response(null, { headers: corsHeaders });
 
-  // Rate limiting
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
     req.headers.get("cf-connecting-ip") ??
@@ -50,9 +48,8 @@ serve(async (req) => {
       );
     }
 
-    const { description, profileContext } = body;
+    const { description, profileContext, mode } = body;
 
-    // Validate profileContext
     if (profileContext !== undefined && (typeof profileContext !== "string" || profileContext.length > 2000)) {
       return new Response(
         JSON.stringify({ error: "Invalid profile context." }),
@@ -60,7 +57,6 @@ serve(async (req) => {
       );
     }
 
-    // Input validation
     if (!description || typeof description !== "string") {
       return new Response(
         JSON.stringify({ error: "description is required and must be a string." }),
@@ -87,39 +83,59 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Fetch approved guides from DB for matching context
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const { data: guides } = await supabase
-      .from("guide_profiles")
-      .select("form_data, user_id")
-      .eq("status", "approved");
-
+    // Fetch approved guides from DB for matching context (traveler mode only)
     let guidesContext = "";
-    if (guides && guides.length > 0) {
-      guidesContext = `\n\nAvailable guides in our network:\n${guides.map((g, i) => {
-        const fd = g.form_data as any;
-        return `Guide ${i + 1}: ${fd?.name || "Guide"} — Languages: ${fd?.languages || "English"}, Specialties: ${fd?.specialties || "General tours"}, Locations: ${fd?.locations || "Various"}`;
-      }).join("\n")}\n\nBased on the customer's preferences, suggest which guide(s) would be the best match and why.`;
-    } else {
-      guidesContext = "\n\nNote: We don't have guide profiles loaded yet, so focus on creating an amazing tour plan. Mention that we'll personally match them with the perfect guide from our vetted network.";
+    if (mode !== "guide") {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      const { data: guides } = await supabase
+        .from("guide_profiles")
+        .select("form_data, user_id")
+        .eq("status", "approved");
+
+      if (guides && guides.length > 0) {
+        guidesContext = `\n\nAvailable guides in our network:\n${guides.map((g, i) => {
+          const fd = g.form_data as any;
+          return `Guide ${i + 1}: ${fd?.name || "Guide"} — Languages: ${fd?.languages || "English"}, Specialties: ${fd?.specialties || "General tours"}, Locations: ${fd?.locations || "Various"}`;
+        }).join("\n")}\n\nBased on the customer's preferences, suggest which guide(s) would be the best match and why. Include a section titled "🎯 Recommended Guides" with match percentages.`;
+      } else {
+        guidesContext = "\n\nNote: We don't have guide profiles loaded yet, so focus on creating an amazing tour plan. Mention that we'll personally match them with the perfect guide from our vetted network.";
+      }
     }
 
-    const systemPrompt = `You are the AI Tour Planner for iGuide Tours, a premium tour guide service. A customer is describing their dream tour.
+    // Build system prompt based on mode
+    let systemPrompt: string;
+
+    if (mode === "guide") {
+      systemPrompt = `You are the AI Itinerary Builder for Guides Directly, a premium tour guide platform. A tour guide is requesting a professional itinerary template they can use as a foundation for their tours.
 
 Your job is to:
-1. Create a detailed, exciting tour plan based on their description
-2. Break it into a day-by-day itinerary (or hour-by-hour for day trips)
-3. Include estimated budget ranges
-4. Suggest the best time of year to visit
-5. Recommend specific highlights, restaurants, and hidden gems
-6. Match them with the ideal guide from our network (if available)
+1. Create a detailed, professional itinerary template based on their city, specialty, and tour duration
+2. Structure it as a time-blocked itinerary (e.g., 9:00 AM — 10:30 AM: Location / Activity)
+3. Include talking points, insider tips, and local knowledge they can use
+4. Suggest pricing tiers (budget, standard, premium)
+5. Include logistical notes (meeting points, rest stops, photo opportunities)
+6. Add a section for "Customization Ideas" so the guide can adapt it
 
-Keep the tone warm, professional, and exciting. Use markdown formatting with headers, bullet points, and emojis for readability. Make the customer feel like this will be an unforgettable experience.
+Format using markdown with clear headers, bullet points, and emojis for visual appeal. Make it feel professional and ready to use. The guide should feel like they have a complete tour product they can start offering immediately.`;
+    } else {
+      systemPrompt = `You are the AI Tour Planner for Guides Directly, a premium tour guide platform. The platform currently operates in Washington DC and is expanding to other cities across the USA, Canada, and globally. You can plan tours for ANY destination worldwide.
 
-Our tour destinations include: Washington DC, New York City, Niagara Falls, Toronto, Boston, and Chicago. If they mention other destinations, politely note our primary service areas but still help plan.${guidesContext}${profileContext ? `\n\nThis traveler has shared their personal preferences — tailor the plan accordingly:${profileContext}` : ""}`;
+A traveler is describing their dream tour. Your job is to:
+1. Create a detailed, exciting day-by-day itinerary based on their preferences
+2. Include specific times, locations, and activities for each day
+3. Provide estimated costs for each major activity
+4. Include a daily budget breakdown
+5. Suggest the best restaurants and hidden gems
+6. Add practical tips (what to wear, best transport, etc.)
+7. Include a "📊 Budget Summary" section at the end with total estimated costs
+
+Keep the tone warm, professional, and exciting. Use markdown formatting with headers (##), bullet points, and emojis for readability. Make the traveler feel this will be an unforgettable experience.
+
+IMPORTANT: Do NOT start your response with any disclaimer about which cities the platform covers. Jump straight into the exciting itinerary.${guidesContext}${profileContext ? `\n\nThis traveler has shared their personal preferences — tailor the plan accordingly:${profileContext}` : ""}`;
+    }
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
