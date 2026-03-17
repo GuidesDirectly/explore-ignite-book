@@ -88,7 +88,7 @@ const Home = () => {
       <AboutSection />
 
       {/* AI Demo Widget */}
-      <AiDemoWidget />
+      <AiTourPlanner />
 
       {/* Section 13 — FAQ */}
       <FAQSection />
