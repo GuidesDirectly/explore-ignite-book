@@ -9,7 +9,7 @@ import Home from "./pages/Home";
 import Tours from "./pages/Tours";
 import TourDetail from "./pages/TourDetail";
 import BookingCheckout from "./pages/BookingCheckout";
-import Chat from "./pages/Chat";
+import AiPlannerPage from "./pages/AiPlannerPage";
 import Review from "./pages/Review";
 import Admin from "./pages/Admin";
 import Testimonials from "./pages/Testimonials";
@@ -50,7 +50,7 @@ const App = () => (
           <Route path="/tours" element={<Tours />} />
           <Route path="/tour/:guideId" element={<TourDetail />} />
           <Route path="/book/:guideId" element={<BookingCheckout />} />
-          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat" element={<AiPlannerPage />} />
           <Route path="/review" element={<Review />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/admin" element={<Admin />} />
