@@ -9,7 +9,7 @@ import Home from "./pages/Home";
 import Tours from "./pages/Tours";
 import TourDetail from "./pages/TourDetail";
 import BookingCheckout from "./pages/BookingCheckout";
-import Chat from "./pages/Chat";
+import AiPlannerPage from "./pages/AiPlannerPage";
 import Review from "./pages/Review";
 import Admin from "./pages/Admin";
 import Testimonials from "./pages/Testimonials";
