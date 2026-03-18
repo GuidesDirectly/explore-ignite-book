@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, MessageCircle, Leaf, DollarSign, Search } from "lucide-react";
+import { ShieldCheck, MessageCircle, Leaf, DollarSign, MapPin, Calendar, Users, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import heroBg from "@/assets/hero-dc.jpg";
@@ -8,15 +8,18 @@ import heroBg from "@/assets/hero-dc.jpg";
 const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [query, setQuery] = useState("");
+  const [where, setWhere] = useState("");
+  const [when, setWhen] = useState("");
+  const [guests, setGuests] = useState("");
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
-      navigate(`/explore?q=${encodeURIComponent(query.trim())}`);
-    } else {
-      navigate("/explore");
-    }
+    const params = new URLSearchParams();
+    if (where.trim()) params.set("q", where.trim());
+    if (when.trim()) params.set("date", when.trim());
+    if (guests.trim()) params.set("guests", guests.trim());
+    const qs = params.toString();
+    navigate(qs ? `/explore?${qs}` : "/explore");
   };
 
   const trustItems = [
@@ -57,22 +60,65 @@ const HeroSection = () => {
             {t("hero.subtitle")}
           </motion.p>
 
-          {/* Glassmorphism search bar */}
+          {/* 3-segment glassmorphism search bar */}
           <motion.form
             onSubmit={handleSubmit}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            className="relative mx-auto w-full max-w-xl h-14 flex items-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 focus-within:border-white/60 transition-colors duration-300 shadow-xl mb-12"
+            className="relative mx-auto w-full max-w-2xl flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl mb-12 overflow-hidden"
           >
-            <Search className="absolute left-5 w-5 h-5 text-white pointer-events-none" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("hero.searchPlaceholder")}
-              className="w-full h-full bg-transparent rounded-full pl-13 pr-5 text-base text-white placeholder:text-white/70 border-none outline-none focus:outline-none focus:ring-0"
-            />
+            {/* Where */}
+            <div className="flex-1 flex items-center gap-2 px-5 py-3">
+              <MapPin className="w-4 h-4 text-white/70 flex-shrink-0" />
+              <input
+                type="text"
+                value={where}
+                onChange={(e) => setWhere(e.target.value)}
+                placeholder={t("hero.searchPlaceholder", "Where to?")}
+                className="w-full bg-transparent text-sm text-white placeholder:text-white/60 border-none outline-none focus:outline-none focus:ring-0"
+              />
+            </div>
+
+            {/* Divider */}
+            <div className="hidden sm:block w-px h-8 bg-white/20 flex-shrink-0" />
+            <div className="sm:hidden h-px w-full bg-white/20" />
+
+            {/* When */}
+            <div className="flex-1 flex items-center gap-2 px-5 py-3">
+              <Calendar className="w-4 h-4 text-white/70 flex-shrink-0" />
+              <input
+                type="text"
+                value={when}
+                onChange={(e) => setWhen(e.target.value)}
+                placeholder="When?"
+                className="w-full bg-transparent text-sm text-white placeholder:text-white/60 border-none outline-none focus:outline-none focus:ring-0"
+              />
+            </div>
+
+            {/* Divider */}
+            <div className="hidden sm:block w-px h-8 bg-white/20 flex-shrink-0" />
+            <div className="sm:hidden h-px w-full bg-white/20" />
+
+            {/* Who */}
+            <div className="flex items-center gap-2 px-5 py-3 sm:flex-1">
+              <Users className="w-4 h-4 text-white/70 flex-shrink-0" />
+              <input
+                type="text"
+                value={guests}
+                onChange={(e) => setGuests(e.target.value)}
+                placeholder="Who?"
+                className="w-full bg-transparent text-sm text-white placeholder:text-white/60 border-none outline-none focus:outline-none focus:ring-0"
+              />
+              {/* Search button */}
+              <button
+                type="submit"
+                className="ml-1 w-10 h-10 rounded-full bg-cta-book hover:bg-cta-book-hover text-cta-book-foreground flex items-center justify-center flex-shrink-0 transition-colors shadow-md"
+                aria-label="Search"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+            </div>
           </motion.form>
 
           {/* Trust strip */}

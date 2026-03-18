@@ -39,7 +39,7 @@
 
     --radius: 0.5rem;
 
-    --hero-overlay: linear-gradient(135deg, hsla(220, 30%, 10%, 0.7), hsla(220, 30%, 10%, 0.3));
+    --hero-overlay: linear-gradient(135deg, hsla(220, 30%, 10%, 0.7), hsla(220, 30%, 10%, 0.6));
     --gold-gradient: linear-gradient(135deg, hsl(36, 80%, 50%), hsl(42, 90%, 60%));
     --navy-gradient: linear-gradient(135deg, hsl(220, 30%, 12%), hsl(220, 25%, 20%));
     --shadow-warm: 0 10px 40px -10px hsla(36, 80%, 50%, 0.25);
@@ -55,8 +55,8 @@
     --cta-find: 42 90% 55%;
     --cta-find-hover: 42 90% 48%;
     --cta-find-foreground: 220 30% 12%;
-    --cta-join: 0 0% 100%;
-    --cta-join-foreground: 210 50% 16%;
+    --cta-join: 220 80% 55%;
+    --cta-join-foreground: 0 0% 100%;
     --header-divider: 0 0% 100% / 0.15;
 
     --font-display: 'Playfair Display', serif;
