@@ -39,7 +39,7 @@
 
     --radius: 0.5rem;
 
-    --hero-overlay: linear-gradient(135deg, hsla(220, 30%, 10%, 0.7), hsla(220, 30%, 10%, 0.3));
+    --hero-overlay: linear-gradient(135deg, hsla(220, 30%, 10%, 0.7), hsla(220, 30%, 10%, 0.6));
     --gold-gradient: linear-gradient(135deg, hsl(36, 80%, 50%), hsl(42, 90%, 60%));
     --navy-gradient: linear-gradient(135deg, hsl(220, 30%, 12%), hsl(220, 25%, 20%));
     --shadow-warm: 0 10px 40px -10px hsla(36, 80%, 50%, 0.25);
