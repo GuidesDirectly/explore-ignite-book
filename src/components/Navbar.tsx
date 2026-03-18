@@ -177,16 +177,15 @@ const Navbar = () => {
             size="sm"
             variant="outline"
             className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold"
-            onClick={() => navigate("/explore")}
+            onClick={() => {
+              if (location.pathname === "/" || location.pathname === "/home") {
+                document.querySelector("#hero-search")?.scrollIntoView({ behavior: "smooth" });
+              } else {
+                navigate("/home#hero-search");
+              }
+            }}
           >
             Find a Guide
-          </Button>
-          <Button
-            size="sm"
-            className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold shadow-md"
-            onClick={() => navigate("/tours")}
-          >
-            Book a Guide
           </Button>
           <Button
             size="sm"
@@ -201,11 +200,11 @@ const Navbar = () => {
 
           <a
             href="tel:+12022438336"
-            className="flex items-center gap-1.5 text-sm text-header-muted hover:text-header-foreground transition-colors"
+            className="flex items-center gap-1.5 text-header-foreground hover:text-cta-book transition-colors font-medium"
           >
             <span className="text-base">🇺🇸</span>
-            <Phone className="w-3.5 h-3.5" />
-            <span className="hidden xl:inline">(202) 243-8336</span>
+            <Phone className="w-4 h-4" />
+            <span className="text-sm">+1 (202) 243-8336</span>
           </a>
 
           <LanguageSwitcher />
