@@ -70,7 +70,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            className="relative mx-auto w-full max-w-2xl flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl mb-12 overflow-hidden"
+            className="relative mx-auto w-full max-w-2xl flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl mb-12"
           >
             {/* Where */}
             <div className="flex-1 flex items-center gap-2 px-5 py-3">
