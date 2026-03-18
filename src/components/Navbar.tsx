@@ -74,7 +74,7 @@ const Navbar = () => {
           onClick={(e) => handleNavClick(e, "#home")}
           className="flex items-center gap-2 shrink-0"
         >
-          <img src={logoImg} alt="iGuide Tours" className="h-8 w-8 rounded-full object-cover" />
+          <img src={logoImg} alt="iGuide Tours" className="h-10 w-auto object-contain" />
           <span className="flex items-baseline gap-1.5">
             <span className="font-display text-2xl font-bold tracking-tight">
               <span className="text-header-foreground">Guides</span>
@@ -199,7 +199,7 @@ const Navbar = () => {
 
           <a
             href="tel:+12022438336"
-            className="flex items-center gap-1.5 text-header-foreground hover:text-cta-book transition-colors font-medium shrink-0"
+            className="flex items-center gap-1.5 text-white hover:text-cta-book transition-colors font-semibold shrink-0"
           >
             <Phone className="w-4 h-4" />
             <span className="text-sm whitespace-nowrap">+1 (202) 243-8336</span>
@@ -313,7 +313,7 @@ const Navbar = () => {
               </div>
               <a
                 href="tel:+12022438336"
-                className="flex items-center gap-2 text-header-foreground hover:text-cta-book transition-colors pt-2 font-medium"
+                className="flex items-center gap-2 text-white hover:text-cta-book transition-colors pt-2 font-semibold"
               >
                 <span>🇺🇸</span>
                 <Phone className="w-4 h-4" />
