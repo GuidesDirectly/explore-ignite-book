@@ -20,7 +20,7 @@ const HeroSection = () => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (where.trim()) params.set("q", where.trim());
-    if (when.trim()) params.set("date", when.trim());
+    if (when) params.set("date", format(when, "yyyy-MM-dd"));
     if (guests.trim()) params.set("guests", guests.trim());
     const qs = params.toString();
     navigate(qs ? `/explore?${qs}` : "/explore");
