@@ -1,27 +1,27 @@
 
 
-# Reframe the Tagline to Lead with Positivity
+## Add Date Picker to Hero Search Bar
 
-## The Problem
-The current tagline **"No Commissions. No Markups. No Middlemen."** repeats the word "No" three times, which feels defensive and negative as a first impression.
+### Changes in `src/components/HeroSection.tsx`
 
-## Proposed Replacement Options
+**1. Imports (lines 1-6)**
+- Rename lucide `Calendar` to `CalendarIcon` to avoid conflict with the Calendar component
+- Add: `format` from `date-fns`, `Popover/PopoverTrigger/PopoverContent`, `Calendar` component, `cn` utility
 
-Here are a few positive-first alternatives that convey the same message:
+**2. State (line 12)**
+- Change `when` from `string` to `Date | undefined`
 
-1. **"Direct Access. Fair Pricing. Real Guides."** -- emphasizes what you GET
-2. **"100% Direct. 100% Transparent. 100% Guide-Priced."** -- confident and bold
-3. **"Pure Pricing. Direct Connections. Authentic Guides."** -- clean and aspirational
-4. **"Commission-Free. Guide-Priced. Directly Yours."** -- keeps the differentiator but reframes it
+**3. Submit handler (line 19)**
+- Format date as `format(when, "yyyy-MM-dd")` instead of `when.trim()`
 
-My recommendation is **option 1**: *"Direct Access. Fair Pricing. Real Guides."* -- it's concise, positive, and communicates the same three pillars (no middlemen, no markups, no commissions) without leading with negation.
+**4. Form container (line 69)**
+- Remove `overflow-hidden` from the className so the popover can render outside the bar
 
-The "No commissions" message still appears elsewhere on the site (value proposition section, about section, services) where it works well as supporting detail rather than a headline.
+**5. "When?" segment (lines 87-97)**
+- Replace the `<input>` with a `<Popover>` containing:
+  - **Trigger**: a `<div>` styled identically to other segments (`bg-transparent text-sm text-white cursor-pointer`) showing `format(when, "MMM d, yyyy")` or "When?" placeholder in `text-white/60`
+  - **Content**: `<Calendar mode="single" selected={when} onSelect={setWhen} disabled={(date) => date < new Date()} className="p-3 pointer-events-auto" />` with `w-auto p-0` on PopoverContent
 
-## What Changes
-
-- **File**: `src/i18n/locales/en.json` -- update the `hero.tagline` key
-- **File**: `src/components/ValuePropositionSection.tsx` -- the detailed "zero commissions" messaging stays as-is in the value prop cards below, where specifics are appropriate
-
-One line change, big tonal shift.
+### File affected
+- `src/components/HeroSection.tsx` — imports, state, handler, form class, and When segment
 
