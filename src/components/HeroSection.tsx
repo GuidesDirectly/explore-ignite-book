@@ -29,12 +29,12 @@ const HeroSection = () => {
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background image */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 pointer-events-none">
         <img src={heroBg} alt="Washington DC at golden hour" className="w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: "var(--hero-overlay)" }} />
       </div>
 
-      <div className="relative container mx-auto px-4 pt-24 pb-20 text-center">
+      <div className="relative container mx-auto px-4 pt-24 pb-20 text-center pointer-events-auto">
         <div className="max-w-3xl mx-auto">
           {/* Headline */}
           <motion.h1

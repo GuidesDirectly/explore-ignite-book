@@ -65,7 +65,7 @@ const Navbar = () => {
       : "bg-header/95 backdrop-blur-md";
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${headerBg}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${headerBg}`}>
       <div className="container mx-auto flex items-center justify-between h-[72px] px-4 lg:px-10">
         {/* Logo */}
         <a
@@ -186,13 +186,7 @@ const Navbar = () => {
           <Button
             size="sm"
             className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold shadow-md animate-cta-pulse"
-            onClick={() => {
-              if (isHome) {
-                document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
-              } else {
-                navigate("/home#meet-guides");
-              }
-            }}
+            onClick={() => navigate("/explore")}
           >
             Book a Guide
           </Button>
@@ -335,14 +329,7 @@ const Navbar = () => {
                 <Button
                   size="sm"
                   className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold w-full"
-                  onClick={() => {
-                    setIsOpen(false);
-                    if (isHome) {
-                      document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
-                    } else {
-                      navigate("/home#meet-guides");
-                    }
-                  }}
+                  onClick={() => { setIsOpen(false); navigate("/explore"); }}
                 >
                   Book a Guide
                 </Button>

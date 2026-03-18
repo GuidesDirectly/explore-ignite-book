@@ -1,19 +1,27 @@
 
 
-## Navbar Clickability Fix — Ready to Execute
+# Reframe the Tagline to Lead with Positivity
 
-This plan has been approved. Upon approval here, I will immediately make these edits:
+## The Problem
+The current tagline **"No Commissions. No Markups. No Middlemen."** repeats the word "No" three times, which feels defensive and negative as a first impression.
 
-### `src/components/Navbar.tsx` — 3 edits
+## Proposed Replacement Options
 
-1. **Line 67**: `z-50` → `z-[100]`
-2. **Desktop "Book a Guide" (~line 172-180)**: Replace scroll-to-`#meet-guides` with `navigate("/explore")`
-3. **Mobile "Book a Guide" (~line 258-267)**: Same — `navigate("/explore")`
+Here are a few positive-first alternatives that convey the same message:
 
-### `src/components/HeroSection.tsx` — 2 edits
+1. **"Direct Access. Fair Pricing. Real Guides."** -- emphasizes what you GET
+2. **"100% Direct. 100% Transparent. 100% Guide-Priced."** -- confident and bold
+3. **"Pure Pricing. Direct Connections. Authentic Guides."** -- clean and aspirational
+4. **"Commission-Free. Guide-Priced. Directly Yours."** -- keeps the differentiator but reframes it
 
-4. **Line 30** (background wrapper): `"absolute inset-0"` → `"absolute inset-0 pointer-events-none"`
-5. **Line 35** (content container): `"relative container…"` → add `pointer-events-auto`
+My recommendation is **option 1**: *"Direct Access. Fair Pricing. Real Guides."* -- it's concise, positive, and communicates the same three pillars (no middlemen, no markups, no commissions) without leading with negation.
 
-No other files affected.
+The "No commissions" message still appears elsewhere on the site (value proposition section, about section, services) where it works well as supporting detail rather than a headline.
+
+## What Changes
+
+- **File**: `src/i18n/locales/en.json` -- update the `hero.tagline` key
+- **File**: `src/components/ValuePropositionSection.tsx` -- the detailed "zero commissions" messaging stays as-is in the value prop cards below, where specifics are appropriate
+
+One line change, big tonal shift.
 
