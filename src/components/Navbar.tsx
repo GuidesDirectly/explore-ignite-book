@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, ChevronDown, Heart, Sparkles, Search, LogIn } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, Heart, Sparkles, LogIn } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -155,9 +155,9 @@ const Navbar = () => {
           {!isLoggedIn ? (
             <Button
               size="sm"
-              variant="ghost"
-              className="text-header-foreground/80 hover:text-header-foreground hover:bg-white/10 font-medium gap-1.5"
-              onClick={() => navigate("/guide-register")}
+              variant="outline"
+              className="border-header-foreground/30 text-header-foreground/90 hover:text-header-foreground hover:bg-white/10 font-medium gap-1.5"
+              onClick={() => navigate("/login")}
             >
               <LogIn className="w-3.5 h-3.5" />
               Login
@@ -168,34 +168,17 @@ const Navbar = () => {
 
           <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
 
-          {/* CTA Group: Find a Guide + Book a Guide */}
-          <Button
-            size="sm"
-            className="bg-cta-find text-cta-find-foreground hover:bg-cta-find-hover font-semibold shadow-md border border-cta-find-foreground/10"
-            onClick={() => {
-              if (isHome) {
-                document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
-              } else {
-                navigate("/home#meet-guides");
-              }
-            }}
-          >
-            <Search className="w-3.5 h-3.5 mr-1" />
-            Find a Guide
-          </Button>
+          {/* CTA Group */}
           <Button
             size="sm"
             className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold shadow-md animate-cta-pulse"
-            onClick={() => navigate("/explore")}
+            onClick={() => navigate("/tours")}
           >
             Book a Guide
           </Button>
-
-          {/* Join as Guide */}
           <Button
             size="sm"
-            variant="outline"
-            className="border-cta-join text-cta-join bg-transparent hover:bg-white/10 hover:border-header-foreground/70 font-semibold"
+            className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold shadow-md"
             onClick={() => navigate("/guide-register")}
           >
             Join as Guide
@@ -292,9 +275,9 @@ const Navbar = () => {
               {!isLoggedIn ? (
                 <Button
                   size="sm"
-                  variant="ghost"
-                  className="text-header-foreground/80 hover:text-header-foreground hover:bg-white/10 font-medium w-full justify-start gap-2"
-                  onClick={() => { setIsOpen(false); navigate("/guide-register"); }}
+                  variant="outline"
+                  className="border-header-foreground/30 text-header-foreground/90 hover:text-header-foreground hover:bg-white/10 font-medium w-full justify-start gap-2"
+                  onClick={() => { setIsOpen(false); navigate("/login"); }}
                 >
                   <LogIn className="w-4 h-4" />
                   Login
@@ -313,30 +296,14 @@ const Navbar = () => {
               <div className="flex flex-col gap-2 pt-3">
                 <Button
                   size="sm"
-                  className="bg-cta-find text-cta-find-foreground hover:bg-cta-find-hover font-semibold w-full"
-                  onClick={() => {
-                    setIsOpen(false);
-                    if (isHome) {
-                      document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
-                    } else {
-                      navigate("/home#meet-guides");
-                    }
-                  }}
-                >
-                  <Search className="w-4 h-4 mr-1" />
-                  Find a Guide
-                </Button>
-                <Button
-                  size="sm"
                   className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold w-full"
-                  onClick={() => { setIsOpen(false); navigate("/explore"); }}
+                  onClick={() => { setIsOpen(false); navigate("/tours"); }}
                 >
                   Book a Guide
                 </Button>
                 <Button
                   size="sm"
-                  variant="outline"
-                  className="border-cta-join text-cta-join bg-transparent hover:bg-white/10 font-semibold w-full"
+                  className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold w-full"
                   onClick={() => { setIsOpen(false); navigate("/guide-register"); }}
                 >
                   Join as Guide
