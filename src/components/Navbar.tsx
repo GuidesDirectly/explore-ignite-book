@@ -313,7 +313,7 @@ const Navbar = () => {
               </div>
               <a
                 href="tel:+12022438336"
-                className="flex items-center gap-2 text-header-foreground hover:text-cta-book transition-colors pt-2 font-medium"
+                className="flex items-center gap-2 text-white hover:text-cta-book transition-colors pt-2 font-semibold"
               >
                 <span>🇺🇸</span>
                 <Phone className="w-4 h-4" />
