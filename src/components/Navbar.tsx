@@ -315,11 +315,11 @@ const Navbar = () => {
               </div>
               <a
                 href="tel:+12022438336"
-                className="flex items-center gap-2 text-sm text-header-muted hover:text-header-foreground transition-colors pt-2"
+                className="flex items-center gap-2 text-header-foreground hover:text-cta-book transition-colors pt-2 font-medium"
               >
                 <span>🇺🇸</span>
                 <Phone className="w-4 h-4" />
-                (202) 243-8336
+                <span className="text-sm">+1 (202) 243-8336</span>
               </a>
             </div>
           </motion.div>
