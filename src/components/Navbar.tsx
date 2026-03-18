@@ -171,6 +171,21 @@ const Navbar = () => {
           {/* CTA Group */}
           <Button
             size="sm"
+            variant="outline"
+            className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold"
+            onClick={() => navigate("/explore")}
+          >
+            Find a Guide
+          </Button>
+          <Button
+            size="sm"
+            className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold shadow-md"
+            onClick={() => navigate("/tours")}
+          >
+            Book a Guide
+          </Button>
+          <Button
+            size="sm"
             className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold shadow-md"
             onClick={() => navigate("/guide-register")}
           >
