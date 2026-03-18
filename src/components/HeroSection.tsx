@@ -89,16 +89,26 @@ const HeroSection = () => {
             <div className="sm:hidden h-px w-full bg-white/20" />
 
             {/* When */}
-            <div className="flex-1 flex items-center gap-2 px-5 py-3">
-              <Calendar className="w-4 h-4 text-white/70 flex-shrink-0" />
-              <input
-                type="text"
-                value={when}
-                onChange={(e) => setWhen(e.target.value)}
-                placeholder="When?"
-                className="w-full bg-transparent text-sm text-white placeholder:text-white/60 border-none outline-none focus:outline-none focus:ring-0"
-              />
-            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <div className="flex-1 flex items-center gap-2 px-5 py-3 cursor-pointer">
+                  <CalendarIcon className="w-4 h-4 text-white/70 flex-shrink-0" />
+                  <span className={cn("text-sm", when ? "text-white" : "text-white/60")}>
+                    {when ? format(when, "MMM d, yyyy") : "When?"}
+                  </span>
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={when}
+                  onSelect={setWhen}
+                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
 
             {/* Divider */}
             <div className="hidden sm:block w-px h-8 bg-white/20 flex-shrink-0" />
