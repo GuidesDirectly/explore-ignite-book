@@ -12,12 +12,6 @@ const ForGuidesSection = () => {
     { icon: Shield, text: t("forGuides.early3") },
   ];
 
-  const aiFeatures = [
-    { icon: Bot, text: "Suggests optimized itineraries tailored to traveler preferences" },
-    { icon: BarChart3, text: "Helps you price tours competitively based on season, demand & budget" },
-    { icon: Sliders, text: "Provides insights from past tours to improve satisfaction & bookings" },
-    { icon: CheckCircle, text: "Fully under your control — you approve all recommendations" },
-  ];
 
   return (
     <section id="for-guides" className="py-24 bg-gradient-navy">
