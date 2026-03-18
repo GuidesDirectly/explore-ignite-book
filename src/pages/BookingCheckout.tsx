@@ -205,11 +205,15 @@ const BookingCheckout = () => {
 
     setSubmitting(true);
 
+    // Attach traveler_user_id when logged in; null for guest checkout
+    const { data: { session } } = await supabase.auth.getSession();
+
     // Create booking first
     const { data: bookingData, error } = await supabase.from("bookings").insert({
       guide_user_id: guideId,
       traveler_name: form.traveler_name,
       traveler_email: form.traveler_email,
+      traveler_user_id: session?.user?.id ?? null,
       date: format(form.date, "yyyy-MM-dd"),
       time: form.time,
       tour_type: form.tour_type,
@@ -218,7 +222,7 @@ const BookingCheckout = () => {
       notes: form.notes || null,
       price: totalPrice,
       status: "pending",
-    }).select("id").single();
+    } as any).select("id").single();
 
     if (error) {
       toast.error("Failed to submit booking. Please try again.");

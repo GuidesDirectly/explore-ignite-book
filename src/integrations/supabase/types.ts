@@ -86,6 +86,7 @@ export type Database = {
           tour_type: string
           traveler_email: string | null
           traveler_name: string
+          traveler_user_id: string | null
           updated_at: string
         }
         Insert: {
@@ -102,6 +103,7 @@ export type Database = {
           tour_type: string
           traveler_email?: string | null
           traveler_name: string
+          traveler_user_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -118,6 +120,7 @@ export type Database = {
           tour_type?: string
           traveler_email?: string | null
           traveler_name?: string
+          traveler_user_id?: string | null
           updated_at?: string
         }
         Relationships: []
