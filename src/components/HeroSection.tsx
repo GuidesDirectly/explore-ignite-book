@@ -1,8 +1,12 @@
 import { useState, FormEvent } from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, MessageCircle, Leaf, DollarSign, MapPin, Calendar, Users, Search } from "lucide-react";
+import { ShieldCheck, MessageCircle, Leaf, DollarSign, MapPin, Calendar as CalendarIcon, Users, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import heroBg from "@/assets/hero-dc.jpg";
 
 const HeroSection = () => {
