@@ -13,7 +13,7 @@ const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [where, setWhere] = useState("");
-  const [when, setWhen] = useState("");
+  const [when, setWhen] = useState<Date | undefined>(undefined);
   const [guests, setGuests] = useState("");
 
   const handleSubmit = (e: FormEvent) => {
