@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Globe, Users, Star, Shield, Bot, BarChart3, Sliders, CheckCircle } from "lucide-react";
+import { DollarSign, Globe, Users, Star, Shield, Bot } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const ForGuidesSection = () => {
