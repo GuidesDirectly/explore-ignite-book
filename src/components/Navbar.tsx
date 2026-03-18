@@ -67,7 +67,7 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${headerBg}`}>
-      <div className="container mx-auto flex items-center justify-between h-[72px] px-4 lg:px-10">
+      <div className="container mx-auto flex items-center justify-between h-[72px] px-4 pr-8 lg:px-10 lg:pr-12 flex-nowrap">
         {/* Logo */}
         <a
           href="#home"

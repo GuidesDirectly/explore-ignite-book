@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import heroBg from "@/assets/hero-dc.jpg";
+import logoImg from "@/assets/logo.jpg";
 
 const HeroSection = () => {
   const { t } = useTranslation();
@@ -38,8 +39,23 @@ const HeroSection = () => {
       {/* Background image */}
       <div className="absolute inset-0 pointer-events-none">
         <img src={heroBg} alt="Washington DC at golden hour" className="w-full h-full object-cover" />
-        <div className="absolute inset-0" style={{ background: "var(--hero-overlay)" }} />
+        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, hsla(220, 30%, 8%, 0.6) 0%, transparent 50%)" }} />
       </div>
+
+      {/* Trust Seal — iGuide Tours logo */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+        className="absolute top-24 right-6 md:top-28 md:right-12 z-10"
+      >
+        <img
+          src={logoImg}
+          alt="iGuide Tours Trust Seal"
+          className="w-16 h-16 md:w-24 md:h-24 rounded-full border-2 border-white/30 shadow-2xl object-contain bg-white/10 backdrop-blur-sm p-1"
+        />
+      </motion.div>
 
       <div className="relative container mx-auto px-4 pt-24 pb-20 text-center pointer-events-auto">
         <div className="max-w-3xl mx-auto">
@@ -48,7 +64,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-tight mb-6 text-white"
+            className="font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-tight mb-6 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
           >
             {t("hero.headline")}
           </motion.h1>
@@ -70,6 +86,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
+            id="hero-search"
             className="relative mx-auto w-full max-w-2xl flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl mb-12"
           >
             {/* Where */}
