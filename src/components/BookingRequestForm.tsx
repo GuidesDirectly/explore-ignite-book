@@ -99,10 +99,14 @@ const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas, a
     setSubmitting(true);
     const data = result.data;
 
+    // Attach traveler_user_id when logged in; null for guest checkout
+    const { data: { session } } = await supabase.auth.getSession();
+
     const { error } = await supabase.from("bookings").insert({
       guide_user_id: guideUserId,
       traveler_name: data.traveler_name,
       traveler_email: data.traveler_email,
+      traveler_user_id: session?.user?.id ?? null,
       date: format(data.date, "yyyy-MM-dd"),
       time: data.time,
       tour_type: data.tour_type,
@@ -110,7 +114,7 @@ const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas, a
       location: data.location || null,
       notes: data.notes || null,
       status: "pending",
-    });
+    } as any);
 
     if (error) {
       console.error("Booking error:", error);
