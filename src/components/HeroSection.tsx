@@ -48,12 +48,12 @@ const HeroSection = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className="absolute top-24 right-6 md:top-28 md:right-12 z-10"
+        className="absolute top-28 right-6 md:top-32 md:right-14 z-10"
       >
         <img
           src={logoImg}
           alt="iGuide Tours Trust Seal"
-          className="w-16 h-16 md:w-24 md:h-24 rounded-full border-2 border-white/30 shadow-2xl object-contain bg-white/10 backdrop-blur-sm p-1"
+          className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] rounded-full border-4 border-white/40 shadow-2xl object-contain bg-white/15 backdrop-blur-sm p-2"
         />
       </motion.div>
 
