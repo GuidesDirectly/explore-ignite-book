@@ -289,13 +289,6 @@ const Navbar = () => {
               <div className="flex flex-col gap-2 pt-3">
                 <Button
                   size="sm"
-                  className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold w-full"
-                  onClick={() => { setIsOpen(false); navigate("/tours"); }}
-                >
-                  Book a Guide
-                </Button>
-                <Button
-                  size="sm"
                   className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold w-full"
                   onClick={() => { setIsOpen(false); navigate("/guide-register"); }}
                 >
