@@ -9,6 +9,7 @@ import DestinationsModal from "./DestinationsModal";
 import TravelerProfileForm from "./TravelerProfileForm";
 import NavbarUserMenu from "./NavbarUserMenu";
 import { supabase } from "@/integrations/supabase/client";
+import logoImg from "@/assets/logo.jpg";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,14 +72,17 @@ const Navbar = () => {
         <a
           href="#home"
           onClick={(e) => handleNavClick(e, "#home")}
-          className="flex items-baseline gap-1.5 shrink-0"
+          className="flex items-center gap-2 shrink-0"
         >
-          <span className="font-display text-2xl font-bold tracking-tight">
-            <span className="text-header-foreground">Guides</span>
-            <span className="text-cta-book">Directly</span>
-          </span>
-          <span className="text-[10px] text-header-muted font-medium hidden sm:inline">
-            by iGuide Tours
+          <img src={logoImg} alt="iGuide Tours" className="h-8 w-8 rounded-full object-cover" />
+          <span className="flex items-baseline gap-1.5">
+            <span className="font-display text-2xl font-bold tracking-tight">
+              <span className="text-header-foreground">Guides</span>
+              <span className="text-cta-book">Directly</span>
+            </span>
+            <span className="text-[10px] text-header-muted font-medium hidden sm:inline">
+              by iGuide Tours
+            </span>
           </span>
         </a>
 
@@ -173,16 +177,15 @@ const Navbar = () => {
             size="sm"
             variant="outline"
             className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold"
-            onClick={() => navigate("/explore")}
+            onClick={() => {
+              if (location.pathname === "/" || location.pathname === "/home") {
+                document.querySelector("#hero-search")?.scrollIntoView({ behavior: "smooth" });
+              } else {
+                navigate("/home#hero-search");
+              }
+            }}
           >
             Find a Guide
-          </Button>
-          <Button
-            size="sm"
-            className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold shadow-md"
-            onClick={() => navigate("/tours")}
-          >
-            Book a Guide
           </Button>
           <Button
             size="sm"
@@ -197,11 +200,11 @@ const Navbar = () => {
 
           <a
             href="tel:+12022438336"
-            className="flex items-center gap-1.5 text-sm text-header-muted hover:text-header-foreground transition-colors"
+            className="flex items-center gap-1.5 text-header-foreground hover:text-cta-book transition-colors font-medium"
           >
             <span className="text-base">🇺🇸</span>
-            <Phone className="w-3.5 h-3.5" />
-            <span className="hidden xl:inline">(202) 243-8336</span>
+            <Phone className="w-4 h-4" />
+            <span className="text-sm">+1 (202) 243-8336</span>
           </a>
 
           <LanguageSwitcher />
@@ -312,11 +315,11 @@ const Navbar = () => {
               </div>
               <a
                 href="tel:+12022438336"
-                className="flex items-center gap-2 text-sm text-header-muted hover:text-header-foreground transition-colors pt-2"
+                className="flex items-center gap-2 text-header-foreground hover:text-cta-book transition-colors pt-2 font-medium"
               >
                 <span>🇺🇸</span>
                 <Phone className="w-4 h-4" />
-                (202) 243-8336
+                <span className="text-sm">+1 (202) 243-8336</span>
               </a>
             </div>
           </motion.div>
