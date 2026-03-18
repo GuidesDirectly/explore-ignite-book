@@ -195,16 +195,14 @@ const Navbar = () => {
             Join as Guide
           </Button>
 
-          {/* Phone + Language on far right */}
           <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
 
           <a
             href="tel:+12022438336"
-            className="flex items-center gap-1.5 text-header-foreground hover:text-cta-book transition-colors font-medium"
+            className="flex items-center gap-1.5 text-header-foreground hover:text-cta-book transition-colors font-medium shrink-0"
           >
-            <span className="text-base">🇺🇸</span>
             <Phone className="w-4 h-4" />
-            <span className="text-sm">+1 (202) 243-8336</span>
+            <span className="text-sm whitespace-nowrap">+1 (202) 243-8336</span>
           </a>
 
           <LanguageSwitcher />
