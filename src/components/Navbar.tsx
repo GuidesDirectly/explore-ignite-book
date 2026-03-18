@@ -275,9 +275,9 @@ const Navbar = () => {
               {!isLoggedIn ? (
                 <Button
                   size="sm"
-                  variant="ghost"
-                  className="text-header-foreground/80 hover:text-header-foreground hover:bg-white/10 font-medium w-full justify-start gap-2"
-                  onClick={() => { setIsOpen(false); navigate("/guide-register"); }}
+                  variant="outline"
+                  className="border-header-foreground/30 text-header-foreground/90 hover:text-header-foreground hover:bg-white/10 font-medium w-full justify-start gap-2"
+                  onClick={() => { setIsOpen(false); navigate("/login"); }}
                 >
                   <LogIn className="w-4 h-4" />
                   Login
