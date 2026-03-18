@@ -26,6 +26,7 @@ import SavedGuides from "./pages/SavedGuides";
 import Install from "./pages/Install";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Support from "./pages/Support";
+import Login from "./pages/Login";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
