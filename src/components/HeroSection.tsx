@@ -1,22 +1,26 @@
 import { useState, FormEvent } from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, MessageCircle, Leaf, DollarSign, MapPin, Calendar, Users, Search } from "lucide-react";
+import { ShieldCheck, MessageCircle, Leaf, DollarSign, MapPin, Calendar as CalendarIcon, Users, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import heroBg from "@/assets/hero-dc.jpg";
 
 const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [where, setWhere] = useState("");
-  const [when, setWhen] = useState("");
+  const [when, setWhen] = useState<Date | undefined>(undefined);
   const [guests, setGuests] = useState("");
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (where.trim()) params.set("q", where.trim());
-    if (when.trim()) params.set("date", when.trim());
+    if (when) params.set("date", format(when, "yyyy-MM-dd"));
     if (guests.trim()) params.set("guests", guests.trim());
     const qs = params.toString();
     navigate(qs ? `/explore?${qs}` : "/explore");
@@ -66,7 +70,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            className="relative mx-auto w-full max-w-2xl flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl mb-12 overflow-hidden"
+            className="relative mx-auto w-full max-w-2xl flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl mb-12"
           >
             {/* Where */}
             <div className="flex-1 flex items-center gap-2 px-5 py-3">
@@ -85,16 +89,26 @@ const HeroSection = () => {
             <div className="sm:hidden h-px w-full bg-white/20" />
 
             {/* When */}
-            <div className="flex-1 flex items-center gap-2 px-5 py-3">
-              <Calendar className="w-4 h-4 text-white/70 flex-shrink-0" />
-              <input
-                type="text"
-                value={when}
-                onChange={(e) => setWhen(e.target.value)}
-                placeholder="When?"
-                className="w-full bg-transparent text-sm text-white placeholder:text-white/60 border-none outline-none focus:outline-none focus:ring-0"
-              />
-            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <div className="flex-1 flex items-center gap-2 px-5 py-3 cursor-pointer">
+                  <CalendarIcon className="w-4 h-4 text-white/70 flex-shrink-0" />
+                  <span className={cn("text-sm", when ? "text-white" : "text-white/60")}>
+                    {when ? format(when, "MMM d, yyyy") : "When?"}
+                  </span>
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={when}
+                  onSelect={setWhen}
+                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
 
             {/* Divider */}
             <div className="hidden sm:block w-px h-8 bg-white/20 flex-shrink-0" />
