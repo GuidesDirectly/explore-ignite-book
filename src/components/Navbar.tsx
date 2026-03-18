@@ -329,14 +329,7 @@ const Navbar = () => {
                 <Button
                   size="sm"
                   className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold w-full"
-                  onClick={() => {
-                    setIsOpen(false);
-                    if (isHome) {
-                      document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
-                    } else {
-                      navigate("/home#meet-guides");
-                    }
-                  }}
+                  onClick={() => { setIsOpen(false); navigate("/explore"); }}
                 >
                   Book a Guide
                 </Button>
