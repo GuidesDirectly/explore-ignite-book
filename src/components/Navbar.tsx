@@ -168,34 +168,17 @@ const Navbar = () => {
 
           <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
 
-          {/* CTA Group: Find a Guide + Book a Guide */}
-          <Button
-            size="sm"
-            className="bg-cta-find text-cta-find-foreground hover:bg-cta-find-hover font-semibold shadow-md border border-cta-find-foreground/10"
-            onClick={() => {
-              if (isHome) {
-                document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
-              } else {
-                navigate("/home#meet-guides");
-              }
-            }}
-          >
-            <Search className="w-3.5 h-3.5 mr-1" />
-            Find a Guide
-          </Button>
+          {/* CTA Group */}
           <Button
             size="sm"
             className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold shadow-md animate-cta-pulse"
-            onClick={() => navigate("/explore")}
+            onClick={() => navigate("/tours")}
           >
             Book a Guide
           </Button>
-
-          {/* Join as Guide */}
           <Button
             size="sm"
-            variant="outline"
-            className="border-cta-join text-cta-join bg-transparent hover:bg-white/10 hover:border-header-foreground/70 font-semibold"
+            className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold shadow-md"
             onClick={() => navigate("/guide-register")}
           >
             Join as Guide
