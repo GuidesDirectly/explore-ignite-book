@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import heroBg from "@/assets/hero-dc.jpg";
+import logoImg from "@/assets/logo.jpg";
 
 const HeroSection = () => {
   const { t } = useTranslation();
