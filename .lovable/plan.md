@@ -1,27 +1,45 @@
 
 
-# Reframe the Tagline to Lead with Positivity
+## Premium Marketplace UI — Execution Plan
 
-## The Problem
-The current tagline **"No Commissions. No Markups. No Middlemen."** repeats the word "No" three times, which feels defensive and negative as a first impression.
+### 1. `src/index.css` — 2 variable edits
 
-## Proposed Replacement Options
+**Line 42** — darken hero overlay:
+```css
+--hero-overlay: linear-gradient(135deg, hsla(220, 30%, 10%, 0.7), hsla(220, 30%, 10%, 0.6));
+```
 
-Here are a few positive-first alternatives that convey the same message:
+**Lines 58-59** — vibrant blue Join CTA:
+```css
+--cta-join: 220 80% 55%;
+--cta-join-foreground: 0 0% 100%;
+```
 
-1. **"Direct Access. Fair Pricing. Real Guides."** -- emphasizes what you GET
-2. **"100% Direct. 100% Transparent. 100% Guide-Priced."** -- confident and bold
-3. **"Pure Pricing. Direct Connections. Authentic Guides."** -- clean and aspirational
-4. **"Commission-Free. Guide-Priced. Directly Yours."** -- keeps the differentiator but reframes it
+### 2. `src/components/HeroSection.tsx` — Full rewrite
 
-My recommendation is **option 1**: *"Direct Access. Fair Pricing. Real Guides."* -- it's concise, positive, and communicates the same three pillars (no middlemen, no markups, no commissions) without leading with negation.
+Replace entire file with 3-segment glassmorphism search bar:
 
-The "No commissions" message still appears elsewhere on the site (value proposition section, about section, services) where it works well as supporting detail rather than a headline.
+- **Imports**: Replace `Search` with `MapPin, Calendar, Users, Search` from lucide-react
+- **State**: Replace single `query` with `where`, `when`, `guests`
+- **Submit**: Build URL `/explore?q=<where>&date=<when>&guests=<guests>`, omitting empty params
+- **Search bar markup** (replaces lines 60-76):
+  - Container: `max-w-2xl rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl`
+  - Layout: `flex flex-col sm:flex-row` for mobile stacking
+  - Three segments, each a `flex-1 flex items-center gap-2 px-4 py-3` with icon + transparent input
+  - Desktop dividers: `hidden sm:block w-px h-8 bg-white/20` between segments
+  - Circular search button on right: `w-10 h-10 rounded-full bg-cta-book flex items-center justify-center` with Search icon
+- Trust strip stays unchanged
 
-## What Changes
+### 3. `src/components/Navbar.tsx` — Remove "Book a Guide"
 
-- **File**: `src/i18n/locales/en.json` -- update the `hero.tagline` key
-- **File**: `src/components/ValuePropositionSection.tsx` -- the detailed "zero commissions" messaging stays as-is in the value prop cards below, where specifics are appropriate
+**Desktop (lines 171-178)**: Delete the entire "Book a Guide" `<Button>` block. Keep the divider, "Join as Guide", phone, and language switcher.
 
-One line change, big tonal shift.
+**Mobile (lines 296-303)**: Delete the "Book a Guide" `<Button>` block. Keep "Join as Guide" button.
+
+Result: Desktop right section → `[Login] | [Join as Guide] | 📞 🌐`
+
+### Files affected
+1. `src/index.css` — 3 lines changed
+2. `src/components/HeroSection.tsx` — search bar rewrite
+3. `src/components/Navbar.tsx` — remove 2 button blocks
 
