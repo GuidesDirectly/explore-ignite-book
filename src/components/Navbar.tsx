@@ -296,30 +296,14 @@ const Navbar = () => {
               <div className="flex flex-col gap-2 pt-3">
                 <Button
                   size="sm"
-                  className="bg-cta-find text-cta-find-foreground hover:bg-cta-find-hover font-semibold w-full"
-                  onClick={() => {
-                    setIsOpen(false);
-                    if (isHome) {
-                      document.querySelector("#meet-guides")?.scrollIntoView({ behavior: "smooth" });
-                    } else {
-                      navigate("/home#meet-guides");
-                    }
-                  }}
-                >
-                  <Search className="w-4 h-4 mr-1" />
-                  Find a Guide
-                </Button>
-                <Button
-                  size="sm"
                   className="bg-cta-book text-cta-book-foreground hover:bg-cta-book-hover font-semibold w-full"
-                  onClick={() => { setIsOpen(false); navigate("/explore"); }}
+                  onClick={() => { setIsOpen(false); navigate("/tours"); }}
                 >
                   Book a Guide
                 </Button>
                 <Button
                   size="sm"
-                  variant="outline"
-                  className="border-cta-join text-cta-join bg-transparent hover:bg-white/10 font-semibold w-full"
+                  className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold w-full"
                   onClick={() => { setIsOpen(false); navigate("/guide-register"); }}
                 >
                   Join as Guide
