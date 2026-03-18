@@ -38,8 +38,23 @@ const HeroSection = () => {
       {/* Background image */}
       <div className="absolute inset-0 pointer-events-none">
         <img src={heroBg} alt="Washington DC at golden hour" className="w-full h-full object-cover" />
-        <div className="absolute inset-0" style={{ background: "var(--hero-overlay)" }} />
+        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, hsla(220, 30%, 8%, 0.6) 0%, transparent 50%)" }} />
       </div>
+
+      {/* Trust Seal — iGuide Tours logo */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+        className="absolute top-24 right-6 md:top-28 md:right-12 z-10"
+      >
+        <img
+          src={logoImg}
+          alt="iGuide Tours Trust Seal"
+          className="w-16 h-16 md:w-24 md:h-24 rounded-full border-2 border-white/30 shadow-2xl object-contain bg-white/10 backdrop-blur-sm p-1"
+        />
+      </motion.div>
 
       <div className="relative container mx-auto px-4 pt-24 pb-20 text-center pointer-events-auto">
         <div className="max-w-3xl mx-auto">
