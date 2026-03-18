@@ -1,27 +1,35 @@
 
 
-# Reframe the Tagline to Lead with Positivity
+## Navbar User Flow Fix — Execution Plan
 
-## The Problem
-The current tagline **"No Commissions. No Markups. No Middlemen."** repeats the word "No" three times, which feels defensive and negative as a first impression.
+### 1. New file: `src/pages/Login.tsx`
+Clean universal login page:
+- Email + password form using `supabase.auth.signInWithPassword`
+- "Forgot password?" link → `/forgot-password`
+- "Become a Guide" link → `/guide-register`
+- On success, redirect to `/home`
+- Centered card layout with Navbar
 
-## Proposed Replacement Options
+### 2. Edit: `src/App.tsx` (line 28)
+- Add `import Login from "./pages/Login";`
+- Add `<Route path="/login" element={<Login />} />` before the catch-all
 
-Here are a few positive-first alternatives that convey the same message:
+### 3. Edit: `src/components/Navbar.tsx` — 5 areas
 
-1. **"Direct Access. Fair Pricing. Real Guides."** -- emphasizes what you GET
-2. **"100% Direct. 100% Transparent. 100% Guide-Priced."** -- confident and bold
-3. **"Pure Pricing. Direct Connections. Authentic Guides."** -- clean and aspirational
-4. **"Commission-Free. Guide-Priced. Directly Yours."** -- keeps the differentiator but reframes it
+**Desktop Login (lines 156-164):** Change `variant="ghost"` → `variant="outline"`, destination `/guide-register` → `/login`, style as clean outline button
 
-My recommendation is **option 1**: *"Direct Access. Fair Pricing. Real Guides."* -- it's concise, positive, and communicates the same three pillars (no middlemen, no markups, no commissions) without leading with negation.
+**Desktop CTAs (lines 171-202):**
+- **Delete** "Find a Guide" button (lines 171-185)
+- **"Book a Guide"** (line 189): Change `/explore` → `/tours`
+- **"Join as Guide"** (lines 195-202): Change from `variant="outline"` to solid style: `bg-cta-join text-white hover:bg-cta-join/90`
 
-The "No commissions" message still appears elsewhere on the site (value proposition section, about section, services) where it works well as supporting detail rather than a headline.
+**Mobile Login (line 297):** Change `/guide-register` → `/login`
 
-## What Changes
+**Mobile CTAs (lines 313-343):**
+- **Delete** "Find a Guide" button (lines 314-328)
+- **"Book a Guide"** (line 332): Change `/explore` → `/tours`
+- **"Join as Guide"** (lines 336-343): Change to solid style matching desktop
 
-- **File**: `src/i18n/locales/en.json` -- update the `hero.tagline` key
-- **File**: `src/components/ValuePropositionSection.tsx` -- the detailed "zero commissions" messaging stays as-is in the value prop cards below, where specifics are appropriate
-
-One line change, big tonal shift.
+### Result
+Header simplified to: `[Login outline] | [Book a Guide solid] [Join as Guide solid] | 📞 🌐`
 
