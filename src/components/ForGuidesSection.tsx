@@ -59,43 +59,10 @@ const ForGuidesSection = () => {
             ))}
           </div>
 
-          {/* AI Tour Assistant Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="rounded-xl border p-6 md:p-8 mb-8 max-w-3xl mx-auto text-left"
-            style={{ borderColor: "hsla(200, 98%, 39%, 0.3)", background: "hsla(200, 98%, 39%, 0.08)" }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                <Bot className="w-5 h-5 text-primary" />
-              </div>
-              <h3 className="font-display text-lg font-bold" style={{ color: "hsl(40, 33%, 97%)" }}>
-                Meet Your New AI Tour Assistant
-              </h3>
-            </div>
-            <p className="text-sm mb-4" style={{ color: "hsl(40, 33%, 80%)" }}>
-              Our AI tool is designed to make your life easier:
-            </p>
-            <ul className="space-y-3 mb-5">
-              {aiFeatures.map(({ icon: Icon, text }, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <Icon className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
-                  <span className="text-sm" style={{ color: "hsl(40, 33%, 85%)" }}>{text}</span>
-                </li>
-              ))}
-            </ul>
-            <Button
-              size="sm"
-              asChild
-              className="gap-2"
-              title="See how AI can enhance your tours and bookings."
-            >
-              <a href="/chat">Start Using AI →</a>
-            </Button>
-          </motion.div>
+          <p className="flex items-center justify-center gap-2 text-sm mb-8" style={{ color: "hsl(40, 33%, 75%)" }}>
+            <Bot className="w-4 h-4 text-primary" />
+            Includes AI-powered business tools to help you price and plan effectively.
+          </p>
 
           {/* Why join early */}
           <motion.div
