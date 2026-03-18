@@ -156,7 +156,7 @@ const Navbar = () => {
             <Button
               size="sm"
               variant="outline"
-              className="border-header-foreground/30 text-header-foreground hover:text-header-foreground hover:bg-header-foreground/10 font-medium gap-1.5"
+              className="border-header-foreground/30 text-header-foreground hover:text-header-foreground hover:bg-header-foreground/10 font-medium gap-1.5 bg-transparent"
               onClick={() => navigate("/login")}
             >
               <LogIn className="w-3.5 h-3.5" />

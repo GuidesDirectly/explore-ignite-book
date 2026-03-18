@@ -1,16 +1,27 @@
 
 
-## Fix Login Button Visibility
+# Reframe the Tagline to Lead with Positivity
 
-**Root cause**: The `outline` button variant applies `bg-background` (a light color ~`hsl(209, 40%, 96%)`), while `text-header-foreground` resolves to white (`hsl(0, 0%, 100%)`). White text on a near-white background is invisible.
+## The Problem
+The current tagline **"No Commissions. No Markups. No Middlemen."** repeats the word "No" three times, which feels defensive and negative as a first impression.
 
-**Fix in `src/components/Navbar.tsx` line 159**:
+## Proposed Replacement Options
 
-Add `bg-transparent` to override the variant's `bg-background`, keeping the button text white against the dark header. The hover state already uses `hover:bg-header-foreground/10` which is fine.
+Here are a few positive-first alternatives that convey the same message:
 
-```tsx
-className="border-header-foreground/30 text-header-foreground hover:text-header-foreground hover:bg-header-foreground/10 font-medium gap-1.5 bg-transparent"
-```
+1. **"Direct Access. Fair Pricing. Real Guides."** -- emphasizes what you GET
+2. **"100% Direct. 100% Transparent. 100% Guide-Priced."** -- confident and bold
+3. **"Pure Pricing. Direct Connections. Authentic Guides."** -- clean and aspirational
+4. **"Commission-Free. Guide-Priced. Directly Yours."** -- keeps the differentiator but reframes it
 
-Single line change, one file affected.
+My recommendation is **option 1**: *"Direct Access. Fair Pricing. Real Guides."* -- it's concise, positive, and communicates the same three pillars (no middlemen, no markups, no commissions) without leading with negation.
+
+The "No commissions" message still appears elsewhere on the site (value proposition section, about section, services) where it works well as supporting detail rather than a headline.
+
+## What Changes
+
+- **File**: `src/i18n/locales/en.json` -- update the `hero.tagline` key
+- **File**: `src/components/ValuePropositionSection.tsx` -- the detailed "zero commissions" messaging stays as-is in the value prop cards below, where specifics are appropriate
+
+One line change, big tonal shift.
 
