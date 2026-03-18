@@ -1,27 +1,31 @@
 
 
-# Reframe the Tagline to Lead with Positivity
+## Execution: AI Placement & Header Visibility
 
-## The Problem
-The current tagline **"No Commissions. No Markups. No Middlemen."** repeats the word "No" three times, which feels defensive and negative as a first impression.
+Two targeted edits, ready to apply.
 
-## Proposed Replacement Options
+### 1. Navbar Login Button (`src/components/Navbar.tsx`, line 159)
 
-Here are a few positive-first alternatives that convey the same message:
+Change Login button classes to explicit white colors:
 
-1. **"Direct Access. Fair Pricing. Real Guides."** -- emphasizes what you GET
-2. **"100% Direct. 100% Transparent. 100% Guide-Priced."** -- confident and bold
-3. **"Pure Pricing. Direct Connections. Authentic Guides."** -- clean and aspirational
-4. **"Commission-Free. Guide-Priced. Directly Yours."** -- keeps the differentiator but reframes it
+```
+border-header-foreground/30 text-header-foreground/90 hover:text-header-foreground hover:bg-white/10
+→ border-white/30 text-white hover:text-white hover:bg-white/10
+```
 
-My recommendation is **option 1**: *"Direct Access. Fair Pricing. Real Guides."* -- it's concise, positive, and communicates the same three pillars (no middlemen, no markups, no commissions) without leading with negation.
+### 2. ForGuidesSection AI Block (`src/components/ForGuidesSection.tsx`)
 
-The "No commissions" message still appears elsewhere on the site (value proposition section, about section, services) where it works well as supporting detail rather than a headline.
+- **Line 3**: Remove unused imports `BarChart3, Sliders, CheckCircle`
+- **Lines 15-20**: Delete `aiFeatures` array
+- **Lines 68-104**: Replace the entire AI Tour Assistant `<motion.div>` with:
+```tsx
+<p className="flex items-center justify-center gap-2 text-sm mb-8" style={{ color: "hsl(40, 33%, 75%)" }}>
+  <Bot className="w-4 h-4 text-primary" />
+  Includes AI-powered business tools to help you price and plan effectively.
+</p>
+```
 
-## What Changes
-
-- **File**: `src/i18n/locales/en.json` -- update the `hero.tagline` key
-- **File**: `src/components/ValuePropositionSection.tsx` -- the detailed "zero commissions" messaging stays as-is in the value prop cards below, where specifics are appropriate
-
-One line change, big tonal shift.
+### Files affected
+1. `src/components/Navbar.tsx` — 1 line
+2. `src/components/ForGuidesSection.tsx` — 3 edits (imports, array, block replacement)
 
