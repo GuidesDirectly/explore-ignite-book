@@ -155,9 +155,9 @@ const Navbar = () => {
           {!isLoggedIn ? (
             <Button
               size="sm"
-              variant="ghost"
-              className="text-header-foreground/80 hover:text-header-foreground hover:bg-white/10 font-medium gap-1.5"
-              onClick={() => navigate("/guide-register")}
+              variant="outline"
+              className="border-header-foreground/30 text-header-foreground/90 hover:text-header-foreground hover:bg-white/10 font-medium gap-1.5"
+              onClick={() => navigate("/login")}
             >
               <LogIn className="w-3.5 h-3.5" />
               Login
