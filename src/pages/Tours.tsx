@@ -176,6 +176,27 @@ const Tours = () => {
     });
   }, [tours, filterCity, filterType, filterLanguage, searchQuery]);
 
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    switch (sortBy) {
+      case "price-low":
+        return arr.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
+      case "price-high":
+        return arr.sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
+      case "rating":
+        return arr.sort((a, b) => b.rating - a.rating);
+      case "newest":
+        return arr.sort((a, b) => {
+          if (!b.createdAt && !a.createdAt) return 0;
+          if (!b.createdAt) return -1;
+          if (!a.createdAt) return 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+      default:
+        return arr;
+    }
+  }, [filtered, sortBy]);
+
   const activeFilterCount = [filterCity, filterType, filterLanguage].filter(v => v && v !== "all").length;
 
   return (
