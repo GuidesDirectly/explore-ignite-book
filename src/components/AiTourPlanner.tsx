@@ -320,8 +320,10 @@ const AiTourPlanner = () => {
       window.setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 300);
-    } catch {
-      setError(GENERIC_PLANNER_ERROR);
+    } catch (err: any) {
+      const msg = err?.message || GENERIC_PLANNER_ERROR;
+      console.error("Itinerary generation error:", msg);
+      setError(msg);
     } finally {
       window.clearTimeout(timeoutId);
       setLoading(false);
