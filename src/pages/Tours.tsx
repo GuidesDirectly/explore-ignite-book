@@ -41,6 +41,7 @@ export interface TourListing {
   description: string;
   price: number | null;
   currency: string;
+  createdAt: string | null;
 }
 
 const Tours = () => {
@@ -52,12 +53,13 @@ const Tours = () => {
   const [filterType, setFilterType] = useState("");
   const [filterLanguage, setFilterLanguage] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState("recommended");
 
   useEffect(() => {
     const fetchTours = async () => {
       const { data: guideData } = await (supabase
         .from("guide_profiles_public" as any)
-        .select("id, user_id, form_data, service_areas, translations") as any);
+        .select("id, user_id, form_data, service_areas, translations, created_at") as any);
 
       if (!guideData) {
         setLoading(false);
@@ -138,6 +140,7 @@ const Tours = () => {
                 : "Experience the best of the city with a licensed local guide.",
               price: priceInfo?.price ?? null,
               currency: priceInfo?.currency || "USD",
+              createdAt: g.created_at ?? null,
             });
           });
         });
@@ -172,6 +175,27 @@ const Tours = () => {
       return true;
     });
   }, [tours, filterCity, filterType, filterLanguage, searchQuery]);
+
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    switch (sortBy) {
+      case "price-low":
+        return arr.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
+      case "price-high":
+        return arr.sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
+      case "rating":
+        return arr.sort((a, b) => b.rating - a.rating);
+      case "newest":
+        return arr.sort((a, b) => {
+          if (!b.createdAt && !a.createdAt) return 0;
+          if (!b.createdAt) return -1;
+          if (!a.createdAt) return 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+      default:
+        return arr;
+    }
+  }, [filtered, sortBy]);
 
   const activeFilterCount = [filterCity, filterType, filterLanguage].filter(v => v && v !== "all").length;
 
@@ -307,8 +331,20 @@ const Tours = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <p className="text-sm text-muted-foreground">
-              {loading ? "Loading..." : `${filtered.length} tour${filtered.length !== 1 ? "s" : ""} found`}
+              {loading ? "Loading..." : `${sorted.length} tour${sorted.length !== 1 ? "s" : ""} found`}
             </p>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[200px] bg-background">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recommended">Recommended</SelectItem>
+                <SelectItem value="price-low">Price (Lowest First)</SelectItem>
+                <SelectItem value="price-high">Price (Highest First)</SelectItem>
+                <SelectItem value="rating">Top Rated</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {loading ? (
@@ -317,7 +353,7 @@ const Tours = () => {
                 <div key={i} className="h-80 rounded-2xl bg-muted animate-pulse" />
               ))}
             </div>
-          ) : filtered.length === 0 ? (
+          ) : sorted.length === 0 ? (
             <div className="text-center py-20">
               <Compass className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="font-display text-xl font-bold text-foreground mb-2">No tours found</h3>
@@ -325,7 +361,7 @@ const Tours = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((tour, i) => (
+              {sorted.map((tour, i) => (
                 <TourCard key={tour.id} tour={tour} index={i} />
               ))}
             </div>
