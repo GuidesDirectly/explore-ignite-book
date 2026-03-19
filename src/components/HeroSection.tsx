@@ -116,6 +116,9 @@ const HeroSection = () => {
               <MapPin className="w-4 h-4 text-white/70 flex-shrink-0" />
               <input
                 type="text"
+                name="destination_search"
+                autoComplete="new-password"
+                aria-autocomplete="none"
                 value={where}
                 onChange={(e) => setWhere(e.target.value)}
                 placeholder={t("hero.searchPlaceholder", "Where to?")}
@@ -158,9 +161,12 @@ const HeroSection = () => {
               <Users className="w-4 h-4 text-white/70 flex-shrink-0" />
               <input
                 type="text"
+                name="guest_count"
+                autoComplete="new-password"
+                aria-autocomplete="none"
                 value={guests}
                 onChange={(e) => setGuests(e.target.value)}
-                placeholder="Who?"
+                placeholder="Guests"
                 className="w-full bg-transparent text-sm text-white placeholder:text-white/60 border-none outline-none focus:outline-none focus:ring-0"
               />
               {/* Search button */}
