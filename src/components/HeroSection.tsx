@@ -51,32 +51,11 @@ const HeroSection = () => {
         className="hidden md:block absolute top-28 right-6 z-10 md:top-40 md:right-16"
         style={{ marginRight: "40px" }}
       >
-        <div
-          style={{
-            width: "160px",
-            height: "160px",
-            borderRadius: "50%",
-            border: "4px solid #FFFFFF",
-            overflow: "hidden",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "hsla(0, 0%, 100%, 0.1)",
-            boxShadow: "0 0 30px hsla(0, 0%, 100%, 0.25)",
-          }}
-        >
-          <img
-            src={logoImg}
-            alt="iGuide Tours Trust Seal"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              padding: "15px",
-              borderRadius: "50%",
-            }}
-          />
-        </div>
+        <img
+          src={logoImg}
+          alt="iGuide Tours"
+          className="w-36 md:w-48 h-auto drop-shadow-2xl rounded-lg"
+        />
       </motion.div>
 
       <div className="relative container mx-auto px-4 pt-24 pb-20 text-center pointer-events-auto">
