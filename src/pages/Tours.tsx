@@ -59,7 +59,7 @@ const Tours = () => {
     const fetchTours = async () => {
       const { data: guideData } = await (supabase
         .from("guide_profiles_public" as any)
-        .select("id, user_id, form_data, service_areas, translations") as any);
+        .select("id, user_id, form_data, service_areas, translations, created_at") as any);
 
       if (!guideData) {
         setLoading(false);
