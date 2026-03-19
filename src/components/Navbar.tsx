@@ -87,7 +87,7 @@ const Navbar = () => {
         </a>
 
         {/* Desktop nav links */}
-        <div className="hidden lg:flex items-center gap-7 ml-8">
+        <div className="hidden lg:flex items-center gap-4 ml-6">
           {navLinks.map((link) => {
             const isDest = (link as any).isDestinations;
 
@@ -197,13 +197,16 @@ const Navbar = () => {
 
           <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
 
-          <a
-            href="tel:+12022438336"
-            className="flex items-center gap-1.5 text-white hover:text-cta-book transition-colors font-semibold shrink-0"
-          >
-            <Phone className="w-4 h-4" />
-            <span className="text-sm whitespace-nowrap">+1 (202) 243-8336</span>
-          </a>
+          <div className="shrink-0" style={{ minWidth: "max-content" }}>
+            <a
+              href="tel:+12022438336"
+              className="flex items-center gap-1.5 transition-colors shrink-0"
+              style={{ color: "#FFFFFF", fontWeight: 700 }}
+            >
+              <Phone className="w-4 h-4" />
+              <span className="text-sm whitespace-nowrap">+1 (202) 243-8336</span>
+            </a>
+          </div>
 
           <LanguageSwitcher />
         </div>
