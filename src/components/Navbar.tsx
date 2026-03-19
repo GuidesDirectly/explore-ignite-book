@@ -87,7 +87,7 @@ const Navbar = () => {
         </a>
 
         {/* Desktop nav links */}
-        <div className="hidden lg:flex items-center gap-4 ml-6">
+        <div className="hidden lg:flex items-center gap-3 ml-6">
           {navLinks.map((link) => {
             const isDest = (link as any).isDestinations;
 

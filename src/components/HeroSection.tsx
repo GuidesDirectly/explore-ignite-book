@@ -48,7 +48,7 @@ const HeroSection = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className="absolute top-28 right-6 md:top-32 md:right-14 z-10"
+        className="absolute top-28 right-6 md:top-36 md:right-16 z-10"
       >
         <img
           src={logoImg}

@@ -452,11 +452,10 @@ const AiTourPlanner = () => {
                 {error && <p className="text-destructive text-sm font-medium">{error}</p>}
 
                 <Button
-                  variant="hero"
                   size="lg"
                   onClick={handleGenerate}
                   disabled={loading}
-                  className="w-full gap-2 text-base py-6 rounded-xl"
+                  className="w-full gap-2 text-base py-6 rounded-xl bg-cta-book hover:bg-cta-book-hover text-cta-book-foreground font-semibold shadow-md"
                 >
                   {loading ? (
                     <>
