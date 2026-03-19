@@ -51,13 +51,13 @@ const HeroSection = () => {
         className="absolute top-28 right-6 md:top-36 md:right-16 z-10"
       >
         <div
-          className="w-[150px] h-[150px] rounded-full overflow-hidden border-4 border-white shadow-[0_0_30px_rgba(255,255,255,0.25)] bg-white/20 backdrop-blur-sm"
+          className="w-[180px] h-[180px] rounded-full overflow-hidden border-[5px] border-white shadow-[0_0_30px_rgba(255,255,255,0.25)] bg-white/20 backdrop-blur-sm p-2"
           style={{ aspectRatio: "1/1" }}
         >
           <img
             src={logoImg}
             alt="iGuide Tours Trust Seal"
-            className="w-full h-full rounded-full object-cover"
+            className="w-full h-full rounded-full object-contain"
           />
         </div>
       </motion.div>
