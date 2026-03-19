@@ -376,8 +376,18 @@ const TourDetail = () => {
                 className="sticky top-24"
               >
                 <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-card space-y-5">
+                  {/* Price — visually dominant */}
+                  {tourPrice != null && tourPrice > 0 && (
+                    <div className="pb-2">
+                      <span className="text-2xl font-bold text-foreground">
+                        From ${tourPrice}
+                      </span>
+                      <span className="text-sm text-muted-foreground"> / person</span>
+                    </div>
+                  )}
+
                   <div>
-                    <h3 className="font-display text-2xl font-bold text-foreground">{tourType}</h3>
+                    <h3 className="font-display text-xl font-bold text-foreground">{tourType}</h3>
                     <p className="text-muted-foreground text-sm mt-1">{city} • with {guideName}</p>
                   </div>
 
