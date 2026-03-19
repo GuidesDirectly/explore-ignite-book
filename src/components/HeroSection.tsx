@@ -50,11 +50,16 @@ const HeroSection = () => {
         transition={{ duration: 0.6, delay: 0.6 }}
         className="absolute top-28 right-6 md:top-36 md:right-16 z-10"
       >
-        <img
-          src={logoImg}
-          alt="iGuide Tours Trust Seal"
-          className="w-[140px] h-[140px] md:w-[180px] md:h-[180px] rounded-full border-[5px] border-white/50 shadow-[0_0_30px_rgba(255,255,255,0.25)] object-contain bg-white/20 backdrop-blur-sm p-2.5"
-        />
+        <div
+          className="w-[150px] h-[150px] rounded-full overflow-hidden border-4 border-white shadow-[0_0_30px_rgba(255,255,255,0.25)] bg-white/20 backdrop-blur-sm"
+          style={{ aspectRatio: "1/1" }}
+        >
+          <img
+            src={logoImg}
+            alt="iGuide Tours Trust Seal"
+            className="w-full h-full rounded-full object-cover"
+          />
+        </div>
       </motion.div>
 
       <div className="relative container mx-auto px-4 pt-24 pb-20 text-center pointer-events-auto">
