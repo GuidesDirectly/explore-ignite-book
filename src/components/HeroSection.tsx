@@ -53,7 +53,7 @@ const HeroSection = () => {
         <img
           src={logoImg}
           alt="iGuide Tours Trust Seal"
-          className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] rounded-full border-4 border-white/40 shadow-2xl object-contain bg-white/15 backdrop-blur-sm p-2"
+          className="w-[140px] h-[140px] md:w-[180px] md:h-[180px] rounded-full border-[5px] border-white/50 shadow-[0_0_30px_rgba(255,255,255,0.25)] object-contain bg-white/20 backdrop-blur-sm p-2.5"
         />
       </motion.div>
 
