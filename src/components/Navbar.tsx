@@ -60,43 +60,41 @@ const Navbar = () => {
   };
 
   const headerBg = scrolled
-    ? "bg-header shadow-[0_2px_10px_rgba(0,0,0,0.15)]"
+    ? "bg-[hsla(220,30%,8%,0.95)] shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
     : isHome
-      ? "bg-transparent"
-      : "bg-header/95 backdrop-blur-md";
+      ? "bg-[hsla(220,30%,8%,0.8)]"
+      : "bg-[hsla(220,30%,8%,0.95)] backdrop-blur-md";
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${headerBg}`}>
-      <div className="container mx-auto flex h-[72px] items-center justify-between gap-3 px-4 pr-5 lg:px-10 lg:pr-5 flex-nowrap">
-        {/* Logo */}
+      <div className="container mx-auto flex h-[72px] items-center justify-between px-4 lg:px-8">
+        {/* LEFT: Logo */}
         <a
           href="#home"
           onClick={(e) => handleNavClick(e, "#home")}
-          className="flex items-center gap-2 shrink-0 min-w-0"
+          className="flex items-center gap-2 shrink-0"
         >
           <img src={logoImg} alt="iGuide Tours" className="h-10 w-auto object-contain shrink-0" />
-          <span className="flex items-baseline gap-1.5 min-w-0">
+          <span className="flex items-baseline gap-1.5">
             <span className="font-display text-xl sm:text-2xl font-bold tracking-tight whitespace-nowrap">
-              <span className="text-header-foreground">Guides</span>
+              <span className="text-white">Guides</span>
               <span className="text-cta-book">Directly</span>
             </span>
-            <span className="text-[10px] text-header-muted font-medium hidden sm:inline whitespace-nowrap">
+            <span className="text-[10px] text-white/50 font-medium hidden sm:inline whitespace-nowrap">
               by iGuide Tours
             </span>
           </span>
         </a>
 
-        {/* Desktop nav links */}
-        <div className="hidden lg:flex items-center gap-2 xl:gap-3 ml-4 xl:ml-6 min-w-0">
+        {/* CENTER: Nav links (desktop) */}
+        <div className="hidden lg:flex items-center gap-3 xl:gap-4">
           {navLinks.map((link) => {
-            const isDest = (link as any).isDestinations;
-
-            if (isDest) {
+            if ((link as any).isDestinations) {
               return (
                 <div key={link.href} ref={destBtnRef} className="relative">
                   <button
                     onClick={() => setDestOpen(true)}
-                    className="text-xs xl:text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200 inline-flex items-center gap-1 whitespace-nowrap"
+                    className="text-xs xl:text-sm font-medium text-white/80 hover:text-white transition-colors inline-flex items-center gap-1 whitespace-nowrap"
                   >
                     {link.label}
                     <ChevronDown className="w-3.5 h-3.5" />
@@ -111,7 +109,7 @@ const Navbar = () => {
                   key={link.href}
                   href={link.href}
                   onClick={(e) => { e.preventDefault(); navigate(link.href); }}
-                  className="text-xs xl:text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200 whitespace-nowrap"
+                  className="text-xs xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
                 >
                   {link.label}
                 </a>
@@ -123,7 +121,7 @@ const Navbar = () => {
                 key={link.href}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="text-xs xl:text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200 whitespace-nowrap"
+                className="text-xs xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
               >
                 {link.label}
               </a>
@@ -131,98 +129,99 @@ const Navbar = () => {
           })}
         </div>
 
-        {/* Right section */}
-        <div className="flex items-center gap-2 sm:gap-3 ml-auto shrink-0 pl-2">
-          <div className="hidden lg:flex items-center gap-2 xl:gap-3">
-            {isLoggedIn && (
-              <>
-                <button
-                  onClick={() => setProfileOpen(true)}
-                  className="relative p-2 rounded-full text-header-muted hover:text-cta-book hover:bg-white/10 transition-colors"
-                  aria-label="Travel Preferences"
-                  title="My Travel Preferences"
-                >
-                  <Sparkles className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => navigate("/saved-guides")}
-                  className="relative p-2 rounded-full text-header-muted hover:text-red-400 hover:bg-white/10 transition-colors"
-                  aria-label="Saved Guides"
-                >
-                  <Heart className="w-4 h-4" />
-                </button>
-              </>
-            )}
-
-            <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
-
-            {!isLoggedIn ? (
-              <Button
-                size="sm"
-                variant="outline"
-                className="border-header-foreground/30 text-header-foreground hover:text-header-foreground hover:bg-header-foreground/10 font-medium gap-1.5 bg-transparent"
-                onClick={() => navigate("/login")}
+        {/* RIGHT: Actions + Phone (desktop) */}
+        <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
+          {isLoggedIn && (
+            <>
+              <button
+                onClick={() => setProfileOpen(true)}
+                className="relative p-2 rounded-full text-white/60 hover:text-cta-book hover:bg-white/10 transition-colors"
+                aria-label="Travel Preferences"
+                title="My Travel Preferences"
               >
-                <LogIn className="w-3.5 h-3.5" />
-                Login
-              </Button>
-            ) : (
-              <NavbarUserMenu email={userEmail} />
-            )}
+                <Sparkles className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => navigate("/saved-guides")}
+                className="relative p-2 rounded-full text-white/60 hover:text-red-400 hover:bg-white/10 transition-colors"
+                aria-label="Saved Guides"
+              >
+                <Heart className="w-4 h-4" />
+              </button>
+            </>
+          )}
 
-            <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
+          <div className="w-px h-6 bg-white/20 mx-1" />
 
+          {!isLoggedIn ? (
             <Button
               size="sm"
               variant="outline"
-              className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold whitespace-nowrap"
-              onClick={() => {
-                if (location.pathname === "/" || location.pathname === "/home") {
-                  document.querySelector("#hero-search")?.scrollIntoView({ behavior: "smooth" });
-                } else {
-                  navigate("/home#hero-search");
-                }
-              }}
+              className="border-white/30 text-white hover:text-white hover:bg-white/10 font-medium gap-1.5 bg-transparent"
+              onClick={() => navigate("/login")}
             >
-              Find a Guide
+              <LogIn className="w-3.5 h-3.5" />
+              Login
             </Button>
-            <Button
-              size="sm"
-              className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold shadow-md whitespace-nowrap"
-              onClick={() => navigate("/guide-register")}
-            >
-              Join as Guide
-            </Button>
+          ) : (
+            <NavbarUserMenu email={userEmail} />
+          )}
 
-            <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
-          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold whitespace-nowrap"
+            onClick={() => {
+              if (isHome) {
+                document.querySelector("#hero-search")?.scrollIntoView({ behavior: "smooth" });
+              } else {
+                navigate("/home#hero-search");
+              }
+            }}
+          >
+            Find a Guide
+          </Button>
+          <Button
+            size="sm"
+            className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold shadow-md whitespace-nowrap"
+            onClick={() => navigate("/guide-register")}
+          >
+            Join as Guide
+          </Button>
 
-          <div className="flex shrink-0 pr-0 sm:pr-1 lg:pr-0">
-            <a
-              href="tel:+12022438336"
-              className="flex shrink-0 items-center gap-1 text-header-foreground hover:text-cta-book transition-colors font-semibold whitespace-nowrap"
-              aria-label="Call +1 (202) 243-8336"
-            >
-              <Phone className="w-4 h-4 shrink-0" />
-              <span className="text-[11px] sm:text-sm whitespace-nowrap">+1 (202) 243-8336</span>
-            </a>
-          </div>
+          <div className="w-px h-6 bg-white/20 mx-1" />
 
-          <div className="hidden lg:block shrink-0">
-            <LanguageSwitcher />
-          </div>
+          <a
+            href="tel:+12022438336"
+            className="flex shrink-0 items-center gap-1.5 text-white hover:text-cta-book transition-colors font-semibold whitespace-nowrap"
+            aria-label="Call +1 (202) 243-8336"
+          >
+            <Phone className="w-4 h-4 shrink-0" />
+            <span className="text-sm whitespace-nowrap">+1 (202) 243-8336</span>
+          </a>
 
-          {/* Mobile toggle */}
-          <div className="lg:hidden flex items-center gap-2 shrink-0">
-            <LanguageSwitcher />
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-header-foreground/80 hover:text-header-foreground transition-colors p-1 shrink-0"
-              aria-label={isOpen ? "Close menu" : "Open menu"}
-            >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+          <div className="w-px h-6 bg-white/20 mx-1" />
+          <LanguageSwitcher />
+        </div>
+
+        {/* Mobile: Phone + Language + Menu */}
+        <div className="lg:hidden flex items-center gap-2 shrink-0">
+          <a
+            href="tel:+12022438336"
+            className="flex shrink-0 items-center gap-1 text-white hover:text-cta-book transition-colors font-semibold"
+            aria-label="Call +1 (202) 243-8336"
+          >
+            <Phone className="w-4 h-4 shrink-0" />
+            <span className="text-[11px] whitespace-nowrap">+1 (202) 243-8336</span>
+          </a>
+          <LanguageSwitcher />
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-white/80 hover:text-white transition-colors p-1 shrink-0"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+          >
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
 
@@ -233,18 +232,16 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-header border-t border-[hsl(var(--header-divider))] overflow-hidden"
+            className="lg:hidden bg-[hsla(220,30%,8%,0.95)] border-t border-white/10 overflow-hidden"
           >
             <div className="container mx-auto px-4 py-4 flex flex-col gap-2">
               {navLinks.map((link) => {
-                const isDest = (link as any).isDestinations;
-
-                if (isDest) {
+                if ((link as any).isDestinations) {
                   return (
                     <button
                       key={link.href}
                       onClick={() => { setIsOpen(false); navigate("/explore"); }}
-                      className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors py-2.5 border-b border-[hsl(var(--header-divider))] text-left"
+                      className="text-sm font-medium text-white/80 hover:text-white transition-colors py-2.5 border-b border-white/10 text-left"
                     >
                       {link.label} →
                     </button>
@@ -257,7 +254,7 @@ const Navbar = () => {
                       key={link.href}
                       href={link.href}
                       onClick={(e) => { e.preventDefault(); navigate(link.href); setIsOpen(false); }}
-                      className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors py-2.5 border-b border-[hsl(var(--header-divider))]"
+                      className="text-sm font-medium text-white/80 hover:text-white transition-colors py-2.5 border-b border-white/10"
                     >
                       {link.label}
                     </a>
@@ -269,7 +266,7 @@ const Navbar = () => {
                     key={link.href}
                     href={link.href}
                     onClick={(e) => { handleNavClick(e, link.href); setIsOpen(false); }}
-                    className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors py-2.5 border-b border-[hsl(var(--header-divider))]"
+                    className="text-sm font-medium text-white/80 hover:text-white transition-colors py-2.5 border-b border-white/10"
                   >
                     {link.label}
                   </a>
@@ -280,7 +277,7 @@ const Navbar = () => {
                 <a
                   href="/saved-guides"
                   onClick={() => setIsOpen(false)}
-                  className="text-sm font-medium text-header-foreground/80 hover:text-red-400 transition-colors py-2.5 border-b border-[hsl(var(--header-divider))] flex items-center gap-2"
+                  className="text-sm font-medium text-white/80 hover:text-red-400 transition-colors py-2.5 border-b border-white/10 flex items-center gap-2"
                 >
                   <Heart className="w-4 h-4" />
                   Saved Guides
@@ -291,7 +288,7 @@ const Navbar = () => {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-header-foreground/30 text-header-foreground/90 hover:text-header-foreground hover:bg-white/10 font-medium w-full justify-start gap-2"
+                  className="border-white/30 text-white/90 hover:text-white hover:bg-white/10 font-medium w-full justify-start gap-2"
                   onClick={() => { setIsOpen(false); navigate("/login"); }}
                 >
                   <LogIn className="w-4 h-4" />
@@ -301,7 +298,7 @@ const Navbar = () => {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="text-header-foreground/80 hover:text-header-foreground hover:bg-white/10 font-medium w-full justify-start gap-2"
+                  className="text-white/80 hover:text-white hover:bg-white/10 font-medium w-full justify-start gap-2"
                   onClick={() => { setIsOpen(false); navigate("/guide-dashboard"); }}
                 >
                   Dashboard
@@ -317,14 +314,6 @@ const Navbar = () => {
                   Join as Guide
                 </Button>
               </div>
-              <a
-                href="tel:+12022438336"
-                className="flex items-center gap-2 text-white hover:text-cta-book transition-colors pt-2 font-semibold"
-              >
-                <span>🇺🇸</span>
-                <Phone className="w-4 h-4" />
-                <span className="text-sm">+1 (202) 243-8336</span>
-              </a>
             </div>
           </motion.div>
         )}
