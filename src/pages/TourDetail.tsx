@@ -56,6 +56,8 @@ const TourDetail = () => {
   const [photos, setPhotos] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
+  const [tourPrice, setTourPrice] = useState<number | null>(null);
+  const [tourCurrency, setTourCurrency] = useState("USD");
 
   useEffect(() => {
     const fetchData = async () => {
