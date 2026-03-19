@@ -67,27 +67,27 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${headerBg}`}>
-      <div className="container mx-auto flex items-center justify-between h-[72px] px-4 pr-8 lg:px-10 lg:pr-12 flex-nowrap">
+      <div className="container mx-auto flex h-[72px] items-center justify-between gap-3 px-4 pr-5 lg:px-10 lg:pr-5 flex-nowrap">
         {/* Logo */}
         <a
           href="#home"
           onClick={(e) => handleNavClick(e, "#home")}
-          className="flex items-center gap-2 shrink-0"
+          className="flex items-center gap-2 shrink-0 min-w-0"
         >
-          <img src={logoImg} alt="iGuide Tours" className="h-10 w-auto object-contain" />
-          <span className="flex items-baseline gap-1.5">
-            <span className="font-display text-2xl font-bold tracking-tight">
+          <img src={logoImg} alt="iGuide Tours" className="h-10 w-auto object-contain shrink-0" />
+          <span className="flex items-baseline gap-1.5 min-w-0">
+            <span className="font-display text-xl sm:text-2xl font-bold tracking-tight whitespace-nowrap">
               <span className="text-header-foreground">Guides</span>
               <span className="text-cta-book">Directly</span>
             </span>
-            <span className="text-[10px] text-header-muted font-medium hidden sm:inline">
+            <span className="text-[10px] text-header-muted font-medium hidden sm:inline whitespace-nowrap">
               by iGuide Tours
             </span>
           </span>
         </a>
 
         {/* Desktop nav links */}
-        <div className="hidden lg:flex items-center gap-3 ml-6">
+        <div className="hidden lg:flex items-center gap-2 xl:gap-3 ml-4 xl:ml-6 min-w-0">
           {navLinks.map((link) => {
             const isDest = (link as any).isDestinations;
 
@@ -96,7 +96,7 @@ const Navbar = () => {
                 <div key={link.href} ref={destBtnRef} className="relative">
                   <button
                     onClick={() => setDestOpen(true)}
-                    className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200 inline-flex items-center gap-1"
+                    className="text-xs xl:text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200 inline-flex items-center gap-1 whitespace-nowrap"
                   >
                     {link.label}
                     <ChevronDown className="w-3.5 h-3.5" />
@@ -111,7 +111,7 @@ const Navbar = () => {
                   key={link.href}
                   href={link.href}
                   onClick={(e) => { e.preventDefault(); navigate(link.href); }}
-                  className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200"
+                  className="text-xs xl:text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200 whitespace-nowrap"
                 >
                   {link.label}
                 </a>
@@ -123,7 +123,7 @@ const Navbar = () => {
                 key={link.href}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200"
+                className="text-xs xl:text-sm font-medium text-header-foreground/80 hover:text-header-foreground transition-colors duration-200 whitespace-nowrap"
               >
                 {link.label}
               </a>
@@ -131,95 +131,98 @@ const Navbar = () => {
           })}
         </div>
 
-        {/* Desktop right section */}
-        <div className="hidden lg:flex items-center gap-3 ml-auto">
-          {isLoggedIn && (
-            <>
-              <button
-                onClick={() => setProfileOpen(true)}
-                className="relative p-2 rounded-full text-header-muted hover:text-cta-book hover:bg-white/10 transition-colors"
-                aria-label="Travel Preferences"
-                title="My Travel Preferences"
-              >
-                <Sparkles className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => navigate("/saved-guides")}
-                className="relative p-2 rounded-full text-header-muted hover:text-red-400 hover:bg-white/10 transition-colors"
-                aria-label="Saved Guides"
-              >
-                <Heart className="w-4 h-4" />
-              </button>
-            </>
-          )}
+        {/* Right section */}
+        <div className="flex items-center gap-2 sm:gap-3 ml-auto shrink-0 pl-2">
+          <div className="hidden lg:flex items-center gap-2 xl:gap-3">
+            {isLoggedIn && (
+              <>
+                <button
+                  onClick={() => setProfileOpen(true)}
+                  className="relative p-2 rounded-full text-header-muted hover:text-cta-book hover:bg-white/10 transition-colors"
+                  aria-label="Travel Preferences"
+                  title="My Travel Preferences"
+                >
+                  <Sparkles className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => navigate("/saved-guides")}
+                  className="relative p-2 rounded-full text-header-muted hover:text-red-400 hover:bg-white/10 transition-colors"
+                  aria-label="Saved Guides"
+                >
+                  <Heart className="w-4 h-4" />
+                </button>
+              </>
+            )}
 
-          <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
+            <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
 
-          {/* Login or Avatar */}
-          {!isLoggedIn ? (
+            {!isLoggedIn ? (
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-header-foreground/30 text-header-foreground hover:text-header-foreground hover:bg-header-foreground/10 font-medium gap-1.5 bg-transparent"
+                onClick={() => navigate("/login")}
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                Login
+              </Button>
+            ) : (
+              <NavbarUserMenu email={userEmail} />
+            )}
+
+            <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
+
             <Button
               size="sm"
               variant="outline"
-              className="border-header-foreground/30 text-header-foreground hover:text-header-foreground hover:bg-header-foreground/10 font-medium gap-1.5 bg-transparent"
-              onClick={() => navigate("/login")}
+              className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold whitespace-nowrap"
+              onClick={() => {
+                if (location.pathname === "/" || location.pathname === "/home") {
+                  document.querySelector("#hero-search")?.scrollIntoView({ behavior: "smooth" });
+                } else {
+                  navigate("/home#hero-search");
+                }
+              }}
             >
-              <LogIn className="w-3.5 h-3.5" />
-              Login
+              Find a Guide
             </Button>
-          ) : (
-            <NavbarUserMenu email={userEmail} />
-          )}
+            <Button
+              size="sm"
+              className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold shadow-md whitespace-nowrap"
+              onClick={() => navigate("/guide-register")}
+            >
+              Join as Guide
+            </Button>
 
-          <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
+            <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
+          </div>
 
-          {/* CTA Group */}
-          <Button
-            size="sm"
-            variant="outline"
-            className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold"
-            onClick={() => {
-              if (location.pathname === "/" || location.pathname === "/home") {
-                document.querySelector("#hero-search")?.scrollIntoView({ behavior: "smooth" });
-              } else {
-                navigate("/home#hero-search");
-              }
-            }}
-          >
-            Find a Guide
-          </Button>
-          <Button
-            size="sm"
-            className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold shadow-md"
-            onClick={() => navigate("/guide-register")}
-          >
-            Join as Guide
-          </Button>
-
-          <div className="w-px h-6 bg-[hsl(var(--header-divider))] mx-1" />
-
-          <div className="shrink-0" style={{ minWidth: "max-content" }}>
+          <div className="flex shrink-0 pr-0 sm:pr-1 lg:pr-0">
             <a
               href="tel:+12022438336"
-              className="flex items-center gap-1.5 transition-colors shrink-0"
-              style={{ color: "#FFFFFF", fontWeight: 700 }}
+              className="flex shrink-0 items-center gap-1 text-header-foreground hover:text-cta-book transition-colors font-semibold whitespace-nowrap"
+              aria-label="Call +1 (202) 243-8336"
             >
-              <Phone className="w-4 h-4" />
-              <span className="text-sm whitespace-nowrap">+1 (202) 243-8336</span>
+              <Phone className="w-4 h-4 shrink-0" />
+              <span className="text-[11px] sm:text-sm whitespace-nowrap">+1 (202) 243-8336</span>
             </a>
           </div>
 
-          <LanguageSwitcher />
-        </div>
+          <div className="hidden lg:block shrink-0">
+            <LanguageSwitcher />
+          </div>
 
-        {/* Mobile toggle */}
-        <div className="lg:hidden flex items-center gap-2">
-          <LanguageSwitcher />
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="text-header-foreground/80 hover:text-header-foreground transition-colors p-1"
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile toggle */}
+          <div className="lg:hidden flex items-center gap-2 shrink-0">
+            <LanguageSwitcher />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-header-foreground/80 hover:text-header-foreground transition-colors p-1 shrink-0"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
