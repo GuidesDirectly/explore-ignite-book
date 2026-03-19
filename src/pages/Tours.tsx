@@ -140,6 +140,7 @@ const Tours = () => {
                 : "Experience the best of the city with a licensed local guide.",
               price: priceInfo?.price ?? null,
               currency: priceInfo?.currency || "USD",
+              createdAt: g.created_at ?? null,
             });
           });
         });
