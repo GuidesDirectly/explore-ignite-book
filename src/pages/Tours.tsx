@@ -53,6 +53,7 @@ const Tours = () => {
   const [filterType, setFilterType] = useState("");
   const [filterLanguage, setFilterLanguage] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState("recommended");
 
   useEffect(() => {
     const fetchTours = async () => {
