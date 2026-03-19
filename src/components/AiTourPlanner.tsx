@@ -28,7 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
-const AI_TOUR_PLANNER_URL = "/api/ai-tour-planner";
+const AI_TOUR_PLANNER_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/plan-tour`;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const GENERIC_PLANNER_ERROR = "Unable to generate itinerary. Please try again.";
 
@@ -320,8 +320,10 @@ const AiTourPlanner = () => {
       window.setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 300);
-    } catch {
-      setError(GENERIC_PLANNER_ERROR);
+    } catch (err: any) {
+      const msg = err?.message || GENERIC_PLANNER_ERROR;
+      console.error("Itinerary generation error:", msg);
+      setError(msg);
     } finally {
       window.clearTimeout(timeoutId);
       setLoading(false);
