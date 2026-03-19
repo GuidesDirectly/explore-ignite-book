@@ -694,21 +694,26 @@ const BookingCheckout = () => {
                   Next <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               ) : (
-                <Button variant="hero" onClick={handleSubmit} disabled={submitting}>
-                  {submitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" /> Processing...
-                    </>
-                  ) : totalPrice > 0 ? (
-                    <>
-                      Pay ${totalPrice.toFixed(2)} <ArrowRight className="w-4 h-4 ml-2" />
-                    </>
-                  ) : (
-                    <>
-                      Confirm Booking <ArrowRight className="w-4 h-4 ml-2" />
-                    </>
-                  )}
-                </Button>
+                <div className="flex flex-col items-end gap-1.5">
+                  <Button variant="hero" onClick={handleSubmit} disabled={submitting} size="lg">
+                    {submitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" /> Processing...
+                      </>
+                    ) : totalPrice > 0 ? (
+                      <>
+                        Pay ${totalPrice.toFixed(2)} <ArrowRight className="w-4 h-4 ml-2" />
+                      </>
+                    ) : (
+                      <>
+                        Confirm Booking <ArrowRight className="w-4 h-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3" /> Secure checkout
+                  </span>
+                </div>
               )}
             </div>
           </div>
