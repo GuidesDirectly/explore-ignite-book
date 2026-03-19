@@ -116,6 +116,9 @@ const HeroSection = () => {
               <MapPin className="w-4 h-4 text-white/70 flex-shrink-0" />
               <input
                 type="text"
+                name="destination_search"
+                autoComplete="new-password"
+                aria-autocomplete="none"
                 value={where}
                 onChange={(e) => setWhere(e.target.value)}
                 placeholder={t("hero.searchPlaceholder", "Where to?")}
