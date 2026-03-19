@@ -48,16 +48,20 @@ const HeroSection = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className="absolute top-28 right-6 md:top-36 md:right-16 z-10"
+        className="absolute top-28 right-6 mr-10 z-10 md:top-36 md:right-16"
       >
         <div
-          className="w-[180px] h-[180px] rounded-full overflow-hidden border-[5px] border-white shadow-[0_0_30px_rgba(255,255,255,0.25)] bg-white/20 backdrop-blur-sm p-2"
-          style={{ aspectRatio: "1/1" }}
+          className="flex h-[180px] w-[180px] items-center justify-center overflow-hidden rounded-full border-4 border-white/100 p-3 backdrop-blur-sm"
+          style={{
+            aspectRatio: "1 / 1",
+            background: "hsla(0, 0%, 100%, 0.1)",
+            boxShadow: "0 0 30px hsla(0, 0%, 100%, 0.25)",
+          }}
         >
           <img
             src={logoImg}
             alt="iGuide Tours Trust Seal"
-            className="w-full h-full rounded-full object-contain"
+            className="h-full w-full rounded-full p-3 !object-contain"
           />
         </div>
       </motion.div>
