@@ -1,21 +1,24 @@
 
 
-# Search Bar Privacy & UX Fix
+# Hero Search Redirect Fix
 
-**File: `src/components/HeroSection.tsx`**
+## Change
 
-## Changes
+**File: `src/components/HeroSection.tsx`, line 27**
 
-### 1. Destination input (~line 117-123)
-Add autofill suppression attributes:
-- `name="destination_search"`
-- `autoComplete="new-password"`
-- `aria-autocomplete="none"`
+Change the navigate target from `/explore` to `/tours`:
 
-### 2. Guests input (~line 159-164)
-- Change placeholder from `"Who?"` to `"Guests"`
-- Add `name="guest_count"`, `autoComplete="new-password"`, `aria-autocomplete="none"`
+```
+// Before
+navigate(qs ? `/explore?${qs}` : "/explore");
 
-### No other changes
-Search logic, layout, calendar, Navbar — untouched.
+// After
+navigate(qs ? `/tours?${qs}` : "/tours");
+```
+
+That's the only change. Everything else stays the same:
+- Query params `q`, `date`, `guests` already built correctly (lines 23-26)
+- `/tours` page already reads `q` param for filtering
+- `/explore` route remains accessible via direct URL or nav links
+- No visual or layout changes to the search bar
 
