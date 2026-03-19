@@ -41,6 +41,7 @@ export interface TourListing {
   description: string;
   price: number | null;
   currency: string;
+  createdAt: string | null;
 }
 
 const Tours = () => {
