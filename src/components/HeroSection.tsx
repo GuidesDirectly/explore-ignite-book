@@ -48,13 +48,13 @@ const HeroSection = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className="absolute top-28 right-6 z-10 md:top-36 md:right-16"
+        className="hidden md:block absolute top-28 right-6 z-10 md:top-40 md:right-16"
         style={{ marginRight: "40px" }}
       >
         <div
           style={{
-            width: "180px",
-            height: "180px",
+            width: "160px",
+            height: "160px",
             borderRadius: "50%",
             border: "4px solid #FFFFFF",
             overflow: "hidden",
@@ -86,7 +86,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-tight mb-6 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+            className="font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-tight mb-8 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
           >
             {t("hero.headline")}
           </motion.h1>
@@ -96,7 +96,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
-            className="text-xl md:text-2xl leading-relaxed mb-10 max-w-2xl mx-auto"
+            className="text-xl md:text-2xl leading-relaxed mb-12 max-w-2xl mx-auto"
             style={{ color: "hsl(40, 33%, 88%)" }}
           >
             {t("hero.subtitle")}
