@@ -56,6 +56,8 @@ const TourDetail = () => {
   const [photos, setPhotos] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
+  const [tourPrice, setTourPrice] = useState<number | null>(null);
+  const [tourCurrency, setTourCurrency] = useState("USD");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,6 +82,20 @@ const TourDetail = () => {
         .limit(10) as any);
 
       if (reviewData) setReviews(reviewData);
+
+      // Fetch tour price
+      const { data: priceData } = await supabase
+        .from("tours")
+        .select("price_per_person, currency")
+        .eq("guide_user_id", guideId)
+        .eq("status", "published")
+        .limit(1)
+        .maybeSingle();
+
+      if (priceData) {
+        setTourPrice(Number(priceData.price_per_person) || null);
+        setTourCurrency(priceData.currency || "USD");
+      }
 
       // Fetch guide photos
       const { data: files } = await supabase.storage
@@ -360,8 +376,18 @@ const TourDetail = () => {
                 className="sticky top-24"
               >
                 <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-card space-y-5">
+                  {/* Price — visually dominant */}
+                  {tourPrice != null && tourPrice > 0 && (
+                    <div className="pb-2">
+                      <span className="text-2xl font-bold text-foreground">
+                        From ${tourPrice}
+                      </span>
+                      <span className="text-sm text-muted-foreground"> / person</span>
+                    </div>
+                  )}
+
                   <div>
-                    <h3 className="font-display text-2xl font-bold text-foreground">{tourType}</h3>
+                    <h3 className="font-display text-xl font-bold text-foreground">{tourType}</h3>
                     <p className="text-muted-foreground text-sm mt-1">{city} • with {guideName}</p>
                   </div>
 
@@ -407,9 +433,24 @@ const TourDetail = () => {
                     </Button>
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                    <span>Free cancellation • No hidden fees • Book directly</span>
+                  {/* Trust signals */}
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span>Secure payment via Stripe</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span>Free cancellation</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span>Instant confirmation</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span>No hidden fees — book directly</span>
+                    </div>
                   </div>
                 </div>
               </motion.div>

@@ -662,13 +662,18 @@ const BookingCheckout = () => {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground bg-primary/5 rounded-lg p-3">
-                    <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
-                    <span>
-                      {totalPrice > 0
-                        ? "Secure payment via Stripe. Your guide receives 85% directly. Transparent pricing."
-                        : "Your booking request goes directly to the guide. No hidden fees."}
-                    </span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground bg-primary/5 rounded-lg p-3">
+                      <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span>
+                        {totalPrice > 0
+                          ? "Secure payment via Stripe. Your guide receives 85% directly. Transparent pricing."
+                          : "Your booking request goes directly to the guide. No hidden fees."}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center">
+                      You won't be charged until you confirm
+                    </p>
                   </div>
                 </motion.div>
               )}
@@ -689,21 +694,26 @@ const BookingCheckout = () => {
                   Next <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               ) : (
-                <Button variant="hero" onClick={handleSubmit} disabled={submitting}>
-                  {submitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" /> Processing...
-                    </>
-                  ) : totalPrice > 0 ? (
-                    <>
-                      Pay ${totalPrice.toFixed(2)} <ArrowRight className="w-4 h-4 ml-2" />
-                    </>
-                  ) : (
-                    <>
-                      Confirm Booking <ArrowRight className="w-4 h-4 ml-2" />
-                    </>
-                  )}
-                </Button>
+                <div className="flex flex-col items-end gap-1.5">
+                  <Button variant="hero" onClick={handleSubmit} disabled={submitting} size="lg">
+                    {submitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" /> Processing...
+                      </>
+                    ) : totalPrice > 0 ? (
+                      <>
+                        Pay ${totalPrice.toFixed(2)} <ArrowRight className="w-4 h-4 ml-2" />
+                      </>
+                    ) : (
+                      <>
+                        Confirm Booking <ArrowRight className="w-4 h-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3" /> Secure checkout
+                  </span>
+                </div>
               )}
             </div>
           </div>

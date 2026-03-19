@@ -18,15 +18,16 @@ import {
   Search,
   MapPin,
   Star,
-  Clock,
-  Users,
+  Globe,
   Filter,
   X,
-  Globe,
   Compass,
+  ShieldCheck,
+  ArrowRight,
 } from "lucide-react";
+import TourCard from "@/components/TourCard";
 
-interface TourListing {
+export interface TourListing {
   id: string;
   guideUserId: string;
   guideName: string;
@@ -38,18 +39,9 @@ interface TourListing {
   reviewCount: number;
   photoUrl: string | null;
   description: string;
+  price: number | null;
+  currency: string;
 }
-
-const TOUR_TYPE_ICONS: Record<string, string> = {
-  "Walking Tour": "🚶",
-  "City Tour": "🏙️",
-  "Food Tour": "🍽️",
-  "Custom Tour": "✨",
-  "Private Tour": "🔒",
-  "Group Tour": "👥",
-  "History Tour": "📜",
-  "Art Tour": "🎨",
-};
 
 const Tours = () => {
   const [searchParams] = useSearchParams();
@@ -88,6 +80,20 @@ const Tours = () => {
         });
       }
 
+      // Fetch published tour prices
+      const { data: tourPriceData } = await supabase
+        .from("tours")
+        .select("guide_user_id, title, price_per_person, currency")
+        .eq("status", "published");
+
+      const priceMap = new Map<string, { price: number; currency: string }>();
+      if (tourPriceData) {
+        tourPriceData.forEach((t: any) => {
+          const key = `${t.guide_user_id}__${t.title}`;
+          priceMap.set(key, { price: Number(t.price_per_person), currency: t.currency || "USD" });
+        });
+      }
+
       // Fetch profile photos
       const photoUrls = new Map<string, string>();
       for (const g of guideData) {
@@ -115,6 +121,7 @@ const Tours = () => {
 
         cities.forEach((city: string) => {
           tourTypes.forEach((tt: string) => {
+            const priceInfo = priceMap.get(`${g.user_id}__${tt}`);
             listings.push({
               id: `${g.id}-${city}-${tt}`,
               guideUserId: g.user_id,
@@ -129,6 +136,8 @@ const Tours = () => {
               description: fd.biography
                 ? fd.biography.substring(0, 120) + (fd.biography.length > 120 ? "…" : "")
                 : "Experience the best of the city with a licensed local guide.",
+              price: priceInfo?.price ?? null,
+              currency: priceInfo?.currency || "USD",
             });
           });
         });
@@ -317,74 +326,7 @@ const Tours = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map((tour, i) => (
-                <motion.div
-                  key={tour.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.05 }}
-                >
-                  <Link
-                    to={`/tour/${tour.guideUserId}?type=${encodeURIComponent(tour.tourType)}&city=${encodeURIComponent(tour.city)}`}
-                    className="group block"
-                  >
-                    <div className="rounded-2xl border border-border/50 bg-card overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 group-hover:-translate-y-1">
-                      {/* Image */}
-                      <div className="relative h-48 bg-muted overflow-hidden">
-                        {tour.photoUrl ? (
-                          <img
-                            src={tour.photoUrl}
-                            alt={`${tour.tourType} in ${tour.city}`}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-primary/5">
-                            <Compass className="w-10 h-10 text-primary/30" />
-                          </div>
-                        )}
-                        <div className="absolute top-3 left-3">
-                          <Badge className="bg-background/90 text-foreground text-xs font-medium backdrop-blur-sm border-0">
-                            {TOUR_TYPE_ICONS[tour.tourType] || "🗺️"} {tour.tourType}
-                          </Badge>
-                        </div>
-                        {tour.rating > 0 && (
-                          <div className="absolute top-3 right-3 flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1">
-                            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-                            <span className="text-xs font-semibold text-foreground">{tour.rating}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-5">
-                        <h3 className="font-display text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-                          {tour.tourType} in {tour.city}
-                        </h3>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3.5 h-3.5" /> {tour.city}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Globe className="w-3.5 h-3.5" /> {tour.languages.slice(0, 2).join(", ")}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                          {tour.description}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-foreground">
-                            with {tour.guideName}
-                          </span>
-                          {tour.reviewCount > 0 && (
-                            <span className="text-xs text-muted-foreground">
-                              {tour.reviewCount} review{tour.reviewCount !== 1 ? "s" : ""}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
+                <TourCard key={tour.id} tour={tour} index={i} />
               ))}
             </div>
           )}
