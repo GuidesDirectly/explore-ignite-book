@@ -53,8 +53,8 @@ const HeroSection = () => {
       >
         <div
           style={{
-            width: "180px",
-            height: "180px",
+            width: "160px",
+            height: "160px",
             borderRadius: "50%",
             border: "4px solid #FFFFFF",
             overflow: "hidden",
