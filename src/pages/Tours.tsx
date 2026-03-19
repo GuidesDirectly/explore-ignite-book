@@ -331,8 +331,20 @@ const Tours = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <p className="text-sm text-muted-foreground">
-              {loading ? "Loading..." : `${filtered.length} tour${filtered.length !== 1 ? "s" : ""} found`}
+              {loading ? "Loading..." : `${sorted.length} tour${sorted.length !== 1 ? "s" : ""} found`}
             </p>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[200px] bg-background">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recommended">Recommended</SelectItem>
+                <SelectItem value="price-low">Price (Lowest First)</SelectItem>
+                <SelectItem value="price-high">Price (Highest First)</SelectItem>
+                <SelectItem value="rating">Top Rated</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {loading ? (
