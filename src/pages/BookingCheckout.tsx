@@ -662,13 +662,18 @@ const BookingCheckout = () => {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground bg-primary/5 rounded-lg p-3">
-                    <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
-                    <span>
-                      {totalPrice > 0
-                        ? "Secure payment via Stripe. Your guide receives 85% directly. Transparent pricing."
-                        : "Your booking request goes directly to the guide. No hidden fees."}
-                    </span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground bg-primary/5 rounded-lg p-3">
+                      <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span>
+                        {totalPrice > 0
+                          ? "Secure payment via Stripe. Your guide receives 85% directly. Transparent pricing."
+                          : "Your booking request goes directly to the guide. No hidden fees."}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center">
+                      You won't be charged until you confirm
+                    </p>
                   </div>
                 </motion.div>
               )}
