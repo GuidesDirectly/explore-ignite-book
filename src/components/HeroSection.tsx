@@ -24,7 +24,7 @@ const HeroSection = () => {
     if (when) params.set("date", format(when, "yyyy-MM-dd"));
     if (guests.trim()) params.set("guests", guests.trim());
     const qs = params.toString();
-    navigate(qs ? `/explore?${qs}` : "/explore");
+    navigate(qs ? `/tours?${qs}` : "/tours");
   };
 
   const trustItems = [
