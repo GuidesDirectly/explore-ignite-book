@@ -96,7 +96,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
-            className="text-xl md:text-2xl leading-relaxed mb-10 max-w-2xl mx-auto"
+            className="text-xl md:text-2xl leading-relaxed mb-12 max-w-2xl mx-auto"
             style={{ color: "hsl(40, 33%, 88%)" }}
           >
             {t("hero.subtitle")}
