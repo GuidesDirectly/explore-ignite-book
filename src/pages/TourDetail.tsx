@@ -83,6 +83,20 @@ const TourDetail = () => {
 
       if (reviewData) setReviews(reviewData);
 
+      // Fetch tour price
+      const { data: priceData } = await supabase
+        .from("tours")
+        .select("price_per_person, currency")
+        .eq("guide_user_id", guideId)
+        .eq("status", "published")
+        .limit(1)
+        .maybeSingle();
+
+      if (priceData) {
+        setTourPrice(Number(priceData.price_per_person) || null);
+        setTourCurrency(priceData.currency || "USD");
+      }
+
       // Fetch guide photos
       const { data: files } = await supabase.storage
         .from("guide-photos")
