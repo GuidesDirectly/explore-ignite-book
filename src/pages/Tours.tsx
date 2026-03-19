@@ -353,7 +353,7 @@ const Tours = () => {
                 <div key={i} className="h-80 rounded-2xl bg-muted animate-pulse" />
               ))}
             </div>
-          ) : filtered.length === 0 ? (
+          ) : sorted.length === 0 ? (
             <div className="text-center py-20">
               <Compass className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="font-display text-xl font-bold text-foreground mb-2">No tours found</h3>
