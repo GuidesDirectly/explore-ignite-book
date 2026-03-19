@@ -48,12 +48,19 @@ const HeroSection = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className="absolute top-28 right-6 mr-10 z-10 md:top-36 md:right-16"
+        className="absolute top-28 right-6 z-10 md:top-36 md:right-16"
+        style={{ marginRight: "40px" }}
       >
         <div
-          className="flex h-[180px] w-[180px] items-center justify-center overflow-hidden rounded-full border-4 border-white/100 p-3 backdrop-blur-sm"
           style={{
-            aspectRatio: "1 / 1",
+            width: "180px",
+            height: "180px",
+            borderRadius: "50%",
+            border: "4px solid #FFFFFF",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             background: "hsla(0, 0%, 100%, 0.1)",
             boxShadow: "0 0 30px hsla(0, 0%, 100%, 0.25)",
           }}
@@ -61,7 +68,13 @@ const HeroSection = () => {
           <img
             src={logoImg}
             alt="iGuide Tours Trust Seal"
-            className="h-full w-full rounded-full p-3 !object-contain"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              padding: "15px",
+              borderRadius: "50%",
+            }}
           />
         </div>
       </motion.div>
