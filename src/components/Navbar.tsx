@@ -171,13 +171,7 @@ const Navbar = () => {
             size="sm"
             variant="outline"
             className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold whitespace-nowrap"
-            onClick={() => {
-              if (isHome) {
-                document.querySelector("#hero-search")?.scrollIntoView({ behavior: "smooth" });
-              } else {
-                navigate("/home#hero-search");
-              }
-            }}
+            onClick={() => navigate("/tours")}
           >
             Find a Guide
           </Button>
