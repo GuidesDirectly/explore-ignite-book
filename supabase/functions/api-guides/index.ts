@@ -7,6 +7,38 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const FORBIDDEN_FIELDS = [
+  "stripe_account_id",
+  "phone",
+  "address",
+  "insuranceCompanyName",
+  "insurancePolicyNumber",
+  "licenseNumber",
+  "licensingAuthority",
+  "bankDetails",
+  "bankAccount",
+  "taxId",
+  "nationalId",
+  "passportNumber",
+  "emergencyContact",
+  "certifications",
+  "current_step",
+  "stripe_onboarding_complete",
+];
+
+function sanitiseGuide(guide: Record<string, unknown>) {
+  const safe = { ...guide };
+  for (const field of FORBIDDEN_FIELDS) {
+    delete safe[field];
+    if (safe.form_data && typeof safe.form_data === "object") {
+      const fd = { ...(safe.form_data as Record<string, unknown>) };
+      delete fd[field];
+      safe.form_data = fd;
+    }
+  }
+  return safe;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -17,7 +49,6 @@ serve(async (req) => {
 
   const url = new URL(req.url);
   const pathParts = url.pathname.split("/").filter(Boolean);
-  // Expected: /api-guides or /api-guides/{id}
   const guideId = pathParts.length > 1 ? pathParts[pathParts.length - 1] : null;
 
   try {
@@ -25,9 +56,8 @@ serve(async (req) => {
       if (guideId && guideId !== "api-guides") {
         // GET single guide
         const { data, error } = await supabase
-          .from("guide_profiles")
+          .from("guide_profiles_public")
           .select("id, user_id, form_data, service_areas, translations, created_at")
-          .eq("status", "approved")
           .eq("id", guideId)
           .single();
 
@@ -37,7 +67,8 @@ serve(async (req) => {
           });
         }
 
-        return new Response(JSON.stringify({ guide: data }), {
+        const sanitised = sanitiseGuide(data as Record<string, unknown>);
+        return new Response(JSON.stringify({ guide: sanitised }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -49,16 +80,15 @@ serve(async (req) => {
       const offset = parseInt(url.searchParams.get("offset") || "0");
 
       let query = supabase
-        .from("guide_profiles")
+        .from("guide_profiles_public")
         .select("id, user_id, form_data, service_areas, translations, created_at")
-        .eq("status", "approved")
         .range(offset, offset + limit - 1);
 
       if (city) {
         query = query.contains("service_areas", [city]);
       }
 
-      const { data, error, count } = await query;
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -67,11 +97,15 @@ serve(async (req) => {
       if (language) {
         results = results.filter((g: any) => {
           const langs = g.form_data?.languages || "";
-          return langs.toLowerCase().includes(language.toLowerCase());
+          return typeof langs === "string"
+            ? langs.toLowerCase().includes(language.toLowerCase())
+            : false;
         });
       }
 
-      return new Response(JSON.stringify({ guides: results, total: results.length }), {
+      const sanitised = results.map((g: any) => sanitiseGuide(g as Record<string, unknown>));
+
+      return new Response(JSON.stringify({ guides: sanitised, total: sanitised.length }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
