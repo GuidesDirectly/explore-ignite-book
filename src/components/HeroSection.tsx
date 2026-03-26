@@ -46,7 +46,7 @@ const HeroSection = () => {
       </div>
 
       {/* iGuide Tours co-brand logo — desktop only */}
-      <div className="hidden md:flex flex-col items-center absolute top-5 right-6 z-10">
+      <div className="hidden md:flex flex-col items-center absolute top-20 right-6 z-10">
         <img src={logo} alt="iGuide Tours" className="w-[100px] h-auto object-contain rounded-xl" />
         <span className="block w-[100px] text-center text-[10px] uppercase tracking-[0.05em] mt-1" style={{ color: "rgba(255,255,255,0.75)" }}>
           Powered by iGuide Tours
