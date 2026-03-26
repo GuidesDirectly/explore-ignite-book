@@ -45,7 +45,15 @@ const HeroSection = () => {
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, hsla(220, 30%, 8%, 0.6) 0%, transparent 50%)" }} />
       </div>
 
-      <div className="relative container mx-auto px-4 pt-24 pb-20 text-center pointer-events-auto">
+      {/* iGuide Tours co-brand logo — desktop only */}
+      <div className="hidden md:flex flex-col items-center absolute top-5 right-6 z-10">
+        <img src={logo} alt="iGuide Tours" className="w-[100px] h-auto object-contain rounded-xl" />
+        <span className="block w-[100px] text-center text-[10px] uppercase tracking-[0.05em] mt-1" style={{ color: "rgba(255,255,255,0.75)" }}>
+          Powered by iGuide Tours
+        </span>
+      </div>
+
+      <div className="relative container mx-auto px-4 pt-24 pb-32 text-center pointer-events-auto">
         <div className="max-w-3xl mx-auto">
           {/* Eyebrow */}
           <motion.p
