@@ -52,6 +52,9 @@ const Home = () => {
       {/* Section 1 — Hero */}
       <HeroSection />
 
+      {/* Trust Bar */}
+      <TrustBarSection />
+
       {/* Section 2 — Launch Strip */}
       <LaunchStripSection />
 
