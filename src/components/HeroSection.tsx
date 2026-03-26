@@ -167,12 +167,12 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-wrap justify-center gap-x-6 gap-y-3"
+            className="flex flex-wrap md:flex-nowrap justify-center items-center gap-x-4 gap-y-3"
           >
             {trustItems.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-2">
+              <div key={label} className="flex items-center gap-1.5 whitespace-nowrap w-1/2 md:w-auto justify-center md:justify-start">
                 <Icon className="w-4 h-4 flex-shrink-0" style={{ color: "hsl(45, 80%, 65%)" }} />
-                <span className="text-sm font-medium" style={{ color: "hsl(40, 33%, 85%)" }}>{label}</span>
+                <span className="text-xs font-medium" style={{ color: "hsl(40, 33%, 85%)" }}>{label}</span>
               </div>
             ))}
           </motion.div>
