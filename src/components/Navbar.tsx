@@ -150,6 +150,14 @@ const Navbar = () => {
             </>
           )}
 
+          <a
+            href="tel:+12022438336"
+            className="hidden lg:inline-flex items-center gap-1.5 text-[13px] text-white/80 hover:text-cta-book transition-colors whitespace-nowrap"
+          >
+            <Phone className="w-4 h-4" />
+            +1 (202) 243-8336
+          </a>
+
           <div className="w-px h-6 bg-white/20 mx-1" />
 
           {!isLoggedIn ? (

@@ -100,7 +100,7 @@ const Footer = () => {
 
         <div className="border-t border-primary-foreground/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-primary-foreground/40">
-            © {new Date().getFullYear()} {t("footer.rights")}
+            © 2025–2026 {t("footer.rights")}
           </p>
           <div className="flex items-center gap-6 text-xs text-primary-foreground/40">
             <a href="#" className="hover:text-primary transition-colors">{t("footer.terms")}</a>
