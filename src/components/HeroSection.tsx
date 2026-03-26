@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-dc.jpg";
+import logo from "@/assets/logo.jpg";
 
 const LANGUAGES = [
   "", "English", "Russian", "Spanish", "French", "German", "Hebrew",
@@ -36,7 +37,7 @@ const HeroSection = () => {
   ];
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-visible">
       {/* Background image */}
       <div className="absolute inset-0 pointer-events-none">
         <img src={heroBg} alt="Washington DC at golden hour" className="w-full h-full object-cover" />
@@ -44,7 +45,15 @@ const HeroSection = () => {
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, hsla(220, 30%, 8%, 0.6) 0%, transparent 50%)" }} />
       </div>
 
-      <div className="relative container mx-auto px-4 pt-24 pb-20 text-center pointer-events-auto">
+      {/* iGuide Tours co-brand logo — desktop only */}
+      <div className="hidden md:flex flex-col items-center absolute top-5 right-6 z-10">
+        <img src={logo} alt="iGuide Tours" className="w-[100px] h-auto object-contain rounded-xl" />
+        <span className="block w-[100px] text-center text-[10px] uppercase tracking-[0.05em] mt-1" style={{ color: "rgba(255,255,255,0.75)" }}>
+          Powered by iGuide Tours
+        </span>
+      </div>
+
+      <div className="relative container mx-auto px-4 pt-24 pb-32 text-center pointer-events-auto">
         <div className="max-w-3xl mx-auto">
           {/* Eyebrow */}
           <motion.p
@@ -158,12 +167,12 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-wrap justify-center gap-x-6 gap-y-3"
+            className="flex flex-wrap md:flex-nowrap justify-center items-center gap-x-4 gap-y-3"
           >
             {trustItems.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-2">
+              <div key={label} className="flex items-center gap-1.5 whitespace-nowrap w-1/2 md:w-auto justify-center md:justify-start">
                 <Icon className="w-4 h-4 flex-shrink-0" style={{ color: "hsl(45, 80%, 65%)" }} />
-                <span className="text-sm font-medium" style={{ color: "hsl(40, 33%, 85%)" }}>{label}</span>
+                <span className="text-xs font-medium" style={{ color: "hsl(40, 33%, 85%)" }}>{label}</span>
               </div>
             ))}
           </motion.div>

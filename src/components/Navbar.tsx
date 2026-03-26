@@ -182,7 +182,8 @@ const Navbar = () => {
           </Button>
           <Button
             size="sm"
-            className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold shadow-md whitespace-nowrap"
+            variant="outline"
+            className="border-[1.5px] border-[#C9A84C] text-[#C9A84C] bg-transparent hover:bg-[rgba(201,168,76,0.12)] hover:text-[#C9A84C] font-semibold whitespace-nowrap rounded-lg px-5 py-2.5 transition-[background] duration-150 ease-in"
             onClick={() => navigate("/guide-register")}
           >
             Join as Guide
