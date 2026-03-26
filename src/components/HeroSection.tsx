@@ -63,6 +63,16 @@ const HeroSection = () => {
 
       <div className="relative container mx-auto px-4 pt-24 pb-20 text-center pointer-events-auto">
         <div className="max-w-3xl mx-auto">
+          {/* Eyebrow */}
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05 }}
+            className="text-xs md:text-sm uppercase tracking-[0.15em] text-white/60 mb-4"
+          >
+            {t("hero.poweredBy")}
+          </motion.p>
+
           {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
