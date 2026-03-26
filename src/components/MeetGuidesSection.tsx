@@ -1,13 +1,8 @@
-import { useEffect, useState, useMemo } from "react";
-import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Globe, Star, Filter, X, ShieldCheck, CheckCircle2, Send } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import GuideBadge, { getHighestBadge, type BadgeType } from "@/components/GuideBadge";
-import { Button } from "@/components/ui/button";
-import { translateOption, translateOptions } from "@/lib/translationHelpers";
+import { MessageCircle, PlusCircle, Check } from "lucide-react";
+import type { BadgeType } from "@/components/GuideBadge";
 
 interface GuideProfile {
   id: string;
@@ -17,113 +12,36 @@ interface GuideProfile {
     firstName: string;
     lastName: string;
     biography: string;
-    languages: string[];
+    languages: string[] | string;
     specializations: string[];
-    tourTypes: string[];
-    targetAudience: string[];
-    insuranceCompanyName?: string;
-    licenseNumber?: string;
-    licensingAuthority?: string;
-    certifications?: string[];
   };
-  translations: Record<string, Record<string, string>> | null;
-  reviewCount: number;
-  avgRating: number;
   photoUrl: string | null;
   badges: BadgeType[];
 }
 
-interface ReviewStats {
-  guide_user_id: string;
-  count: number;
-  avg: number;
-}
-
-const AREA_OPTIONS = ["Washington DC", "New York City", "Niagara Falls", "Toronto", "Boston", "Chicago"];
-
-const SPECIALTY_OPTIONS = [
-  "City Tours",
-  "Ecotourism",
-  "Cultural Exploration",
-  "Nature Adventures",
-  "Hiking & Wildlife",
-  "Custom Itineraries",
-  "History & Heritage",
-  "Food & Culinary",
-  "Art & Museums",
-  "Architecture & Urban Design",
-  "Photography Tours",
-  "Family-Friendly",
-  "Luxury & VIP",
-  "Adventure & Sports",
-  "Nightlife & Entertainment",
-  "Religious & Spiritual Sites",
-  "Wine & Brewery Tours",
-  "Beach & Water Activities",
-  "Shopping & Local Markets",
-];
+const CREDENTIAL_MAP: Record<string, string> = {
+  Michael: "Founder & President, iGuide Tours",
+  Mike: "President, Chicago Tour-Guide Professionals Association (CTPA)",
+};
 
 const MeetGuidesSection = () => {
-  const { t, i18n } = useTranslation();
-  const location = useLocation();
   const navigate = useNavigate();
   const [guides, setGuides] = useState<GuideProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
-
-  // Filters
-  const [filterArea, setFilterArea] = useState<string>("");
-  const [filterLanguage, setFilterLanguage] = useState<string>("");
-  const [filterSpecialty, setFilterSpecialty] = useState<string>("");
-  const [filterMinReviews, setFilterMinReviews] = useState<string>("");
-  const [filterMinRating, setFilterMinRating] = useState<string>("");
-  const [filterBadge, setFilterBadge] = useState<string>("");
-  const [filterCities, setFilterCities] = useState<string[]>([]);
-
-  // Read cities from URL hash params (e.g., /home#guides?cities=Paris,Bali)
-  useEffect(() => {
-    const hash = location.hash;
-    if (hash.includes("cities=")) {
-      const params = new URLSearchParams(hash.split("?")[1] || "");
-      const citiesParam = params.get("cities");
-      if (citiesParam) {
-        const cities = decodeURIComponent(citiesParam).split(",").map(c => c.trim()).filter(Boolean);
-        if (cities.length > 0) {
-          setFilterCities(cities);
-          setShowFilters(true);
-        }
-      }
-    }
-  }, [location.hash]);
 
   useEffect(() => {
     const fetchGuides = async () => {
       const { data: guideData, error } = await (supabase
         .from("guide_profiles_public" as any)
-        .select("id, user_id, form_data, service_areas, translations") as any);
+        .select("id, user_id, form_data, service_areas")
+        .limit(2) as any);
 
       if (error || !guideData) {
         setLoading(false);
         return;
       }
 
-      // Fetch review stats
-      const { data: reviewData } = await (supabase
-        .from("reviews_public" as any)
-        .select("guide_user_id, rating")
-        .eq("hidden", false) as any);
-
-      const statsMap = new Map<string, { count: number; total: number }>();
-      if (reviewData) {
-        reviewData.forEach((r) => {
-          const existing = statsMap.get(r.guide_user_id) || { count: 0, total: 0 };
-          existing.count += 1;
-          existing.total += r.rating;
-          statsMap.set(r.guide_user_id, existing);
-        });
-      }
-
-      // Fetch badges for all guides
+      // Fetch badges
       const { data: badgeData } = await supabase
         .from("guide_badges" as any)
         .select("guide_user_id, badge_type");
@@ -136,13 +54,13 @@ const MeetGuidesSection = () => {
         });
       }
 
-      // Fetch profile photos for all guides
+      // Fetch profile photos
       const photoUrls = new Map<string, string>();
       for (const g of guideData) {
         const { data: files } = await supabase.storage
           .from("guide-photos")
           .list(g.user_id, { limit: 10 });
-        const profileFile = files?.find(f => f.name.startsWith("profile"));
+        const profileFile = files?.find((f: any) => f.name.startsWith("profile"));
         if (profileFile) {
           const { data: photoData } = supabase.storage
             .from("guide-photos")
@@ -153,17 +71,12 @@ const MeetGuidesSection = () => {
         }
       }
 
-      const enriched: GuideProfile[] = guideData.map((g: any) => {
-        const stats = statsMap.get(g.user_id);
-        return {
-          ...g,
-          service_areas: g.service_areas || [],
-          reviewCount: stats?.count || 0,
-          avgRating: stats ? Math.round((stats.total / stats.count) * 10) / 10 : 0,
-          photoUrl: photoUrls.get(g.user_id) || null,
-          badges: badgeMap.get(g.user_id) || [],
-        };
-      });
+      const enriched: GuideProfile[] = guideData.map((g: any) => ({
+        ...g,
+        service_areas: g.service_areas || [],
+        photoUrl: photoUrls.get(g.user_id) || null,
+        badges: badgeMap.get(g.user_id) || [],
+      }));
 
       setGuides(enriched);
       setLoading(false);
@@ -171,60 +84,48 @@ const MeetGuidesSection = () => {
     fetchGuides();
   }, []);
 
-  // Derive unique filter options
-  const allLanguages = useMemo(() => {
-    const langs = new Set<string>();
-    guides.forEach(g => g.form_data.languages?.forEach(l => langs.add(l)));
-    return Array.from(langs).sort();
-  }, [guides]);
-
-  const allSpecialties = useMemo(() => {
-    const specs = new Set<string>(SPECIALTY_OPTIONS);
-    guides.forEach(g => g.form_data.specializations?.forEach(s => specs.add(s)));
-    // Keep SPECIALTY_OPTIONS order first, then any extras sorted
-    const ordered = SPECIALTY_OPTIONS.filter(s => specs.has(s));
-    const extras = Array.from(specs).filter(s => !SPECIALTY_OPTIONS.includes(s)).sort();
-    return [...ordered, ...extras];
-  }, [guides]);
-
-  // Filtered guides
-  const filteredGuides = useMemo(() => {
-    return guides.filter(g => {
-      if (filterArea && !g.service_areas?.includes(filterArea)) return false;
-      if (filterLanguage && !g.form_data.languages?.includes(filterLanguage)) return false;
-      if (filterSpecialty && !g.form_data.specializations?.includes(filterSpecialty)) return false;
-      if (filterMinReviews && g.reviewCount < parseInt(filterMinReviews)) return false;
-      if (filterMinRating && g.avgRating < parseFloat(filterMinRating)) return false;
-      if (filterBadge && !g.badges?.includes(filterBadge as BadgeType)) return false;
-      if (filterCities.length > 0) {
-        const matchesCity = filterCities.some(city =>
-          g.service_areas?.some(area => area.toLowerCase().includes(city.toLowerCase()))
-        );
-        if (!matchesCity) return false;
-      }
-      return true;
-    });
-  }, [guides, filterArea, filterLanguage, filterSpecialty, filterMinReviews, filterMinRating, filterBadge, filterCities]);
-
-  const activeFilterCount = [filterArea, filterLanguage, filterSpecialty, filterMinReviews, filterMinRating, filterBadge].filter(Boolean).length + (filterCities.length > 0 ? 1 : 0);
-
-  const clearFilters = () => {
-    setFilterArea("");
-    setFilterLanguage("");
-    setFilterSpecialty("");
-    setFilterMinReviews("");
-    setFilterMinRating("");
-    setFilterBadge("");
-    setFilterCities([]);
+  const getInitials = (g: GuideProfile) => {
+    const first = g.form_data.firstName?.[0] || "";
+    const last = g.form_data.lastName?.[0] || "";
+    return (first + last).toUpperCase();
   };
 
+  const getLanguagesString = (g: GuideProfile) => {
+    const langs = g.form_data.languages;
+    if (Array.isArray(langs)) return langs.join(", ");
+    if (typeof langs === "string") return langs;
+    return "";
+  };
+
+  const getBioExcerpt = (g: GuideProfile) => {
+    const bio = g.form_data.biography || "";
+    return bio.length > 120 ? bio.slice(0, 120) + "..." : bio;
+  };
+
+  const getCredentialLine = (g: GuideProfile) => {
+    const firstName = g.form_data.firstName;
+    return CREDENTIAL_MAP[firstName] || "";
+  };
+
+  const getSpecializations = (g: GuideProfile) => {
+    return (g.form_data.specializations || []).slice(0, 3);
+  };
+
+  const isFounderMichael = (g: GuideProfile) =>
+    g.form_data.firstName === "Michael";
+
+  // Loading skeleton
   if (loading) {
     return (
-      <section id="meet-guides" className="py-24 bg-background">
+      <section id="meet-guides" className="py-20" style={{ backgroundColor: "#122040" }}>
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-72 rounded-2xl bg-muted animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-[900px] mx-auto mt-14">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="h-[460px] rounded-xl animate-pulse"
+                style={{ backgroundColor: "#1A2F50" }}
+              />
             ))}
           </div>
         </div>
@@ -232,382 +133,272 @@ const MeetGuidesSection = () => {
     );
   }
 
-  if (guides.length === 0) return <section id="meet-guides" />;
-
   return (
-    <section id="meet-guides" className="py-24 bg-background relative overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.03]">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary rounded-full blur-3xl" />
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full border border-primary/20 bg-primary/5">
-            <Star className="w-4 h-4 text-primary" />
-            <span className="text-primary text-sm font-semibold">{t("guides.badge")}</span>
-          </div>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            {t("guides.title")}{" "}
-            <span className="text-gradient-gold">{t("guides.titleGold")}</span>
+    <section id="meet-guides" className="py-20" style={{ backgroundColor: "#122040" }}>
+      <div className="container mx-auto px-4">
+        {/* Heading */}
+        <div className="text-center">
+          <span
+            className="text-xs font-semibold uppercase"
+            style={{ color: "#C9A84C", letterSpacing: "0.1em", fontSize: 12 }}
+          >
+            Our Founding Guides
+          </span>
+          <h2
+            className="font-serif font-semibold mt-3"
+            style={{ color: "#F5F0E8", fontSize: "clamp(28px, 4vw, 40px)" }}
+          >
+            Meet the People Behind Your Experience
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {t("guides.subtitle")}
+          <p
+            className="mx-auto mt-3"
+            style={{
+              color: "rgba(255,255,255,0.65)",
+              fontSize: 16,
+              maxWidth: 520,
+            }}
+          >
+            Our founding guides set the standard for what direct, human-first travel looks like.
           </p>
-        </motion.div>
+        </div>
 
-        {/* Active city filter chips from destinations */}
-        {filterCities.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Filtering by:</span>
-            {filterCities.map(city => (
-              <span key={city} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs font-semibold pl-2.5 pr-1.5 py-1 rounded-full border border-primary/20">
-                <MapPin className="w-3 h-3" />
-                {city}
-                <button
-                  onClick={() => setFilterCities(prev => prev.filter(c => c !== city))}
-                  className="ml-0.5 hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+        {/* 4-card grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-[900px] mx-auto mt-14">
+          {/* Real guide cards */}
+          {guides.map((guide) => (
+            <div
+              key={guide.id}
+              className="rounded-xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5 flex flex-col"
+              style={{
+                backgroundColor: "#1A2F50",
+                border: "1px solid rgba(201,168,76,0.25)",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.borderColor = "rgba(201,168,76,0.25)")
+              }
+            >
+              {/* Photo / Initials area */}
+              <div className="relative aspect-square" style={{ backgroundColor: "#0A1628" }}>
+                {guide.photoUrl ? (
+                  <img
+                    src={guide.photoUrl}
+                    alt={`${guide.form_data.firstName} ${guide.form_data.lastName}`}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span
+                      className="font-serif font-semibold"
+                      style={{ color: "#C9A84C", fontSize: 48 }}
+                    >
+                      {getInitials(guide)}
+                    </span>
+                  </div>
+                )}
+                {/* FOUNDING GUIDE badge */}
+                <span
+                  className="absolute bottom-3 left-3 font-bold uppercase"
+                  style={{
+                    backgroundColor: "#C9A84C",
+                    color: "#0A1628",
+                    fontSize: 10,
+                    padding: "3px 8px",
+                    borderRadius: 4,
+                    fontWeight: 700,
+                  }}
                 >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            ))}
-            <button
-              onClick={() => setFilterCities([])}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Clear all
-            </button>
-          </div>
-        )}
-
-        {/* Filter bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="mb-10"
-        >
-          {/* Toggle button for mobile */}
-          <div className="flex items-center justify-between mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-primary/20 text-foreground hover:bg-primary/5"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter className="w-4 h-4 mr-2" />
-              {t("guides.filters")}
-              {activeFilterCount > 0 && (
-                <Badge className="ml-2 bg-primary text-secondary text-xs px-1.5 py-0">{activeFilterCount}</Badge>
-              )}
-            </Button>
-            {activeFilterCount > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground"
-                onClick={clearFilters}
-              >
-                <X className="w-3 h-3 mr-1" />
-                {t("guides.clearFilters")}
-              </Button>
-            )}
-          </div>
-
-          {/* Filter controls */}
-          {showFilters && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-5"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                {/* Area filter */}
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                    {t("guides.filterArea")}
-                  </label>
-                  <select
-                    value={filterArea}
-                    onChange={(e) => setFilterArea(e.target.value)}
-                    className="w-full h-9 rounded-lg border border-border/50 bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  >
-                    <option value="">{t("guides.allAreas")}</option>
-                    {AREA_OPTIONS.map(area => (
-                      <option key={area} value={area}>{translateOption(t, area)}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Language filter */}
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                    {t("guides.filterLanguage")}
-                  </label>
-                  <select
-                    value={filterLanguage}
-                    onChange={(e) => setFilterLanguage(e.target.value)}
-                    className="w-full h-9 rounded-lg border border-border/50 bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  >
-                    <option value="">{t("guides.allLanguages")}</option>
-                    {allLanguages.map(lang => (
-                      <option key={lang} value={lang}>{translateOption(t, lang)}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Specialty filter */}
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                    {t("guides.filterSpecialty")}
-                  </label>
-                  <select
-                    value={filterSpecialty}
-                    onChange={(e) => setFilterSpecialty(e.target.value)}
-                    className="w-full h-9 rounded-lg border border-border/50 bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  >
-                    <option value="">{t("guides.allSpecialties")}</option>
-                    {allSpecialties.map(spec => (
-                      <option key={spec} value={spec}>{translateOption(t, spec)}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Min reviews filter */}
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                    {t("guides.filterMinReviews")}
-                  </label>
-                  <select
-                    value={filterMinReviews}
-                    onChange={(e) => setFilterMinReviews(e.target.value)}
-                    className="w-full h-9 rounded-lg border border-border/50 bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  >
-                    <option value="">{t("guides.any")}</option>
-                    <option value="1">1+</option>
-                    <option value="3">3+</option>
-                    <option value="5">5+</option>
-                    <option value="10">10+</option>
-                  </select>
-                </div>
-
-                {/* Min rating filter */}
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                    {t("guides.filterMinRating")}
-                  </label>
-                  <select
-                    value={filterMinRating}
-                    onChange={(e) => setFilterMinRating(e.target.value)}
-                    className="w-full h-9 rounded-lg border border-border/50 bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  >
-                    <option value="">{t("guides.any")}</option>
-                    <option value="3">3+ ★</option>
-                    <option value="3.5">3.5+ ★</option>
-                    <option value="4">4+ ★</option>
-                    <option value="4.5">4.5+ ★</option>
-                  </select>
-                </div>
-
-                {/* Badge type filter */}
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                    {t("guides.filterBadge", "Verification")}
-                  </label>
-                  <select
-                    value={filterBadge}
-                    onChange={(e) => setFilterBadge(e.target.value)}
-                    className="w-full h-9 rounded-lg border border-border/50 bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  >
-                    <option value="">{t("guides.any")}</option>
-                    <option value="licensed_verified">Licensed & Verified</option>
-                    <option value="permit_confirmed">Permit Confirmed</option>
-                    <option value="certification_pending">Certification Pending</option>
-                  </select>
-                </div>
+                  FOUNDING GUIDE
+                </span>
               </div>
-            </motion.div>
-          )}
-        </motion.div>
 
-        {/* Results count */}
-        {activeFilterCount > 0 && (
-          <p className="text-sm text-muted-foreground mb-6">
-            {t("guides.showing", { count: filteredGuides.length, total: guides.length })}
-          </p>
-        )}
-
-        {/* Guide cards */}
-        {filteredGuides.length === 0 ? (
-          <div className="text-center py-16 space-y-6">
-            <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-              <MapPin className="w-7 h-7 text-primary" />
-            </div>
-            <div>
-              <p className="text-lg font-semibold text-foreground mb-1">
-                {filterCities.length > 0
-                  ? t("guides.noGuidesInCity", { city: filterCities.join(", "), defaultValue: `No guides found in ${filterCities.join(", ")} yet` })
-                  : t("guides.noResults")}
-              </p>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                {t("guides.noResultsHint", "We're expanding fast! Request a guide for your destination and we'll match you with one.")}
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Button
-                variant="default"
-                onClick={() => {
-                  const dest = filterCities.length > 0 ? filterCities[0] : "";
-                  navigate(`/home#inquiry${dest ? `?dest=${encodeURIComponent(dest)}` : ""}`);
-                }}
-                className="gap-2"
-              >
-                <Send className="w-4 h-4" />
-                {t("guides.requestGuide", "Request a Guide")}
-              </Button>
-              <Button variant="outline" size="sm" onClick={clearFilters}>
-                {t("guides.clearFilters")}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredGuides.map((guide, index) => {
-              const fd = guide.form_data;
-              const currentLang = i18n.language?.split("-")[0] || "en";
-              const translatedBio = guide.translations?.[currentLang]?.["form_data.biography"] || fd.biography;
-              const initials = `${fd.firstName?.[0] || ""}${fd.lastName?.[0] || ""}`;
-              const shortBio = translatedBio?.length > 120
-                ? translatedBio.slice(0, 120) + "…"
-                : translatedBio;
-
-              return (
-                <Link to={`/guide/${guide.id}`} className="block">
-                <motion.div
-                  key={guide.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group relative bg-card rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 cursor-pointer"
+              {/* Content */}
+              <div className="flex flex-col flex-1">
+                {/* Name */}
+                <h3
+                  className="font-serif font-semibold px-5 pt-5 pb-1"
+                  style={{ color: "#F5F0E8", fontSize: 22 }}
                 >
-                  {/* Header with photo or initials avatar */}
-                  <div className="relative h-28 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent">
-                    <div className="absolute -bottom-8 left-6">
-                      {guide.photoUrl ? (
-                        <img
-                          src={guide.photoUrl}
-                          alt={`${fd.firstName} ${fd.lastName}`}
-                          className="w-16 h-16 rounded-xl object-cover ring-4 ring-card shadow-lg"
-                          onError={(e) => {
-                            // Fallback to initials on load error
-                            const target = e.currentTarget;
-                            target.style.display = "none";
-                            target.nextElementSibling?.classList.remove("hidden");
-                          }}
-                        />
-                      ) : null}
-                      <div className={`w-16 h-16 rounded-xl bg-primary text-secondary font-display font-bold text-xl flex items-center justify-center ring-4 ring-card shadow-lg ${guide.photoUrl ? "hidden" : ""}`}>
-                        {initials}
-                      </div>
-                    </div>
-                    {/* Area badge */}
-                    {guide.service_areas?.length > 0 && (
-                      <div className="absolute top-3 right-3">
-                        <Badge variant="secondary" className="text-xs bg-background/80 backdrop-blur-sm border-border/50">
-                          <MapPin className="w-3 h-3 mr-1" />
-                          {translateOption(t, guide.service_areas[0])}
-                        </Badge>
-                      </div>
-                    )}
+                  {guide.form_data.firstName} {guide.form_data.lastName}
+                </h3>
+
+                {/* Credential line */}
+                {getCredentialLine(guide) && (
+                  <p className="px-5 pb-2" style={{ color: "#C9A84C", fontSize: 13 }}>
+                    {getCredentialLine(guide)}
+                  </p>
+                )}
+
+                {/* City & Languages */}
+                <p className="px-5 pb-3" style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>
+                  📍 {guide.service_areas?.[0] || "—"} · {getLanguagesString(guide)}
+                </p>
+
+                {/* Bio excerpt */}
+                <p
+                  className="px-5 pb-4"
+                  style={{
+                    color: "rgba(255,255,255,0.7)",
+                    fontSize: 14,
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {getBioExcerpt(guide)}
+                </p>
+
+                {/* Specialization pills */}
+                {getSpecializations(guide).length > 0 && (
+                  <div className="px-5 pb-4 flex flex-wrap gap-1.5">
+                    {getSpecializations(guide).map((spec) => (
+                      <span
+                        key={spec}
+                        className="rounded-full"
+                        style={{
+                          backgroundColor: "rgba(201,168,76,0.12)",
+                          border: "1px solid rgba(201,168,76,0.3)",
+                          color: "#C9A84C",
+                          fontSize: 11,
+                          padding: "3px 10px",
+                        }}
+                      >
+                        {spec}
+                      </span>
+                    ))}
                   </div>
+                )}
 
-                  <div className="pt-12 px-6 pb-6">
-                    <h3 className="font-display text-xl font-bold text-foreground mb-1">
-                      {fd.firstName} {fd.lastName}
-                    </h3>
-                    {/* Verification badge — show highest only */}
-                    {getHighestBadge(guide.badges) && (
-                      <div className="mb-1">
-                        <GuideBadge type={getHighestBadge(guide.badges)!} size="sm" />
-                      </div>
-                    )}
+                {/* Experience line */}
+                {isFounderMichael(guide) && (
+                  <p className="px-5 pb-4" style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>
+                    35+ Years Experience
+                  </p>
+                )}
 
-                    {/* Review stats */}
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="flex items-center gap-1 text-muted-foreground text-sm">
-                        <Globe className="w-3.5 h-3.5 text-primary/70" />
-                        <span>{translateOptions(t, fd.languages || []).join(", ")}</span>
-                      </div>
-                    </div>
+                {/* Spacer */}
+                <div className="flex-1" />
 
-                    {/* Rating & reviews */}
-                    {guide.reviewCount > 0 && (
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3.5 h-3.5 text-primary fill-primary" />
-                          <span className="text-sm font-semibold text-foreground">{guide.avgRating}</span>
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          ({guide.reviewCount} {guide.reviewCount === 1 ? t("guides.review") : t("guides.reviews")})
-                        </span>
-                      </div>
-                    )}
+                {/* Message button */}
+                <button
+                  onClick={() => navigate(`/guide/${guide.id}`)}
+                  className="w-full flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer"
+                  style={{
+                    backgroundColor: "#C9A84C",
+                    color: "#0A1628",
+                    fontWeight: 600,
+                    fontSize: 15,
+                    padding: 16,
+                    borderRadius: "0 0 12px 12px",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#B8924A")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#C9A84C")
+                  }
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Message {guide.form_data.firstName}
+                </button>
+              </div>
+            </div>
+          ))}
 
-                    {/* Bio */}
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                      {shortBio}
-                    </p>
+          {/* Recruitment cards */}
+          {[0, 1].map((i) => (
+            <div
+              key={`recruit-${i}`}
+              className="rounded-xl flex flex-col items-center justify-center text-center transition-all duration-200"
+              style={{
+                backgroundColor: "rgba(201,168,76,0.04)",
+                border: "1.5px dashed rgba(201,168,76,0.35)",
+                minHeight: 460,
+                padding: "40px 24px",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "rgba(201,168,76,0.6)";
+                e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.08)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "rgba(201,168,76,0.35)";
+                e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.04)";
+              }}
+            >
+              <PlusCircle
+                className="mb-4"
+                style={{ width: 48, height: 48, color: "rgba(201,168,76,0.5)" }}
+              />
+              <h3
+                className="font-serif font-semibold mb-3"
+                style={{ color: "#F5F0E8", fontSize: 20 }}
+              >
+                Become a Founding Guide
+              </h3>
+              <p
+                className="mb-6 mx-auto"
+                style={{
+                  color: "rgba(255,255,255,0.6)",
+                  fontSize: 14,
+                  lineHeight: 1.7,
+                  maxWidth: 260,
+                }}
+              >
+                Join our first wave of professional guides in Washington DC, Chicago, New York, and
+                beyond. Own your clients. Keep 100% of your earnings.
+              </p>
 
-                    {/* Specializations */}
-                    <div className="flex flex-wrap gap-1.5">
-                      {fd.specializations?.slice(0, 3).map((spec) => (
-                        <Badge
-                          key={spec}
-                          variant="secondary"
-                          className="text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/15"
-                        >
-                          {translateOption(t, spec)}
-                        </Badge>
-                      ))}
-                    </div>
+              {/* Perks */}
+              <div className="flex flex-col gap-2 mb-7 text-left">
+                {[
+                  "No commission, ever",
+                  "AI-powered profile tools",
+                  "First access to new cities",
+                ].map((perk) => (
+                  <span
+                    key={perk}
+                    className="flex items-center gap-2"
+                    style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}
+                  >
+                    <Check className="w-4 h-4 flex-shrink-0" style={{ color: "#C9A84C" }} />
+                    {perk}
+                  </span>
+                ))}
+              </div>
 
-                    {/* Credentials badges */}
-                    {(fd.insuranceCompanyName || fd.licenseNumber) && (
-                      <div className="flex flex-wrap items-center gap-1.5 mt-2 pt-2 border-t border-border/30">
-                        {fd.insuranceCompanyName && (
-                          <Badge variant="outline" className="text-xs gap-1 border-green-500/30 text-green-400 bg-green-500/10">
-                            <ShieldCheck className="w-3 h-3" /> {t("guides.insured")}
-                          </Badge>
-                        )}
-                        {fd.licenseNumber && (
-                          <Badge variant="outline" className="text-xs gap-1 border-blue-500/30 text-blue-400 bg-blue-500/10">
-                            <CheckCircle2 className="w-3 h-3" /> {t("guides.licensed")}
-                          </Badge>
-                        )}
-                        {fd.certifications && fd.certifications.length > 0 && (
-                          <Badge variant="outline" className="text-xs gap-1 border-purple-500/30 text-purple-400 bg-purple-500/10">
-                            {t(fd.certifications.length > 1 ? "guides.certs_plural" : "guides.certs", { count: fd.certifications.length })}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
+              <Link
+                to="/guide-register"
+                className="inline-block rounded-lg font-semibold transition-colors duration-200"
+                style={{
+                  backgroundColor: "#C9A84C",
+                  color: "#0A1628",
+                  padding: "12px 24px",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#B8924A")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#C9A84C")
+                }
+              >
+                Apply as Founding Guide
+              </Link>
+            </div>
+          ))}
+        </div>
+
+        {/* Below grid link */}
+        <p className="text-center mt-10" style={{ fontSize: 14, color: "rgba(255,255,255,0.5)" }}>
+          Already a guide?{" "}
+          <Link
+            to="/guides"
+            className="underline underline-offset-2 hover:no-underline"
+            style={{ color: "#C9A84C" }}
+          >
+            Browse all our verified guides →
+          </Link>
+        </p>
       </div>
     </section>
   );
