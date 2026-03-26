@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, ChevronDown, Heart, Sparkles, LogIn } from "lucide-react";
+import { Menu, X, ChevronDown, Heart, Sparkles, LogIn } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -47,7 +47,6 @@ const Navbar = () => {
   const navLinks = [
     { label: "Destinations", href: "#destinations", isDestinations: true },
     { label: "Guides", href: "#meet-guides" },
-    { label: "Browse Tours", href: "/tours", isRoute: true },
     { label: t("nav.services", "How it Works"), href: "#how-it-works" },
     { label: t("nav.contact", "About"), href: "#about" },
   ];
@@ -74,7 +73,7 @@ const Navbar = () => {
           onClick={(e) => handleNavClick(e, "#home")}
           className="flex items-center gap-2 shrink-0"
         >
-          <img src={logoImg} alt="iGuide Tours" className="h-10 w-auto object-contain shrink-0" />
+          <img src={logoImg} alt="iGuide Tours" className="h-9 w-9 object-contain shrink-0" />
           <span className="flex items-baseline gap-1.5">
             <span className="font-display text-xl sm:text-2xl font-bold tracking-tight whitespace-nowrap">
               <span className="text-white">Guides</span>
@@ -154,15 +153,13 @@ const Navbar = () => {
           <div className="w-px h-6 bg-white/20 mx-1" />
 
           {!isLoggedIn ? (
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-white/30 text-white hover:text-white hover:bg-white/10 font-medium gap-1.5 bg-transparent"
+            <button
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-white/80 hover:text-cta-book transition-colors"
               onClick={() => navigate("/login")}
             >
               <LogIn className="w-3.5 h-3.5" />
               Login
-            </Button>
+            </button>
           ) : (
             <NavbarUserMenu email={userEmail} />
           )}
@@ -184,30 +181,11 @@ const Navbar = () => {
           </Button>
 
           <div className="w-px h-6 bg-white/20 mx-1" />
-
-          <a
-            href="tel:+12022438336"
-            className="flex shrink-0 items-center gap-1.5 text-white hover:text-cta-book transition-colors font-semibold whitespace-nowrap"
-            aria-label="Call +1 (202) 243-8336"
-          >
-            <Phone className="w-4 h-4 shrink-0" />
-            <span className="text-sm whitespace-nowrap">+1 (202) 243-8336</span>
-          </a>
-
-          <div className="w-px h-6 bg-white/20 mx-1" />
           <LanguageSwitcher />
         </div>
 
         {/* Mobile: Phone + Language + Menu */}
         <div className="lg:hidden flex items-center gap-2 shrink-0">
-          <a
-            href="tel:+12022438336"
-            className="flex shrink-0 items-center gap-1 text-white hover:text-cta-book transition-colors font-semibold"
-            aria-label="Call +1 (202) 243-8336"
-          >
-            <Phone className="w-4 h-4 shrink-0" />
-            <span className="text-[11px] whitespace-nowrap">+1 (202) 243-8336</span>
-          </a>
           <LanguageSwitcher />
           <button
             onClick={() => setIsOpen(!isOpen)}
