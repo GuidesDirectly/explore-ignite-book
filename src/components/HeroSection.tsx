@@ -49,20 +49,30 @@ const HeroSection = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className="hidden md:block absolute bottom-[90px] left-10 z-10"
+        className="hidden md:flex flex-col items-center absolute bottom-[100px] left-10 z-10"
       >
         <img
           src={logoImg}
           alt="iGuide Tours"
-          className="w-20 h-auto drop-shadow-2xl rounded-lg opacity-90"
+          className="w-[72px] h-auto drop-shadow-2xl rounded-lg opacity-[0.85]"
         />
-        <span className="block mt-1 text-[11px] text-white/70 tracking-wide">
+        <span className="block mt-1 text-[10px] uppercase tracking-[0.08em] text-white/65 text-center">
           Powered by iGuide Tours
         </span>
       </motion.div>
 
       <div className="relative container mx-auto px-4 pt-24 pb-20 text-center pointer-events-auto">
         <div className="max-w-3xl mx-auto">
+          {/* Eyebrow */}
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05 }}
+            className="text-xs md:text-sm uppercase tracking-[0.15em] text-white/60 mb-4"
+          >
+            {t("hero.poweredBy")}
+          </motion.p>
+
           {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
