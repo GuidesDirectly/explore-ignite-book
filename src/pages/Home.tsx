@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import TrustBarSection from "@/components/TrustBarSection";
 import LaunchStripSection from "@/components/LaunchStripSection";
 import WhatIsPlatformSection from "@/components/WhatIsPlatformSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
@@ -50,6 +51,9 @@ const Home = () => {
 
       {/* Section 1 — Hero */}
       <HeroSection />
+
+      {/* Trust Bar */}
+      <TrustBarSection />
 
       {/* Section 2 — Launch Strip */}
       <LaunchStripSection />
