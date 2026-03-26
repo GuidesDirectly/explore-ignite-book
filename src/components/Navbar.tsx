@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown, Heart, Sparkles, LogIn } from "lucide-react";
+import { Menu, X, ChevronDown, Heart, Sparkles, LogIn, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -9,7 +9,7 @@ import DestinationsModal from "./DestinationsModal";
 import TravelerProfileForm from "./TravelerProfileForm";
 import NavbarUserMenu from "./NavbarUserMenu";
 import { supabase } from "@/integrations/supabase/client";
-import logoImg from "@/assets/logo.jpg";
+
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -73,7 +73,7 @@ const Navbar = () => {
           onClick={(e) => handleNavClick(e, "#home")}
           className="flex items-center gap-2 shrink-0"
         >
-          <img src={logoImg} alt="iGuide Tours" className="h-9 w-9 object-contain shrink-0" />
+          
           <span className="flex items-baseline gap-1.5">
             <span className="font-display text-xl sm:text-2xl font-bold tracking-tight whitespace-nowrap">
               <span className="text-white">Guides</span>
@@ -149,6 +149,14 @@ const Navbar = () => {
               </button>
             </>
           )}
+
+          <a
+            href="tel:+12022438336"
+            className="hidden lg:inline-flex items-center gap-1.5 text-[13px] text-white/80 hover:text-cta-book transition-colors whitespace-nowrap"
+          >
+            <Phone className="w-4 h-4" />
+            +1 (202) 243-8336
+          </a>
 
           <div className="w-px h-6 bg-white/20 mx-1" />
 

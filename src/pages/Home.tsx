@@ -19,7 +19,7 @@ import FAQSection from "@/components/FAQSection";
 import FinalCtaSection from "@/components/FinalCtaSection";
 import InquirySection from "@/components/InquirySection";
 import Footer from "@/components/Footer";
-import { MessageCircle } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 const Home = () => {
   const location = useLocation();
@@ -103,10 +103,12 @@ const Home = () => {
 
       <Link
         to="/chat"
-        className="fixed bottom-6 right-6 z-50 bg-primary text-secondary w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200"
+        className="fixed bottom-6 right-6 z-50 bg-[#C9A84C] w-auto px-3 py-2 rounded-2xl flex items-center gap-1.5 shadow-lg hover:scale-110 transition-transform duration-200"
         aria-label="Chat with AI assistant"
+        title="Chat with our AI Trip Architect"
       >
-        <MessageCircle className="w-6 h-6" />
+        <Sparkles className="w-5 h-5 text-[#0A1628]" />
+        <span className="text-[11px] font-semibold text-[#0A1628]">AI Planner</span>
       </Link>
     </div>
   );

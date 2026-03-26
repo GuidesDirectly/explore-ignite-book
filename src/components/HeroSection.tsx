@@ -1,31 +1,31 @@
 import { useState, FormEvent } from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, MessageCircle, Leaf, DollarSign, MapPin, Calendar as CalendarIcon, Users, Search } from "lucide-react";
+import { ShieldCheck, MessageCircle, Leaf, DollarSign, MapPin, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import heroBg from "@/assets/hero-dc.jpg";
-import logoImg from "@/assets/logo.jpg";
+
+const LANGUAGES = [
+  "", "English", "Russian", "Spanish", "French", "German", "Hebrew",
+  "Arabic", "Chinese", "Japanese", "Portuguese", "Italian", "Korean",
+  "Hindi", "Polish", "Vietnamese", "Indonesian", "Dutch", "Thai",
+  "Turkish", "Swedish", "Ukrainian",
+];
 
 const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [where, setWhere] = useState("");
-  const [when, setWhen] = useState<Date | undefined>(undefined);
-  const [guests, setGuests] = useState("");
+  const [city, setCity] = useState("");
+  const [language, setLanguage] = useState("");
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (where.trim()) params.set("q", where.trim());
-    if (when) params.set("date", format(when, "yyyy-MM-dd"));
-    if (guests.trim()) params.set("guests", guests.trim());
+    if (city.trim()) params.set("city", city.trim());
+    if (language) params.set("language", language);
     const qs = params.toString();
-    navigate(qs ? `/tours?${qs}` : "/tours");
+    navigate(qs ? `/guides?${qs}` : "/guides");
   };
 
   const trustItems = [
@@ -43,23 +43,6 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-black/45" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, hsla(220, 30%, 8%, 0.6) 0%, transparent 50%)" }} />
       </div>
-
-      {/* Powered by iGuide Tours — trust badge */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.6 }}
-        className="hidden md:flex flex-col items-center absolute bottom-[100px] left-10 z-10"
-      >
-        <img
-          src={logoImg}
-          alt="iGuide Tours"
-          className="w-[72px] h-auto drop-shadow-2xl rounded-lg opacity-[0.85]"
-        />
-        <span className="block mt-1 text-[10px] uppercase tracking-[0.08em] text-white/65 text-center">
-          Powered by iGuide Tours
-        </span>
-      </motion.div>
 
       <div className="relative container mx-auto px-4 pt-24 pb-20 text-center pointer-events-auto">
         <div className="max-w-3xl mx-auto">
@@ -109,83 +92,66 @@ const HeroSection = () => {
             </Button>
           </motion.div>
 
-          {/* 3-segment glassmorphism search bar */}
-          <motion.form
-            onSubmit={handleSubmit}
+          {/* Guide finder search bar */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            id="hero-search"
-            className="relative mx-auto w-full max-w-2xl flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl mb-12"
+            className="mx-auto w-full max-w-2xl mb-12"
           >
-            {/* Where */}
-            <div className="flex-1 flex items-center gap-2 px-5 py-3">
-              <MapPin className="w-4 h-4 text-white/70 flex-shrink-0" />
-              <input
-                type="text"
-                name="destination_search"
-                autoComplete="new-password"
-                aria-autocomplete="none"
-                value={where}
-                onChange={(e) => setWhere(e.target.value)}
-                placeholder={t("hero.searchPlaceholder", "Where to?")}
-                className="w-full bg-transparent text-sm text-white placeholder:text-white/60 border-none outline-none focus:outline-none focus:ring-0"
-              />
-            </div>
-
-            {/* Divider */}
-            <div className="hidden sm:block w-px h-8 bg-white/20 flex-shrink-0" />
-            <div className="sm:hidden h-px w-full bg-white/20" />
-
-            {/* When */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <div className="flex-1 flex items-center gap-2 px-5 py-3 cursor-pointer">
-                  <CalendarIcon className="w-4 h-4 text-white/70 flex-shrink-0" />
-                  <span className={cn("text-sm", when ? "text-white" : "text-white/60")}>
-                    {when ? format(when, "MMM d, yyyy") : "When?"}
-                  </span>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={when}
-                  onSelect={setWhen}
-                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
+            <p className="text-[13px] text-white/85 text-center mb-3">
+              Find your guide — search by city and language
+            </p>
+            <form
+              onSubmit={handleSubmit}
+              id="hero-search"
+              className="relative flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl"
+            >
+              {/* City field — 60% */}
+              <div className="flex-[3] flex items-center gap-2 px-5 py-3">
+                <MapPin className="w-4 h-4 text-white/70 flex-shrink-0" />
+                <input
+                  type="text"
+                  name="city_search"
+                  autoComplete="off"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Which city are you visiting?"
+                  className="w-full bg-transparent text-sm text-white placeholder:text-white/60 border-none outline-none focus:outline-none focus:ring-0"
                 />
-              </PopoverContent>
-            </Popover>
+              </div>
 
-            {/* Divider */}
-            <div className="hidden sm:block w-px h-8 bg-white/20 flex-shrink-0" />
-            <div className="sm:hidden h-px w-full bg-white/20" />
+              {/* Divider */}
+              <div className="hidden sm:block w-px h-8 bg-white/20 flex-shrink-0" />
+              <div className="sm:hidden h-px w-full bg-white/20" />
 
-            {/* Who */}
-            <div className="flex items-center gap-2 px-5 py-3 sm:flex-1">
-              <Users className="w-4 h-4 text-white/70 flex-shrink-0" />
-              <input
-                type="text"
-                name="guest_count"
-                autoComplete="new-password"
-                aria-autocomplete="none"
-                value={guests}
-                onChange={(e) => setGuests(e.target.value)}
-                placeholder="Guests"
-                className="w-full bg-transparent text-sm text-white placeholder:text-white/60 border-none outline-none focus:outline-none focus:ring-0"
-              />
-              {/* Search button */}
-              <button
-                type="submit"
-                className="ml-1 w-10 h-10 rounded-full bg-cta-book hover:bg-cta-book-hover text-cta-book-foreground flex items-center justify-center flex-shrink-0 transition-colors shadow-md"
-                aria-label="Search"
-              >
-                <Search className="w-4 h-4" />
-              </button>
-            </div>
-          </motion.form>
+              {/* Language field — 40% */}
+              <div className="flex items-center gap-2 px-5 py-3 flex-[2]">
+                <MessageCircle className="w-4 h-4 text-white/70 flex-shrink-0" />
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="w-full bg-transparent text-sm text-white border-none outline-none focus:outline-none focus:ring-0 appearance-none cursor-pointer"
+                  style={{ WebkitAppearance: "none" }}
+                >
+                  <option value="" className="bg-[hsl(220,30%,8%)] text-white">Any Language</option>
+                  {LANGUAGES.filter(Boolean).map((lang) => (
+                    <option key={lang} value={lang} className="bg-[hsl(220,30%,8%)] text-white">
+                      {lang}
+                    </option>
+                  ))}
+                </select>
+                {/* Search button */}
+                <button
+                  type="submit"
+                  className="ml-1 w-10 h-10 rounded-full bg-[#C9A84C] hover:bg-[#b8963f] flex items-center justify-center flex-shrink-0 transition-colors shadow-md"
+                  aria-label="Search"
+                >
+                  <Search className="w-[18px] h-[18px] text-[#0A1628]" />
+                </button>
+              </div>
+            </form>
+          </motion.div>
 
           {/* Trust strip */}
           <motion.div
