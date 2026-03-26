@@ -1,61 +1,35 @@
 
 
-# Security Hardening: api-guides Edge Function + View + RLS
+# Hero Text Update Plan
 
-## Changes (3 total, no frontend modifications)
+## Current State
+- The hero headline and subtitle use i18n keys `hero.headline` and `hero.subtitle` from translation files
+- There are **no CTA buttons** in the hero section currently — only a glassmorphism search bar and trust strip
+- The user requests two new CTA buttons ("Find a Guide" and "I'm a Guide — Join Free")
 
-### 1. Database Migration — Recreate view with `security_invoker`
+## Changes
 
-```sql
-CREATE OR REPLACE VIEW guide_profiles_public
-WITH (security_invoker = true) AS
-SELECT
-  id,
-  user_id,
-  service_areas,
-  status,
-  created_at,
-  translations,
-  jsonb_build_object(
-    'firstName', form_data->'firstName',
-    'lastName', form_data->'lastName',
-    'biography', form_data->'biography',
-    'languages', form_data->'languages',
-    'specializations', form_data->'specializations',
-    'tourTypes', form_data->'tourTypes',
-    'targetAudience', form_data->'targetAudience'
-  ) AS form_data
-FROM guide_profiles
-WHERE status = 'approved';
-```
+### 1. Update `src/i18n/locales/en.json` — Text strings only
 
-The view already has the correct sanitized columns. This migration adds `security_invoker = true` so even service-role callers respect the view's column restrictions.
+| Key | Current Value | New Value |
+|---|---|---|
+| `hero.headline` | "Book Local Guides Directly — Cities & Ecotourism Worldwide" | "See Every City, Landmarks & Landscape Through Local Eyes" |
+| `hero.subtitle` | "No middlemen. No commissions. Just real people and authentic experiences." | "Connect directly with trusted local guides who design your experience — no middlemen, no markups, no hidden fees." |
 
-### 2. Database Migration — Drop overly-broad RLS policy
+### 2. Update `src/components/HeroSection.tsx` — Add two CTA buttons
 
-```sql
-DROP POLICY IF EXISTS "Anyone can view approved guide profiles" ON guide_profiles;
-```
+Insert a `motion.div` block between the subtitle (line 82) and the search bar (line 84) containing:
 
-After this, only admins and guide-own-profile policies remain on the base table.
+- **Primary button**: "Find a Guide" — navigates to `/guides` using `navigate("/guides")`. Uses the existing `hero` variant from the button component (gold gradient style).
+- **Secondary button**: "I'm a Guide — Join Free" — navigates to `/guide-register`. Uses the existing `heroOutline` variant (transparent with border).
 
-### 3. Edge Function Update — `supabase/functions/api-guides/index.ts`
+Both buttons will be inside a flex row with `gap-4`, matching the existing motion animation pattern. No new styling — uses existing button variants already defined in `button.tsx`.
 
-- Switch both queries from `guide_profiles` to `guide_profiles_public`
-- Use explicit column select (no `SELECT *`)
-- Remove `.eq("status", "approved")` (view already filters)
-- Add `sanitiseGuide()` with `FORBIDDEN_FIELDS` blocklist
-- Apply sanitisation to all responses before returning
+### 3. Files modified
+- `src/i18n/locales/en.json` — 2 string values changed
+- `src/components/HeroSection.tsx` — add Button import + CTA block between subtitle and search bar
 
-```text
-Files modified:
-  supabase/functions/api-guides/index.ts  (edge function)
-  1 new migration                          (view + RLS policy)
-```
-
-### Verification After Apply
-
-- [ ] Migration applied with no SQL errors
-- [ ] Edge function deployed successfully
-- [ ] Old "Anyone can view approved guide profiles" policy confirmed dropped
+### 4. Not touched
+- No images, logo, layout structure, routing logic, database, or other components
+- Other locale files are not updated (only English requested)
 
