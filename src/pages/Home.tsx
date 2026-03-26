@@ -19,7 +19,7 @@ import FAQSection from "@/components/FAQSection";
 import FinalCtaSection from "@/components/FinalCtaSection";
 import InquirySection from "@/components/InquirySection";
 import Footer from "@/components/Footer";
-import { MessageCircle } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 const Home = () => {
   const location = useLocation();
