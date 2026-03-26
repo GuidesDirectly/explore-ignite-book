@@ -37,7 +37,7 @@ const HeroSection = () => {
   ];
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-visible">
       {/* Background image */}
       <div className="absolute inset-0 pointer-events-none">
         <img src={heroBg} alt="Washington DC at golden hour" className="w-full h-full object-cover" />
