@@ -49,14 +49,14 @@ const HeroSection = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className="hidden md:block absolute bottom-[90px] left-10 z-10"
+        className="hidden md:flex flex-col items-center absolute bottom-[100px] left-10 z-10"
       >
         <img
           src={logoImg}
           alt="iGuide Tours"
-          className="w-20 h-auto drop-shadow-2xl rounded-lg opacity-90"
+          className="w-[72px] h-auto drop-shadow-2xl rounded-lg opacity-[0.85]"
         />
-        <span className="block mt-1 text-[11px] text-white/70 tracking-wide">
+        <span className="block mt-1 text-[10px] uppercase tracking-[0.08em] text-white/65 text-center">
           Powered by iGuide Tours
         </span>
       </motion.div>
