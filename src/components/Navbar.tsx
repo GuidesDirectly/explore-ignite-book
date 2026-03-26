@@ -73,7 +73,7 @@ const Navbar = () => {
           onClick={(e) => handleNavClick(e, "#home")}
           className="flex items-center gap-2 shrink-0"
         >
-          <img src={logoImg} alt="iGuide Tours" className="h-9 w-9 object-contain shrink-0" />
+          
           <span className="flex items-baseline gap-1.5">
             <span className="font-display text-xl sm:text-2xl font-bold tracking-tight whitespace-nowrap">
               <span className="text-white">Guides</span>
