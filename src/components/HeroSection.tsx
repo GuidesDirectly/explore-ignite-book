@@ -82,6 +82,21 @@ const HeroSection = () => {
             {t("hero.subtitle")}
           </motion.p>
 
+          {/* CTA buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+          >
+            <Button variant="hero" size="lg" asChild>
+              <Link to="/guides">Find a Guide</Link>
+            </Button>
+            <Button variant="heroOutline" size="lg" asChild>
+              <Link to="/guide-register">I'm a Guide — Join Free</Link>
+            </Button>
+          </motion.div>
+
           {/* 3-segment glassmorphism search bar */}
           <motion.form
             onSubmit={handleSubmit}
