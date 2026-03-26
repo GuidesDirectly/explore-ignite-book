@@ -186,14 +186,6 @@ const Navbar = () => {
 
         {/* Mobile: Phone + Language + Menu */}
         <div className="lg:hidden flex items-center gap-2 shrink-0">
-          <a
-            href="tel:+12022438336"
-            className="flex shrink-0 items-center gap-1 text-white hover:text-cta-book transition-colors font-semibold"
-            aria-label="Call +1 (202) 243-8336"
-          >
-            <Phone className="w-4 h-4 shrink-0" />
-            <span className="text-[11px] whitespace-nowrap">+1 (202) 243-8336</span>
-          </a>
           <LanguageSwitcher />
           <button
             onClick={() => setIsOpen(!isOpen)}
