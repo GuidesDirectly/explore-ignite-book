@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-dc.jpg";
+import logo from "@/assets/logo.jpg";
 
 const LANGUAGES = [
   "", "English", "Russian", "Spanish", "French", "German", "Hebrew",
