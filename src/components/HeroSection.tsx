@@ -2,7 +2,8 @@ import { useState, FormEvent } from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, MessageCircle, Leaf, DollarSign, MapPin, Calendar as CalendarIcon, Users, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
@@ -80,6 +81,21 @@ const HeroSection = () => {
           >
             {t("hero.subtitle")}
           </motion.p>
+
+          {/* CTA buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+          >
+            <Button variant="hero" size="lg" asChild>
+              <Link to="/guides">Find a Guide</Link>
+            </Button>
+            <Button variant="heroOutline" size="lg" asChild>
+              <Link to="/guide-register">I'm a Guide — Join Free</Link>
+            </Button>
+          </motion.div>
 
           {/* 3-segment glassmorphism search bar */}
           <motion.form
