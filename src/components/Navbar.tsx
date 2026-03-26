@@ -9,7 +9,7 @@ import DestinationsModal from "./DestinationsModal";
 import TravelerProfileForm from "./TravelerProfileForm";
 import NavbarUserMenu from "./NavbarUserMenu";
 import { supabase } from "@/integrations/supabase/client";
-import logoImg from "@/assets/logo.jpg";
+
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
