@@ -181,17 +181,6 @@ const Navbar = () => {
           </Button>
 
           <div className="w-px h-6 bg-white/20 mx-1" />
-
-          <a
-            href="tel:+12022438336"
-            className="flex shrink-0 items-center gap-1.5 text-white hover:text-cta-book transition-colors font-semibold whitespace-nowrap"
-            aria-label="Call +1 (202) 243-8336"
-          >
-            <Phone className="w-4 h-4 shrink-0" />
-            <span className="text-sm whitespace-nowrap">+1 (202) 243-8336</span>
-          </a>
-
-          <div className="w-px h-6 bg-white/20 mx-1" />
           <LanguageSwitcher />
         </div>
 
