@@ -73,7 +73,7 @@ const Footer = () => {
               </p>
               <p className="flex items-center gap-3">
                 <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-                Bethesda, MD
+                Bethesda, MD · Washington DC Area
               </p>
               <div className="flex items-center gap-4 pt-2">
                 <a href="https://www.facebook.com/Toursiguide/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/60 hover:text-primary transition-colors">
