@@ -153,15 +153,13 @@ const Navbar = () => {
           <div className="w-px h-6 bg-white/20 mx-1" />
 
           {!isLoggedIn ? (
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-white/30 text-white hover:text-white hover:bg-white/10 font-medium gap-1.5 bg-transparent"
+            <button
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-white/80 hover:text-cta-book transition-colors"
               onClick={() => navigate("/login")}
             >
               <LogIn className="w-3.5 h-3.5" />
               Login
-            </Button>
+            </button>
           ) : (
             <NavbarUserMenu email={userEmail} />
           )}
