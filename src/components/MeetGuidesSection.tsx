@@ -230,7 +230,7 @@ const MeetGuidesSection = () => {
                     {getSpecializations(guide).map((spec) => (
                       <span
                         key={spec}
-                        className="rounded-full"
+                        className="rounded-full cursor-pointer"
                         style={{
                           backgroundColor: "rgba(201,168,76,0.12)",
                           border: "1px solid rgba(201,168,76,0.3)",
@@ -238,6 +238,9 @@ const MeetGuidesSection = () => {
                           fontSize: 11,
                           padding: "3px 10px",
                         }}
+                        onClick={() => navigate(`/guide/${guide.id}?specialization=${encodeURIComponent(spec)}`)}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.22)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.12)")}
                       >
                         {spec}
                       </span>
