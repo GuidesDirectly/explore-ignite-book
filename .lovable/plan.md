@@ -1,27 +1,25 @@
 
 
-# Fix: Filter MeetGuidesSection by specific guide UUIDs
+# Routing Fix — Two Changes
 
-## Single change in `src/components/MeetGuidesSection.tsx`
+## 1. Add `/guides` route — `src/App.tsx`
 
-**Lines ~38-41** — Replace the current query:
+Add one line after the existing `/tours` route (line 51):
 
 ```typescript
-// FROM:
-.from("guide_profiles_public" as any)
-.select("id, user_id, form_data, service_areas")
-.limit(2)
-
-// TO:
-.from("guide_profiles_public" as any)
-.select("id, user_id, form_data, service_areas")
-.in("id", [
-  "6f6e341e-b696-4c3f-80a8-ca64cc1be863",
-  "f38ded03-43a2-4238-8b9a-eecb620a2a9c"
-])
+<Route path="/guides" element={<Tours />} />
 ```
 
-Remove `.limit(2)`. The `.in()` filter ensures only Michael Zlotnitsky and Mike McMains are ever returned.
+No other changes to App.tsx. The `/tours` route remains.
 
-No other files or sections touched.
+## 2. Clickable specialization tags — `src/components/MeetGuidesSection.tsx`
+
+Replace the static `<span>` for each specialization pill with a clickable element:
+
+- Add `onClick={() => navigate(`/guide/${guide.id}?specialization=${encodeURIComponent(spec)}`)}`
+- Add `cursor-pointer` class
+- Add `onMouseEnter`: set background to `rgba(201,168,76,0.22)`
+- Add `onMouseLeave`: reset background to `rgba(201,168,76,0.12)`
+
+No other changes to MeetGuidesSection.tsx. No other files touched.
 
