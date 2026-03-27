@@ -15,7 +15,6 @@ interface GuideProfile {
     languages: string[] | string;
     specializations: string[];
   };
-  photoUrl: string | null;
   badges: BadgeType[];
 }
 
