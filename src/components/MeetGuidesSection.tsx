@@ -33,7 +33,10 @@ const MeetGuidesSection = () => {
       const { data: guideData, error } = await (supabase
         .from("guide_profiles_public" as any)
         .select("id, user_id, form_data, service_areas")
-        .limit(2) as any);
+        .in("id", [
+          "6f6e341e-b696-4c3f-80a8-ca64cc1be863",
+          "f38ded03-43a2-4238-8b9a-eecb620a2a9c"
+        ]) as any);
 
       if (error || !guideData) {
         setLoading(false);
