@@ -53,27 +53,9 @@ const MeetGuidesSection = () => {
         });
       }
 
-      // Fetch profile photos
-      const photoUrls = new Map<string, string>();
-      for (const g of guideData) {
-        const { data: files } = await supabase.storage
-          .from("guide-photos")
-          .list(g.user_id, { limit: 10 });
-        const profileFile = files?.find((f: any) => f.name.startsWith("profile"));
-        if (profileFile) {
-          const { data: photoData } = supabase.storage
-            .from("guide-photos")
-            .getPublicUrl(`${g.user_id}/${profileFile.name}`);
-          if (photoData?.publicUrl) {
-            photoUrls.set(g.user_id, photoData.publicUrl);
-          }
-        }
-      }
-
       const enriched: GuideProfile[] = guideData.map((g: any) => ({
         ...g,
         service_areas: g.service_areas || [],
-        photoUrl: photoUrls.get(g.user_id) || null,
         badges: badgeMap.get(g.user_id) || [],
       }));
 
