@@ -370,7 +370,7 @@ const MeetGuidesSection = () => {
         <p className="text-center mt-10" style={{ fontSize: 14, color: "rgba(255,255,255,0.5)" }}>
           Already a guide?{" "}
           <Link
-            to="/tours"
+            to="/guides"
             className="underline underline-offset-2 hover:no-underline"
             style={{ color: "#C9A84C" }}
           >
