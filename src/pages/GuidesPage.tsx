@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Globe, Search, MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import dcImg from "@/assets/hero-dc.jpg";
+import chicagoImg from "@/assets/city-cards/chicago.jpg";
 
 const LANGUAGE_FLAGS: Record<string, string> = {
   English: "🇺🇸",
@@ -33,6 +35,14 @@ const LANGUAGE_OPTIONS = [
   "Any Language",
   ...Object.keys(LANGUAGE_FLAGS),
 ];
+
+function getCityImage(guide: GuideProfile): string | null {
+  const areas = guide.service_areas || [];
+  const areasStr = JSON.stringify(areas).toLowerCase();
+  if (areasStr.includes("washington") || areasStr.includes("dc") || areasStr.includes("d.c")) return dcImg;
+  if (areasStr.includes("chicago")) return chicagoImg;
+  return null;
+}
 
 type SortOption = "recommended" | "most_reviews" | "newest";
 
@@ -294,9 +304,23 @@ const GuidesPage = () => {
                     {/* Avatar */}
                     <div
                       className="relative flex items-center justify-center"
-                      style={{ aspectRatio: "1/1", background: "#0A1628" }}
+                      style={{ aspectRatio: "1/1", background: "#0A1628", overflow: "hidden" }}
                     >
-                      <span className="font-serif" style={{ fontSize: 52, color: "#C9A84C" }}>
+                      {getCityImage(guide) && (
+                        <>
+                          <img
+                            src={getCityImage(guide)!}
+                            alt=""
+                            className="absolute inset-0 w-full h-full"
+                            style={{ objectFit: "cover", opacity: 0.4 }}
+                          />
+                          <div
+                            className="absolute inset-0"
+                            style={{ background: "linear-gradient(to top, rgba(10,22,40,0.7), rgba(10,22,40,0.3))" }}
+                          />
+                        </>
+                      )}
+                      <span className="font-serif" style={{ fontSize: 52, color: "#C9A84C", position: "relative", zIndex: 1 }}>
                         {initials}
                       </span>
                       {guide.status === "approved" && (
@@ -307,6 +331,8 @@ const GuidesPage = () => {
                             fontSize: 10,
                             padding: "3px 8px",
                             borderRadius: 4,
+                            position: "relative",
+                            zIndex: 1,
                           }}
                         >
                           VERIFIED
