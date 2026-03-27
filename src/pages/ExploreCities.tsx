@@ -225,8 +225,8 @@ const ExploreCities = () => {
       </section>
 
       {/* Trust bar */}
-      <div className="bg-primary py-4">
-        <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-primary-foreground text-sm font-semibold text-center">
+      <div className="py-4" style={{ background: '#0A1628', borderTop: '1px solid rgba(201,168,76,0.2)', borderBottom: '1px solid rgba(201,168,76,0.2)' }}>
+        <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm font-semibold text-center" style={{ color: '#C9A84C', fontSize: '12px', letterSpacing: '0.1em' }}>
           <span>$0 Booking Fees</span>
           <span className="hidden sm:inline opacity-40">·</span>
           <span>100% Direct to Guides</span>
