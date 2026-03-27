@@ -316,7 +316,7 @@ const GuidesPage = () => {
                           />
                           <div
                             className="absolute inset-0"
-                            style={{ background: "linear-gradient(to top, rgba(10,22,40,0.7), rgba(10,22,40,0.3))" }}
+                            style={{ background: "linear-gradient(to top, rgba(10,22,40,0.5), rgba(10,22,40,0.15))" }}
                           />
                         </>
                       )}
