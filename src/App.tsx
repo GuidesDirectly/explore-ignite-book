@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import Index from "./pages/Index";
 import Home from "./pages/Home";
 import Tours from "./pages/Tours";
+import GuidesPage from "./pages/GuidesPage";
 import TourDetail from "./pages/TourDetail";
 import BookingCheckout from "./pages/BookingCheckout";
 import AiPlannerPage from "./pages/AiPlannerPage";
@@ -49,7 +50,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/home" element={<Home />} />
           <Route path="/tours" element={<Tours />} />
-          <Route path="/guides" element={<Tours />} />
+          <Route path="/guides" element={<GuidesPage />} />
           <Route path="/tour/:guideId" element={<TourDetail />} />
           <Route path="/book/:guideId" element={<BookingCheckout />} />
           <Route path="/chat" element={<AiPlannerPage />} />
