@@ -1,49 +1,30 @@
 
 
-# Section 3 — Meet Our Guides (Founding Guides + Recruitment)
+# Emergency Fix — Force Initials-Only Avatars in MeetGuidesSection
 
-## Correction applied
-- "Browse all our verified guides →" link routes to **`/guides`** (not `/tours`)
+## Problem
+The `MeetGuidesSection` fetches profile photos from the `guide-photos` storage bucket (lines 57-72). If AI-generated photos were uploaded there, they get displayed. The code itself has no hardcoded fake image URLs.
 
-## File: `src/components/MeetGuidesSection.tsx` — full rewrite
+## Fix — `src/components/MeetGuidesSection.tsx`
 
-### Data fetching
-- Query `guide_profiles_public` with `.limit(2)`
-- Fetch review stats and photos as before
+**Remove the entire photo-fetching block** (lines 57-72) and the `photoUrl` property, so the component always renders initials avatars.
 
-### Section wrapper
-- `id="meet-guides"`, background `#122040`, `py-20`
+1. Delete the photo-fetching `for` loop and `photoUrls` map (lines 57-72)
+2. Set `photoUrl: null` always in the enriched data (line 77)
+3. Remove the `guide.photoUrl` conditional branch (lines 185-191) — keep only the initials `<div>`
+4. Update initials font size from 48px to 64px per the spec
+5. Remove `photoUrl` from the `GuideProfile` interface
 
-### Heading block (centered)
-- Eyebrow: "Our Founding Guides" — gold, 12px uppercase, `tracking-[0.1em]`
-- H2: "Meet the People Behind Your Experience" — serif, 40/28px, `#F5F0E8`
-- Subheading: "Our founding guides set the standard..." — 16px, `rgba(255,255,255,0.65)`, max-w-[520px]
+## Audit of other components
+No hardcoded fake person photos found anywhere else in source code:
+- `GuideProfilePage.tsx` — fetches from storage (user-uploaded only)
+- `GuideGallery.tsx` — fetches portfolio images from storage (user-uploaded only)
+- `Admin.tsx` — fetches from storage for admin review
+- `GuideDashboard.tsx` — upload/delete flow for guide's own photos
+- No unsplash, pexels, randomuser, or AI image service URLs found
 
-### 4-card grid
-- `grid grid-cols-1 md:grid-cols-2 gap-7 max-w-[900px] mx-auto mt-14`
+The storage bucket itself may contain uploaded files that need manual deletion, but that's outside the codebase.
 
-### Cards 1 & 2 — Real guide profiles
-Each card (bg `#1A2F50`, border `1px solid rgba(201,168,76,0.25)`, rounded-xl, hover lift + border glow):
-
-1. **Initials avatar** (1:1 square, navy bg, gold initials 48px serif). Photo if available with `loading="lazy"`. "FOUNDING GUIDE" badge bottom-left.
-2. **Name** — 22px serif semibold, `#F5F0E8`
-3. **Title line** — Hardcoded per guide:
-   - "Michael Zlotnitsky" → "Founder & President, iGuide Tours"
-   - "Mike McMains" → "President, Chicago Tour-Guide Professionals Association (CTPA)"
-   - Color: `#C9A84C`, 13px
-4. **City & Languages** — from DB, 13px, muted
-5. **Bio excerpt** — 120 chars + "...", 14px
-6. **Specialization pills** — max 3, gold-tinted
-7. **Experience line** — "35+ Years Experience" for Michael only
-8. **Message button** — full-width gold, "Message {firstName}", navigates to `/guide/{id}`
-
-### Cards 3 & 4 — Recruitment cards
-- Dashed gold border, subtle bg
-- Centered: `PlusCircle` icon, "Become a Founding Guide", description, 3 perks, "Apply as Founding Guide" → `/guide-register`
-
-### Below grid
-- "Already a guide? Browse all our verified guides →" — gold link to **`/guides`**, `mt-10`
-
-## Not touched
-- Home.tsx, any section above, no images generated, no Supabase schema changes
+## Result
+Guide cards will always show gold initials (MZ, MM) on navy background — no photos displayed regardless of storage contents.
 
