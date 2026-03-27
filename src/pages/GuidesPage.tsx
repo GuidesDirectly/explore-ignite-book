@@ -140,10 +140,16 @@ const GuidesPage = () => {
     return f + l;
   };
 
-  const getFlags = (fd: any) => {
-    const langs: string[] = Array.isArray(fd?.languages) ? fd.languages : [];
-    const flags = langs.map((l) => LANGUAGE_FLAGS[l] || null).filter(Boolean);
-    return { shown: flags.slice(0, 4), extra: Math.max(0, flags.length - 4) };
+  const getLanguageCodes = (languages: string[]): string[] => {
+    const codeMap: Record<string, string> = {
+      English: "EN", "Русский": "RU", Polski: "PL", Deutsch: "DE",
+      "Français": "FR", "Español": "ES", "中文": "ZH", "日本語": "JA",
+      "עברית": "HE", "العربية": "AR", "Português": "PT", "한국어": "KO",
+      Italiano: "IT", "हिन्दी": "HI", "Tiếng Việt": "VI",
+      "Bahasa Indonesia": "ID", Nederlands: "NL", "ไทย": "TH",
+      "Türkçe": "TR", Svenska: "SV", "Українська": "UK",
+    };
+    return languages.map(l => codeMap[l] || l.slice(0, 2).toUpperCase()).slice(0, 4);
   };
 
   return (
@@ -278,7 +284,8 @@ const GuidesPage = () => {
               {filtered.map((guide) => {
                 const fd = guide.form_data || {};
                 const initials = getInitials(fd);
-                const { shown: flags, extra: extraFlags } = getFlags(fd);
+                const languages: string[] = Array.isArray(fd?.languages) ? fd.languages : [];
+                const langCodes = getLanguageCodes(languages);
                 const city = guide.service_areas?.[0] || "";
                 const bio = fd.biography
                   ? fd.biography.length > 100
@@ -340,18 +347,29 @@ const GuidesPage = () => {
                       )}
                     </div>
 
-                    {/* Language flags */}
-                    {flags.length > 0 && (
-                      <div
-                        className="flex items-center gap-1.5 px-4 py-2.5"
-                        style={{ background: "rgba(255,255,255,0.03)", fontSize: 16 }}
-                      >
-                        {flags.map((f, i) => (
-                          <span key={i}>{f}</span>
+                    {/* Language code pills */}
+                    {langCodes.length > 0 && (
+                      <div style={{ display: "flex", gap: "6px", padding: "8px 16px", flexWrap: "wrap" }}>
+                        {langCodes.map((code) => (
+                          <span
+                            key={code}
+                            style={{
+                              fontSize: "11px",
+                              fontWeight: 600,
+                              color: "#C9A84C",
+                              background: "rgba(201,168,76,0.12)",
+                              border: "1px solid rgba(201,168,76,0.3)",
+                              borderRadius: "4px",
+                              padding: "2px 7px",
+                              letterSpacing: "0.05em",
+                            }}
+                          >
+                            {code}
+                          </span>
                         ))}
-                        {extraFlags > 0 && (
-                          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
-                            +{extraFlags}
+                        {languages.length > 4 && (
+                          <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", padding: "2px 4px" }}>
+                            +{languages.length - 4}
                           </span>
                         )}
                       </div>
