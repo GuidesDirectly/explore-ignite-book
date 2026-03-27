@@ -36,6 +36,14 @@ const LANGUAGE_OPTIONS = [
   ...Object.keys(LANGUAGE_FLAGS),
 ];
 
+function getCityImage(guide: GuideProfile): string | null {
+  const areas = guide.service_areas || [];
+  const areasStr = JSON.stringify(areas).toLowerCase();
+  if (areasStr.includes("washington") || areasStr.includes("dc") || areasStr.includes("d.c")) return dcImg;
+  if (areasStr.includes("chicago")) return chicagoImg;
+  return null;
+}
+
 type SortOption = "recommended" | "most_reviews" | "newest";
 
 interface GuideProfile {
