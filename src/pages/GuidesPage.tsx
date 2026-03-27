@@ -284,7 +284,8 @@ const GuidesPage = () => {
               {filtered.map((guide) => {
                 const fd = guide.form_data || {};
                 const initials = getInitials(fd);
-                const { shown: flags, extra: extraFlags } = getFlags(fd);
+                const languages: string[] = Array.isArray(fd?.languages) ? fd.languages : [];
+                const langCodes = getLanguageCodes(languages);
                 const city = guide.service_areas?.[0] || "";
                 const bio = fd.biography
                   ? fd.biography.length > 100
