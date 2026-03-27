@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import Index from "./pages/Index";
 import Home from "./pages/Home";
 import Tours from "./pages/Tours";
+import GuidesPage from "./pages/GuidesPage";
 import TourDetail from "./pages/TourDetail";
 import BookingCheckout from "./pages/BookingCheckout";
 import AiPlannerPage from "./pages/AiPlannerPage";
