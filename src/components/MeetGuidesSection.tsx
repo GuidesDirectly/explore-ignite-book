@@ -15,7 +15,6 @@ interface GuideProfile {
     languages: string[] | string;
     specializations: string[];
   };
-  photoUrl: string | null;
   badges: BadgeType[];
 }
 
@@ -54,27 +53,9 @@ const MeetGuidesSection = () => {
         });
       }
 
-      // Fetch profile photos
-      const photoUrls = new Map<string, string>();
-      for (const g of guideData) {
-        const { data: files } = await supabase.storage
-          .from("guide-photos")
-          .list(g.user_id, { limit: 10 });
-        const profileFile = files?.find((f: any) => f.name.startsWith("profile"));
-        if (profileFile) {
-          const { data: photoData } = supabase.storage
-            .from("guide-photos")
-            .getPublicUrl(`${g.user_id}/${profileFile.name}`);
-          if (photoData?.publicUrl) {
-            photoUrls.set(g.user_id, photoData.publicUrl);
-          }
-        }
-      }
-
       const enriched: GuideProfile[] = guideData.map((g: any) => ({
         ...g,
         service_areas: g.service_areas || [],
-        photoUrl: photoUrls.get(g.user_id) || null,
         badges: badgeMap.get(g.user_id) || [],
       }));
 
@@ -181,24 +162,15 @@ const MeetGuidesSection = () => {
               }
             >
               {/* Photo / Initials area */}
-              <div className="relative aspect-square" style={{ backgroundColor: "#0A1628" }}>
-                {guide.photoUrl ? (
-                  <img
-                    src={guide.photoUrl}
-                    alt={`${guide.form_data.firstName} ${guide.form_data.lastName}`}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span
-                      className="font-serif font-semibold"
-                      style={{ color: "#C9A84C", fontSize: 48 }}
-                    >
-                      {getInitials(guide)}
-                    </span>
-                  </div>
-                )}
+              <div className="relative aspect-square rounded-t-[12px]" style={{ backgroundColor: "#0A1628" }}>
+                <div className="w-full h-full flex items-center justify-center">
+                  <span
+                    className="font-serif"
+                    style={{ color: "#C9A84C", fontSize: 64, fontWeight: 600 }}
+                  >
+                    {getInitials(guide)}
+                  </span>
+                </div>
                 {/* FOUNDING GUIDE badge */}
                 <span
                   className="absolute bottom-3 left-3 font-bold uppercase"
