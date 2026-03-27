@@ -312,7 +312,7 @@ const GuidesPage = () => {
                             src={getCityImage(guide)!}
                             alt=""
                             className="absolute inset-0 w-full h-full"
-                            style={{ objectFit: "cover", opacity: 0.75 }}
+                            style={{ objectFit: "cover", opacity: 0.92 }}
                           />
                           <div
                             className="absolute inset-0"
