@@ -347,18 +347,29 @@ const GuidesPage = () => {
                       )}
                     </div>
 
-                    {/* Language flags */}
-                    {flags.length > 0 && (
-                      <div
-                        className="flex items-center gap-1.5 px-4 py-2.5"
-                        style={{ background: "rgba(255,255,255,0.03)", fontSize: 16 }}
-                      >
-                        {flags.map((f, i) => (
-                          <span key={i}>{f}</span>
+                    {/* Language code pills */}
+                    {langCodes.length > 0 && (
+                      <div style={{ display: "flex", gap: "6px", padding: "8px 16px", flexWrap: "wrap" }}>
+                        {langCodes.map((code) => (
+                          <span
+                            key={code}
+                            style={{
+                              fontSize: "11px",
+                              fontWeight: 600,
+                              color: "#C9A84C",
+                              background: "rgba(201,168,76,0.12)",
+                              border: "1px solid rgba(201,168,76,0.3)",
+                              borderRadius: "4px",
+                              padding: "2px 7px",
+                              letterSpacing: "0.05em",
+                            }}
+                          >
+                            {code}
+                          </span>
                         ))}
-                        {extraFlags > 0 && (
-                          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
-                            +{extraFlags}
+                        {languages.length > 4 && (
+                          <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", padding: "2px 4px" }}>
+                            +{languages.length - 4}
                           </span>
                         )}
                       </div>
