@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Globe, Search, MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import dcImg from "@/assets/hero-dc.jpg";
+import chicagoImg from "@/assets/city-cards/chicago.jpg";
 
 const LANGUAGE_FLAGS: Record<string, string> = {
   English: "🇺🇸",
