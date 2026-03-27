@@ -162,24 +162,15 @@ const MeetGuidesSection = () => {
               }
             >
               {/* Photo / Initials area */}
-              <div className="relative aspect-square" style={{ backgroundColor: "#0A1628" }}>
-                {guide.photoUrl ? (
-                  <img
-                    src={guide.photoUrl}
-                    alt={`${guide.form_data.firstName} ${guide.form_data.lastName}`}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span
-                      className="font-serif font-semibold"
-                      style={{ color: "#C9A84C", fontSize: 48 }}
-                    >
-                      {getInitials(guide)}
-                    </span>
-                  </div>
-                )}
+              <div className="relative aspect-square rounded-t-[12px]" style={{ backgroundColor: "#0A1628" }}>
+                <div className="w-full h-full flex items-center justify-center">
+                  <span
+                    className="font-serif"
+                    style={{ color: "#C9A84C", fontSize: 64, fontWeight: 600 }}
+                  >
+                    {getInitials(guide)}
+                  </span>
+                </div>
                 {/* FOUNDING GUIDE badge */}
                 <span
                   className="absolute bottom-3 left-3 font-bold uppercase"
