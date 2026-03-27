@@ -140,10 +140,16 @@ const GuidesPage = () => {
     return f + l;
   };
 
-  const getFlags = (fd: any) => {
-    const langs: string[] = Array.isArray(fd?.languages) ? fd.languages : [];
-    const flags = langs.map((l) => LANGUAGE_FLAGS[l] || null).filter(Boolean);
-    return { shown: flags.slice(0, 4), extra: Math.max(0, flags.length - 4) };
+  const getLanguageCodes = (languages: string[]): string[] => {
+    const codeMap: Record<string, string> = {
+      English: "EN", "Русский": "RU", Polski: "PL", Deutsch: "DE",
+      "Français": "FR", "Español": "ES", "中文": "ZH", "日本語": "JA",
+      "עברית": "HE", "العربية": "AR", "Português": "PT", "한국어": "KO",
+      Italiano: "IT", "हिन्दी": "HI", "Tiếng Việt": "VI",
+      "Bahasa Indonesia": "ID", Nederlands: "NL", "ไทย": "TH",
+      "Türkçe": "TR", Svenska: "SV", "Українська": "UK",
+    };
+    return languages.map(l => codeMap[l] || l.slice(0, 2).toUpperCase()).slice(0, 4);
   };
 
   return (
