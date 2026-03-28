@@ -67,8 +67,6 @@ const Home = () => {
       {/* Section 5 — Featured Destinations */}
       <DestinationsSection />
 
-      {/* Section 6 — Featured Guides */}
-      <MeetGuidesSection />
 
       {/* Section 7 — Why Direct Booking Is Better */}
       <WhyDirectSection />
