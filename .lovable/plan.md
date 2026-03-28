@@ -1,18 +1,27 @@
 
 
-# Add Top Padding to GuidesPage Header
+# Homepage Cleanup — Remove 6 Sections
 
-**File:** `src/pages/GuidesPage.tsx` — one style change.
+**File:** `src/pages/Home.tsx` only
 
-**Change:** Line ~153, the Section 1 `<section>` currently uses inline style `paddingTop: 60`. Replace with Tailwind classes `pt-32 md:pt-40` and keep `paddingBottom: 40` inline (or convert to `pb-10`).
+## Remove these imports (lines 8, 9, 18, 19, 20, 21):
+- `LaunchStripSection`
+- `WhatIsPlatformSection`
+- `AiTourPlanner`
+- `MonetizationSection`
+- `AboutSection`
+- `FAQSection`
 
-```tsx
-// Before
-<section style={{ background: "#0A1628", paddingTop: 60, paddingBottom: 40 }}>
+## Remove these JSX usages:
+- `{/* Section 2 — Launch Strip */}` + `<LaunchStripSection />`
+- `{/* Section 3 — What Is This Platform */}` + `<WhatIsPlatformSection />`
+- `{/* Section 11 — How We Make Money */}` + `<MonetizationSection />`
+- `{/* Section 12 — About */}` + `<AboutSection />`
+- `{/* AI Demo Widget */}` + `<AiTourPlanner />`
+- `{/* Section 13 — FAQ */}` + `<FAQSection />`
 
-// After
-<section style={{ background: "#0A1628" }} className="pt-32 md:pt-40 pb-10">
-```
+## Keep untouched:
+HeroSection, TrustBarSection, HowItWorksSection, DestinationsSection, WhyDirectSection, TravelerAiCta, TestimonialsSection, ForGuidesSection, TrustSection, FinalCtaSection, InquirySection, Footer, floating AI Planner `<Link>` button.
 
-No other changes. No other files touched.
+No files deleted. No other files modified.
 
