@@ -157,7 +157,7 @@ const GuidesPage = () => {
       <Navbar />
 
       {/* SECTION 1 — Header */}
-      <section style={{ background: "#0A1628", paddingTop: 60, paddingBottom: 40 }}>
+      <section style={{ background: "#0A1628" }} className="pt-32 md:pt-40 pb-10">
         <div className="container mx-auto px-4 text-center">
           <p style={{ color: "#C9A84C", fontSize: 12, letterSpacing: "0.1em" }} className="uppercase font-semibold mb-4">
             Find Your Guide
