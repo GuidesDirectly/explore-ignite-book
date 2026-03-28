@@ -3,13 +3,20 @@ import { useLocation, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import TrustBarSection from "@/components/TrustBarSection";
+import LaunchStripSection from "@/components/LaunchStripSection";
+import WhatIsPlatformSection from "@/components/WhatIsPlatformSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import DestinationsSection from "@/components/DestinationsSection";
+
 import WhyDirectSection from "@/components/WhyDirectSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import ForGuidesSection from "@/components/ForGuidesSection";
 import TravelerAiCta from "@/components/TravelerAiCta";
+import AiTourPlanner from "@/components/AiTourPlanner";
 import TrustSection from "@/components/TrustSection";
+import MonetizationSection from "@/components/MonetizationSection";
+import AboutSection from "@/components/AboutSection";
+import FAQSection from "@/components/FAQSection";
 import FinalCtaSection from "@/components/FinalCtaSection";
 import InquirySection from "@/components/InquirySection";
 import Footer from "@/components/Footer";
@@ -21,6 +28,7 @@ const Home = () => {
   useEffect(() => {
     if (location.hash) {
       const scrollToHash = () => {
+        // Strip query params from hash for querySelector (e.g., #guides?cities=X → #guides)
         const hashId = location.hash.split("?")[0];
         const el = document.querySelector(hashId);
         if (el) {
@@ -29,6 +37,7 @@ const Home = () => {
         }
         return false;
       };
+      // Try multiple times as sections may load async
       const attempts = [100, 500, 1000, 2000];
       attempts.forEach((delay) => {
         setTimeout(() => scrollToHash(), delay);
@@ -46,11 +55,18 @@ const Home = () => {
       {/* Trust Bar */}
       <TrustBarSection />
 
+      {/* Section 2 — Launch Strip */}
+      <LaunchStripSection />
+
+      {/* Section 3 — What Is This Platform */}
+      <WhatIsPlatformSection />
+
       {/* Section 4 — How It Works */}
       <HowItWorksSection />
 
       {/* Section 5 — Featured Destinations */}
       <DestinationsSection />
+
 
       {/* Section 7 — Why Direct Booking Is Better */}
       <WhyDirectSection />
@@ -66,6 +82,18 @@ const Home = () => {
 
       {/* Section 10 — Trust / Transparency */}
       <TrustSection />
+
+      {/* Section 11 — How We Make Money (Monetization Infographic) */}
+      <MonetizationSection />
+
+      {/* Section 12 — About */}
+      <AboutSection />
+
+      {/* AI Demo Widget */}
+      <AiTourPlanner />
+
+      {/* Section 13 — FAQ */}
+      <FAQSection />
 
       {/* Section 14 — Final CTA */}
       <FinalCtaSection />
