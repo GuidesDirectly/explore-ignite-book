@@ -7,7 +7,7 @@ import LaunchStripSection from "@/components/LaunchStripSection";
 import WhatIsPlatformSection from "@/components/WhatIsPlatformSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import DestinationsSection from "@/components/DestinationsSection";
-import MeetGuidesSection from "@/components/MeetGuidesSection";
+
 import WhyDirectSection from "@/components/WhyDirectSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import ForGuidesSection from "@/components/ForGuidesSection";
@@ -67,8 +67,6 @@ const Home = () => {
       {/* Section 5 — Featured Destinations */}
       <DestinationsSection />
 
-      {/* Section 6 — Featured Guides */}
-      <MeetGuidesSection />
 
       {/* Section 7 — Why Direct Booking Is Better */}
       <WhyDirectSection />
