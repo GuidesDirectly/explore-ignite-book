@@ -791,6 +791,33 @@ const Admin = () => {
               <p className="text-center text-muted-foreground py-12">No guide applications yet.</p>
             )}
 
+            {/* Draft guide reminder button */}
+            {draftGuides.length > 0 && (
+              <div className="mb-4">
+                <button
+                  onClick={handleSendReminders}
+                  disabled={sendingReminders}
+                  style={{
+                    background: "rgba(201,168,76,0.1)",
+                    border: "1px solid rgba(201,168,76,0.3)",
+                    color: "#C9A84C",
+                    fontSize: "13px",
+                    fontWeight: 500,
+                    borderRadius: "8px",
+                    padding: "8px 16px",
+                    cursor: sendingReminders ? "not-allowed" : "pointer",
+                    opacity: sendingReminders ? 0.6 : 1,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <Mail className="w-4 h-4" />
+                  {sendingReminders ? "Sending..." : `Send Reminders to Draft Guides (${draftGuides.length})`}
+                </button>
+              </div>
+            )}
+
             {/* Pending section */}
             {pendingGuides.length > 0 && (
               <div>
