@@ -54,6 +54,9 @@ const Home = () => {
       {/* Section 4 — How It Works */}
       <HowItWorksSection />
 
+      {/* Meet Our Founding Guides */}
+      <MeetGuidesSection />
+
       {/* Section 5 — Featured Destinations */}
       <DestinationsSection />
 
