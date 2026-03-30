@@ -701,7 +701,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "iGuide Tours <noreply@iguidetours.net>",
+      from: "Guides Directly <noreply@iguidetours.net>",
       to: toEmails,
       subject,
       html,
