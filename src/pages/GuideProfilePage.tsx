@@ -333,7 +333,7 @@ const GuideProfilePage = () => {
                       src={photoUrl}
                       alt={`${fd.firstName} ${fd.lastName}`}
                       className="w-20 h-20 rounded-xl object-cover shadow-lg"
-                      style={{ ring: "none", boxShadow: "0 0 0 4px #1A2F50, 0 4px 12px rgba(0,0,0,0.3)" }}
+                      style={{ boxShadow: "0 0 0 4px #1A2F50, 0 4px 12px rgba(0,0,0,0.3)" }}
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
                         e.currentTarget.nextElementSibling?.classList.remove("hidden");
