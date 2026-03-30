@@ -273,6 +273,26 @@ const Admin = () => {
   const pendingGuides = guides.filter((g) => g.status === "pending");
   const approvedGuides = guides.filter((g) => g.status === "approved");
   const rejectedGuides = guides.filter((g) => g.status === "rejected");
+  const draftGuides = guides.filter((g) => g.status === "draft");
+
+  const handleSendReminders = async () => {
+    setSendingReminders(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("draft-guide-reminder");
+      if (error) throw error;
+      const sent = data?.sent ?? 0;
+      if (sent > 0) {
+        toast.success(`Sent reminders to ${sent} draft guide${sent > 1 ? "s" : ""}`);
+      } else {
+        toast.info("No draft guides found to remind");
+      }
+    } catch (e) {
+      console.error("Failed to send reminders:", e);
+      toast.error("Failed to send reminders — please try again");
+    } finally {
+      setSendingReminders(false);
+    }
+  };
 
   if (loading) {
     return (
