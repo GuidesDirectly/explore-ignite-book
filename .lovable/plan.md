@@ -1,18 +1,17 @@
 
 
-# Reduce GuidesPage Header Padding
+# Two Fixes — GuidesPage Cards Above the Fold
 
-**File:** `src/pages/GuidesPage.tsx` — one class change
+**File:** `src/pages/GuidesPage.tsx` only
 
-**Change:** Section 1 `<section>` element — replace `pt-32 md:pt-40` with `pt-24 md:pt-28`. Keep `pb-10` unchanged.
+## Fix 1 — Remove header section
+Delete the entire Section 1 (`<section>` with eyebrow, H1, subheading, and search bar — roughly lines 160–210). Keep the Navbar, results bar, cards grid, recruitment banner, and Footer.
 
-```tsx
-// Before
-<section style={{ background: "#0A1628" }} className="pt-32 md:pt-40 pb-10">
+## Fix 2 — Change avatar aspect ratio
+In the guide card avatar `<div>`, change `aspectRatio: "1/1"` to `aspectRatio: "16/9"`.
 
-// After
-<section style={{ background: "#0A1628" }} className="pt-24 md:pt-28 pb-10">
-```
-
-One line, one file. Nothing else touched.
+## Result
+- Page starts with Navbar → results bar → guide cards immediately
+- Cards use landscape photos instead of square, making full cards visible above the fold
+- No other files or content changed
 
