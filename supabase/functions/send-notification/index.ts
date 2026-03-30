@@ -31,7 +31,7 @@ interface NotificationRequest {
   data: Record<string, unknown>;
 }
 
-const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request"]);
+const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request", "profile_reminder"]);
 
 // Notification types that can be sent without authentication (public forms)
 const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request", "review_request"]);
