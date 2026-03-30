@@ -65,6 +65,7 @@ const GuideProfilePage = () => {
   const [notFound, setNotFound] = useState(false);
   const [badges, setBadges] = useState<BadgeType[]>([]);
   const { savedIds, toggleSave, loading: saveLoading } = useSavedGuides();
+  const [bioExpanded, setBioExpanded] = useState(false);
 
   useEffect(() => {
     const fetchGuide = async () => {
