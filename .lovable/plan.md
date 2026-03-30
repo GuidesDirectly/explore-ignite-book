@@ -1,19 +1,18 @@
 
 
-# Restore MeetGuidesSection to Homepage
+# Reduce GuidesPage Header Padding
 
-**File:** `src/pages/Home.tsx` — two additions
+**File:** `src/pages/GuidesPage.tsx` — one class change
 
-1. **Add import** with the other imports:
-   ```tsx
-   import MeetGuidesSection from "@/components/MeetGuidesSection";
-   ```
+**Change:** Section 1 `<section>` element — replace `pt-32 md:pt-40` with `pt-24 md:pt-28`. Keep `pb-10` unchanged.
 
-2. **Add JSX** between HowItWorksSection and DestinationsSection:
-   ```tsx
-   {/* Meet Our Founding Guides */}
-   <MeetGuidesSection />
-   ```
+```tsx
+// Before
+<section style={{ background: "#0A1628" }} className="pt-32 md:pt-40 pb-10">
 
-No other files touched. No changes to MeetGuidesSection.tsx.
+// After
+<section style={{ background: "#0A1628" }} className="pt-24 md:pt-28 pb-10">
+```
+
+One line, one file. Nothing else touched.
 
