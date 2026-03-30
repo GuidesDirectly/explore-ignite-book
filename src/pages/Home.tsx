@@ -3,6 +3,7 @@ import { useLocation, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import TrustBarSection from "@/components/TrustBarSection";
+import TruePriceSection from "@/components/TruePriceSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import DestinationsSection from "@/components/DestinationsSection";
 import WhyDirectSection from "@/components/WhyDirectSection";
@@ -45,6 +46,9 @@ const Home = () => {
 
       {/* Trust Bar */}
       <TrustBarSection />
+
+      {/* True Price Moment */}
+      <TruePriceSection />
 
       {/* Section 4 — How It Works */}
       <HowItWorksSection />
