@@ -1,56 +1,55 @@
 
 
-# CRM Onboarding Enhancements — Three Targeted Additions
+# Welcome Email System Upgrade — Three Template Rewrites + One New Email
 
-## Overview
-Three surgical additions to the existing guide onboarding flow. Nothing existing is modified.
+**File:** `supabase/functions/send-notification/index.ts` only. No other files changed.
 
-## Feature 1 — Add `profile_reminder` email type to send-notification
+## Change 1 — Rewrite `guide_application` template (lines 327–362)
 
-**File:** `supabase/functions/send-notification/index.ts`
+Replace the entire `guide_application` handler body HTML and subject. Keep the admin notification email (lines 353–362) completely unchanged.
 
-- Add `"profile_reminder"` to the `NotificationRequest` type union (line 30)
-- Add `"profile_reminder"` to `VALID_TYPES` set (line 34)
-- Add `"profile_reminder"` to `PUBLIC_TYPES` set (line 37) — this type will be called server-to-server from the draft-guide-reminder function, not from authenticated users
-- Add a new `else if (type === "profile_reminder")` handler block after the existing handlers, before the final `resend.emails.send` call
-- Email template: dark navy header (`#0A1628`) with "Guides Directly" in white, clean white body, gold CTA button (`#C9A84C` bg, `#0A1628` text) linking to `data.registration_url`, navy footer — matching the existing email styling pattern
-- Subject: "Complete your Guides Directly profile — your spot is waiting"
-- From: `iGuide Tours <noreply@iguidetours.net>`
-- To: `data.guide_email`
+- **New subject:** `You're in — welcome to Guides Directly, [guideName]`
+- **New HTML:** Guides Directly branded header (#0A1628 bg, white "GuidesDirectly" text, subdued "by iGuide Tours"), white body with the full copy from the prompt (three ✦ tips, zero-commission promise, signed by Michael Zlotnitsky), gold CTA button (#C9A84C) linking to `https://iguidetours.net/about`, grey footer with "© 2025–2026 Guides Directly" text
+- **From address** on the primary send (line 613): stays as-is (shared across all types). The admin notification `from` (line 355) stays unchanged.
+- **Data fields unchanged:** still uses `guideName`, `guideEmail`
 
-## Feature 2 — New `draft-guide-reminder` edge function
+## Change 2 — Rewrite `guide_status` approved branch only (lines 272–301)
 
-**New file:** `supabase/functions/draft-guide-reminder/index.ts`
+Replace only the approved branch subject and HTML. The rejected branch (lines 302–308), admin notification (lines 317–326), and email lookup logic (lines 255–266) stay completely unchanged.
 
-- Uses service role client to query `guide_profiles` where `status = 'draft'` and `created_at < now() - 48 hours`
-- For each result with a non-null `form_data->>'email'`:
-  - Calls send-notification via `fetch` (internal Supabase function URL) with `type: "profile_reminder"` payload
-  - Passes `guide_name`, `guide_email`, and `registration_url` (link to `/guide-register`)
-- Returns JSON `{ sent: number }` count
-- Standard CORS headers matching other functions
-- Add `[functions.draft-guide-reminder]` with `verify_jwt = false` to `supabase/config.toml`
+- **New approved subject:** `You're approved — your Guides Directly profile is now live`
+- **New HTML:** Same branded header as Change 1. Body contains the four numbered next steps (video, share profile, languages, respond quickly), zero-commission promise, gold CTA "View Your Live Profile →" linking to `https://iguidetours.net/guide/[guideUserId]`, signed by Michael Zlotnitsky
+- **Data fields unchanged:** still uses `guideName`, `guideEmail`, `guideUserId`, `status`
 
-## Feature 3 — Admin panel reminder button
+## Change 3 — Add traveler confirmation to `inquiry` handler (after line 196)
 
-**File:** `src/pages/Admin.tsx`
+After the existing admin notification HTML is set (the `inquiry` block currently only sets `toEmails = [NOTIFY_EMAIL]` for the admin), add a second `resend.emails.send()` call that sends a confirmation email to the traveler.
 
-- Add a `draftGuides` filter: `guides.filter(g => g.status === "draft")`
-- Above the pending guides section (around line 773), add a conditional block that renders when `draftGuides.length > 0`:
-  - Button: "Send Reminders to Draft Guides" with `Mail` icon
-  - Styled with gold-tinted background/border per spec
-  - On click: calls `supabase.functions.invoke("draft-guide-reminder")`, shows loading state, then toast with count or error
-- Add `sendingReminders` state boolean
-- No other Admin.tsx features changed
+- **Guard:** only send if `data.email` is truthy
+- **To:** `data.email`
+- **From:** `Guides Directly <noreply@iguidetours.net>`
+- **Subject:** `We received your message, [name] — a guide will be in touch soon`
+- **HTML:** Same branded header/footer. Body echoes back destination, group_size, message. Gold CTA "Browse Guides Now →" linking to `https://iguidetours.net/guides`. Includes zero-commission note. Signed by "The Guides Directly Team"
+- **Existing admin notification email stays unchanged** — it still goes to NOTIFY_EMAIL with the current subject/body
 
-## Files touched
-1. `supabase/functions/send-notification/index.ts` — add type + handler
-2. `supabase/functions/draft-guide-reminder/index.ts` — new file
-3. `supabase/config.toml` — add function entry
-4. `src/pages/Admin.tsx` — add button + draft filter
+## Change 4 — Update `from` on primary send (line 613)
 
-## What is NOT touched
-- `GuideRegister.tsx` — unchanged
-- Existing email types — unchanged
-- Existing Admin approve/reject — unchanged
-- No other frontend files
+Change from `"iGuide Tours <noreply@iguidetours.net>"` to `"Guides Directly <noreply@iguidetours.net>"` for brand consistency on the main `resend.emails.send` call. Admin notification `from` addresses inside individual handlers are left unchanged.
+
+## What stays unchanged
+- All type names, data field names, payload structures
+- Rejection email template (guide_status rejected branch)
+- All admin notification emails inside handlers
+- Authentication/authorization logic
+- profile_reminder template
+- All other email types (review, tour_plan, booking_status, booking_request, review_request)
+- No frontend files modified
+- No routing changes
+
+## Deployment
+After editing, redeploy `send-notification` edge function.
+
+## Technical details
+
+The inquiry traveler confirmation is added as a second `resend.emails.send()` call wrapped in try/catch (matching the pattern used by other handlers for secondary emails), placed after the existing admin HTML is assigned but before the final shared `resend.emails.send()` call at line 612. The existing admin email continues to be sent via the shared call at line 612 (since `toEmails` remains `[NOTIFY_EMAIL]`).
 
