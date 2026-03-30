@@ -496,7 +496,7 @@ const GuideProfilePage = () => {
                 <div
                   className="w-full flex flex-col items-center justify-center rounded-xl"
                   style={{
-                    aspectRatio: "16/9",
+                    height: "200px",
                     background: "#0A1628",
                     border: "1px solid rgba(201,168,76,0.2)",
                   }}
