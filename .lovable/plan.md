@@ -1,51 +1,61 @@
 
 
-# Redesign — WhyDirectSection Comparison Block
+# Guide Profile Page — Brand Alignment & Feature Enhancement
 
-**File:** `src/components/WhyDirectSection.tsx` — full rewrite of component internals
+**File:** `src/pages/GuideProfilePage.tsx` — single file rewrite. No other files touched.
 
-## What changes
-Replace the entire component body with a two-column comparison block. No other files touched. Section stays in same Home.tsx position.
+## 7 Changes
 
-## Structure
+### Change 1 — Dark brand background
+Replace all `bg-background`, `bg-card`, `text-foreground`, `text-muted-foreground`, `border-border` references with hardcoded dark brand colors:
+- Page background: `#0A1628`
+- Cards: `#1A2F50` with `border: 1px solid rgba(201,168,76,0.15)`, radius `12px`
+- Primary text: `#F5F0E8`
+- Secondary text: `rgba(255,255,255,0.65)`
+- Accent: `#C9A84C`
+- Loading/not-found states also get dark treatment
 
-```text
-┌─────────────────────────────────────────┐
-│  bg: #0A1628, py: 80px                  │
-│                                         │
-│  WHY BOOK DIRECT (gold eyebrow)         │
-│  "The difference is more than the       │
-│   price." (serif H2, #F5F0E8)           │
-│  Subheading (white 65% opacity)         │
-│                                         │
-│  ┌── Other Platforms ──┐ ┌─ Guides Directly ─┐
-│  │ red header bg       │ │ green header bg    │
-│  │ ✗ item 1            │ │ ✓ item 1           │
-│  │ ✗ item 2            │ │ ✓ item 2           │
-│  │ ... (6 items)       │ │ ... (6 items)      │
-│  └─────────────────────┘ └────────────────────┘
-│                                         │
-│  Italic closing statement (50% white)   │
-└─────────────────────────────────────────┘
-```
+### Change 2 — Replace CTA buttons
+Remove the single "Request a Booking" button (lines 377–382). Replace with two stacked buttons:
+1. **"Message {firstName}"** — gold filled (`#C9A84C` bg, `#0A1628` text), `MessageCircle` icon, `onClick` smooth-scrolls to `#contact-section`
+2. **"Share This Guide"** — outlined (`1.5px solid #C9A84C`, transparent bg, gold text), `Share2` icon, uses `navigator.share()` with fallback to clipboard copy + toast
 
-## Technical details
+### Change 3 — Credential line
+Between the guide name `<h1>` and the badges block, add conditional credential text:
+- `firstName === "Michael"` → "Founder & President, iGuide Tours"
+- `firstName === "Mike"` → "President, Chicago Tour-Guide Professionals Association (CTPA)"
+- Others → nothing
 
-- Remove all existing imports (motion, Check, X, useTranslation) except `Check` and `X` from lucide-react
-- Remove framer-motion animations and i18n — all text is hardcoded per spec
-- Background `#0A1628`, padding `py-20` (80px)
-- Eyebrow: `#C9A84C`, 11px, uppercase, tracking `0.12em`
-- H2: serif (`font-display`), 36px desktop / 26px mobile, weight 600, color `#F5F0E8`
-- Subheading: 16px, `rgba(255,255,255,0.65)`, max-w `480px`
-- Two-column grid: `max-w-[860px]`, `grid-cols-1 md:grid-cols-2`, gap 24px, mt 48px
-- Left column: red theme (`#C0392B`) with specified rgba backgrounds/borders, 6 items with X icon
-- Right column: green theme (`#2D6A4F`) with specified rgba backgrounds/borders, 6 items with Check icon
-- Italic footer text: 15px, `rgba(255,255,255,0.5)`, max-w `500px`, mt 32px
-- All border radii, padding, and colors exactly as specified
-- Mobile: columns stack, Other Platforms on top
+Style: 13px, `#C9A84C`, margin `4px 0`.
 
-## Files touched
-- `src/components/WhyDirectSection.tsx` — rewritten
+### Change 4 — Video section
+New section between About and Specializations. Heading: "Watch & Learn" with `PlayCircle` icon (gold).
+- If `form_data.videoUrl` exists → render YouTube iframe (16:9, rounded)
+- Otherwise → placeholder box (16:9, `#0A1628` bg, gold border) with centered PlayCircle icon + "Video coming soon" + "Check back to see {firstName}'s introduction video"
 
-No other files modified. No images. No routing changes.
+Add `videoUrl?: string` to the `GuideData.form_data` interface.
+
+### Change 5 — Social sharing strip
+New horizontal strip above the contact form (after Reviews, after BookingRequestForm, before GuideContactForm). Contains:
+- Label: "Share {firstName}'s profile:"
+- Three buttons: WhatsApp (green), Facebook (blue), Copy Link (gold)
+- Each with specified rgba backgrounds, borders, icons, and click handlers
+- Container: gold-tinted bg, gold border, 12px radius, flex-wrap
+
+### Change 6 — Contact form anchor
+Add `id="contact-section"` wrapper `<div>` around `<GuideContactForm>`. Update the contact form heading prop or wrapper to show "Send {firstName} a Message". The submit button label change depends on whether `GuideContactForm` accepts props for these — if not, we wrap with a heading above it.
+
+### Change 7 — Back link target
+Change `Link to="/home#meet-guides"` → `Link to="/guides"` (both the back link at top and the not-found state).
+
+## New imports needed
+- `MessageCircle, Share2, PlayCircle, Link as LinkIcon` from lucide-react
+- `useToast` from `@/hooks/use-toast`
+
+## Technical notes
+- All inline styles use the exact hex/rgba values from the spec
+- `CalendarCheck` import removed (no longer used)
+- `BookingRequestForm` import kept (still rendered in the right column)
+- Motion animations preserved
+- All data fetching and SEO logic unchanged
 
