@@ -90,6 +90,7 @@ const Admin = () => {
   const [editFormData, setEditFormData] = useState<GuideApplication["form_data"] | null>(null);
   const [editServiceAreas, setEditServiceAreas] = useState<string[]>([]);
   const [savingGuide, setSavingGuide] = useState(false);
+  const [sendingReminders, setSendingReminders] = useState(false);
   const [expandedTour, setExpandedTour] = useState<string | null>(null);
   const [guidePhotoUrls, setGuidePhotoUrls] = useState<Record<string, string>>({});
 
