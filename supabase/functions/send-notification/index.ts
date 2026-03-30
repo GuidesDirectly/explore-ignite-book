@@ -194,6 +194,59 @@ const handler = async (req: Request): Promise<Response> => {
         </table>
         <p style="margin-top:16px;color:#888;font-size:12px;">Sent from iGuide Tours website</p>
       `;
+
+      // Send traveler confirmation email if email is provided
+      if (data.email) {
+        try {
+          await resend.emails.send({
+            from: "Guides Directly <noreply@iguidetours.net>",
+            to: [String(data.email)],
+            subject: `We received your message, ${escapeHtml(data.name)} — a guide will be in touch soon`,
+            html: `
+              <div style="font-family:'Georgia','Times New Roman',serif;max-width:600px;margin:0 auto;">
+                <div style="background:#0A1628;padding:32px 40px;text-align:center;">
+                  <h1 style="color:#ffffff;margin:0;font-size:26px;letter-spacing:1px;">GuidesDirectly</h1>
+                  <p style="color:rgba(255,255,255,0.5);margin:6px 0 0;font-size:12px;">by iGuide Tours</p>
+                </div>
+                <div style="padding:40px;background:#ffffff;">
+                  <h2 style="color:#0A1628;font-size:22px;margin:0 0 20px;">Hi ${escapeHtml(data.name)},</h2>
+                  <p style="color:#333333;line-height:1.7;font-size:16px;">Thank you for reaching out to <strong>Guides Directly</strong>.</p>
+                  <p style="color:#333333;line-height:1.7;font-size:16px;">We have received your inquiry about <strong>${escapeHtml(data.destination)}</strong> and will connect you with a verified local guide within 24 hours.</p>
+
+                  <div style="border-top:1px solid #F0E6C8;margin:28px 0;"></div>
+
+                  <h3 style="color:#0A1628;font-size:17px;margin:0 0 16px;">Here is what you told us:</h3>
+                  <p style="color:#333333;line-height:1.7;font-size:16px;margin:0 0 8px;">• <strong>Destination:</strong> ${escapeHtml(data.destination)}</p>
+                  ${data.group_size ? `<p style="color:#333333;line-height:1.7;font-size:16px;margin:0 0 8px;">• <strong>Group size:</strong> ${escapeHtml(data.group_size)}</p>` : ""}
+                  ${data.message ? `<p style="color:#333333;line-height:1.7;font-size:16px;margin:0 0 8px;">• <strong>Your message:</strong> ${escapeHtml(data.message)}</p>` : ""}
+
+                  <p style="color:#333333;line-height:1.7;font-size:16px;margin-top:20px;">While you wait, you can browse our verified guides directly:</p>
+
+                  <div style="text-align:center;margin:30px 0 10px;">
+                    <a href="https://iguidetours.net/guides" style="display:inline-block;background:#C9A84C;color:#0A1628;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">Browse Guides Now →</a>
+                  </div>
+
+                  <div style="border-top:1px solid #F0E6C8;margin:28px 0;"></div>
+
+                  <h3 style="color:#0A1628;font-size:17px;margin:0 0 12px;">A quick note on how we work:</h3>
+                  <p style="color:#333333;line-height:1.7;font-size:16px;">Unlike other platforms, Guides Directly takes zero commission from your guide. The price you agree with your guide is exactly what they receive. No markups. No platform fees. Just a direct human connection.</p>
+
+                  <p style="color:#333333;line-height:1.7;font-size:16px;">If you have urgent questions, call us: <strong>+1 (202) 243-8336</strong></p>
+
+                  <p style="color:#333333;line-height:1.7;font-size:16px;">We look forward to helping you experience <strong>${escapeHtml(data.destination)}</strong> through local eyes.</p>
+
+                  <p style="color:#333333;font-size:15px;margin-top:28px;">— The Guides Directly Team</p>
+                </div>
+                <div style="padding:20px;text-align:center;background:#F5F5F5;">
+                  <p style="color:#999999;font-size:12px;margin:0;line-height:1.6;">© 2025–2026 Guides Directly, powered by iGuide Tours<br/>Bethesda, MD · Washington DC Area<br/>+1 (202) 243-8336</p>
+                </div>
+              </div>
+            `,
+          });
+        } catch (e) {
+          console.error("Failed to send traveler confirmation:", e);
+        }
+      }
     } else if (type === "review") {
       const stars = "★".repeat(data.rating as number) + "☆".repeat(5 - (data.rating as number));
       subject = `⭐ New ${escapeHtml(data.rating)}-Star Review from ${escapeHtml(data.reviewer_name)}`;
