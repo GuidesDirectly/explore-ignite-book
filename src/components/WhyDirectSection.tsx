@@ -1,124 +1,77 @@
-import { motion } from "framer-motion";
 import { Check, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
+
+const otherPlatformItems = [
+  "Guide keeps only 70% of what you pay",
+  "Platform fee added at checkout",
+  "Guide treats you as a booking, not a guest",
+  "Your money funds the middleman",
+  "Guide has no incentive to go above and beyond",
+  "Your relationship ends when the tour ends",
+];
+
+const guidesDirectlyItems = [
+  "Guide keeps 100% of every dollar you pay",
+  "Zero platform fees, always",
+  "Guide is personally invested in your day",
+  "Every dollar goes to the local economy",
+  "Guide has every reason to exceed expectations",
+  "Build a real relationship — book them again",
+];
 
 const WhyDirectSection = () => {
-  const { t } = useTranslation();
-
-  const travelerItems = [
-    t("whyDirect.tItem1"),
-    t("whyDirect.tItem2"),
-    t("whyDirect.tItem3"),
-    t("whyDirect.tItem4"),
-    t("whyDirect.tItem5"),
-    t("whyDirect.tItem6"),
-  ];
-
-  const guideItems = [
-    t("whyDirect.gItem1"),
-    t("whyDirect.gItem2"),
-    t("whyDirect.gItem3"),
-    t("whyDirect.gItem4"),
-    t("whyDirect.gItem5"),
-  ];
-
-  const comparison = [
-    { feature: t("valueProp.commission"), us: t("valueProp.commissionUs"), ota: t("valueProp.commissionOta") },
-    { feature: t("valueProp.directChat"), us: t("valueProp.directChatUs"), ota: t("valueProp.directChatOta") },
-    { feature: t("valueProp.transparentPricing"), us: t("valueProp.transparentPricingUs"), ota: t("valueProp.transparentPricingOta") },
-    { feature: t("valueProp.guidesKeepEarnings"), us: t("valueProp.guidesKeepEarningsUs"), ota: t("valueProp.guidesKeepEarningsOta") },
-    { feature: t("valueProp.algorithmRanking"), us: t("valueProp.algorithmRankingUs"), ota: t("valueProp.algorithmRankingOta") },
-  ];
-
   return (
-    <section id="why-book-direct" className="py-24 bg-card">
-      <div className="container mx-auto px-4 max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-14"
-        >
-          <p className="text-primary font-body text-sm uppercase tracking-[0.2em] font-semibold mb-3">
-            {t("whyDirect.label")}
+    <section id="why-book-direct" style={{ background: "#0A1628" }} className="py-20">
+      <div className="container mx-auto px-4">
+        {/* Heading */}
+        <div className="text-center max-w-[600px] mx-auto">
+          <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: "0.12em" }} className="uppercase font-semibold mb-3">
+            WHY BOOK DIRECT
           </p>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            {t("whyDirect.title")}
+          <h2 style={{ color: "#F5F0E8" }} className="font-display text-[26px] md:text-[36px] font-semibold leading-tight">
+            The difference is more than the price.
           </h2>
-        </motion.div>
-
-        {/* Two-column benefit lists */}
-        <div className="grid md:grid-cols-2 gap-10 mb-16">
-          {/* Travelers */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="bg-background rounded-2xl p-8 border border-border shadow-card"
-          >
-            <h3 className="font-display text-xl font-bold text-foreground mb-6">{t("whyDirect.travelerTitle")}</h3>
-            <div className="space-y-4">
-              {travelerItems.map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-gradient-gold flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 text-secondary" />
-                  </div>
-                  <p className="text-foreground leading-relaxed">{item}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Guides */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="bg-background rounded-2xl p-8 border border-border shadow-card"
-          >
-            <h3 className="font-display text-xl font-bold text-foreground mb-6">{t("whyDirect.guideTitle")}</h3>
-            <div className="space-y-4">
-              {guideItems.map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-secondary border border-primary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 text-primary" />
-                  </div>
-                  <p className="text-foreground leading-relaxed">{item}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 16, maxWidth: 480, marginTop: 12 }} className="mx-auto">
+            When your guide keeps everything they earn, everything about the experience changes.
+          </p>
         </div>
 
-        {/* Comparison table */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <div className="rounded-2xl overflow-hidden border border-border shadow-card">
-            <div className="grid grid-cols-3 bg-secondary text-sm font-semibold">
-              <div className="p-4 text-primary-foreground/70">{t("valueProp.feature")}</div>
-              <div className="p-4 text-center text-primary">{t("valueProp.guidesDirect")}</div>
-              <div className="p-4 text-center text-primary-foreground/70">{t("valueProp.typicalOta")}</div>
+        {/* Two-column comparison */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[860px] mx-auto mt-12">
+          {/* Other Platforms */}
+          <div>
+            <div style={{ background: "rgba(192,57,43,0.1)", border: "1px solid rgba(192,57,43,0.3)", borderRadius: "12px 12px 0 0", padding: "16px 24px" }}>
+              <span style={{ color: "#C0392B", fontSize: 15, fontWeight: 600 }}>Other Platforms</span>
             </div>
-            {comparison.map((row, i) => (
-              <div key={i} className={`grid grid-cols-3 text-sm ${i % 2 === 0 ? "bg-card" : "bg-muted/30"}`}>
-                <div className="p-4 text-foreground font-medium">{row.feature}</div>
-                <div className="p-4 text-center flex items-center justify-center gap-1.5 text-primary font-semibold">
-                  <Check className="w-4 h-4" /> {row.us}
+            <div style={{ background: "rgba(192,57,43,0.04)", borderLeft: "1px solid rgba(192,57,43,0.2)", borderRight: "1px solid rgba(192,57,43,0.2)", borderBottom: "1px solid rgba(192,57,43,0.2)", borderRadius: "0 0 12px 12px" }} className="p-6 space-y-4">
+              {otherPlatformItems.map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <X style={{ color: "#C0392B" }} className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 14 }}>{item}</span>
                 </div>
-                <div className="p-4 text-center text-muted-foreground flex items-center justify-center gap-1.5">
-                  <X className="w-3.5 h-3.5 text-destructive/60" /> {row.ota}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </motion.div>
+
+          {/* Guides Directly */}
+          <div>
+            <div style={{ background: "rgba(45,106,79,0.12)", border: "1px solid rgba(45,106,79,0.4)", borderRadius: "12px 12px 0 0", padding: "16px 24px" }}>
+              <span style={{ color: "#2D6A4F", fontSize: 15, fontWeight: 600 }}>Guides Directly</span>
+            </div>
+            <div style={{ background: "rgba(45,106,79,0.04)", borderLeft: "1px solid rgba(45,106,79,0.2)", borderRight: "1px solid rgba(45,106,79,0.2)", borderBottom: "1px solid rgba(45,106,79,0.2)", borderRadius: "0 0 12px 12px" }} className="p-6 space-y-4">
+              {guidesDirectlyItems.map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <Check style={{ color: "#2D6A4F" }} className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 14 }}>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Closing statement */}
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, fontStyle: "italic", maxWidth: 500, marginTop: 32 }} className="text-center mx-auto">
+          Guides Directly is the only platform where the guide you meet is the guide who keeps everything you paid.
+        </p>
       </div>
     </section>
   );
