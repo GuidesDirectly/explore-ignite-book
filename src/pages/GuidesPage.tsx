@@ -239,7 +239,7 @@ const GuidesPage = () => {
                     {/* Avatar */}
                     <div
                       className="relative flex items-center justify-center"
-                      style={{ aspectRatio: "1/1", background: "#0A1628", overflow: "hidden" }}
+                      style={{ aspectRatio: "16/9", background: "#0A1628", overflow: "hidden" }}
                     >
                       {getCityImage(guide) && (
                         <>
