@@ -15,11 +15,13 @@ import GuideBadge, { getHighestBadge, type BadgeType } from "@/components/GuideB
 import { Button } from "@/components/ui/button";
 import {
   MapPin, Globe, Star, ShieldCheck, CheckCircle2,
-  ArrowLeft, Mail, Clock, Users, Camera, Mountain, CalendarCheck
+  ArrowLeft, Users, Camera, Mountain,
+  MessageCircle, Share2, PlayCircle, Link as LinkIcon
 } from "lucide-react";
 import SaveGuideButton from "@/components/SaveGuideButton";
 import { useSavedGuides } from "@/hooks/useSavedGuides";
 import { motion } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 interface GuideData {
   id: string;
@@ -37,6 +39,7 @@ interface GuideData {
     licenseNumber?: string;
     licensingAuthority?: string;
     certifications?: string[];
+    videoUrl?: string;
   };
   translations: Record<string, Record<string, string>> | null;
 }
@@ -53,6 +56,7 @@ interface ReviewData {
 const GuideProfilePage = () => {
   const { id } = useParams<{ id: string }>();
   const { t, i18n } = useTranslation();
+  const { toast } = useToast();
   const [guide, setGuide] = useState<GuideData | null>(null);
   const [reviews, setReviews] = useState<ReviewData[]>([]);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
@@ -80,7 +84,6 @@ const GuideProfilePage = () => {
 
       setGuide(data);
 
-      // Photo — find actual profile file (name may include timestamp)
       const { data: photoFiles } = await supabase.storage
         .from("guide-photos")
         .list(data.user_id, { limit: 10 });
@@ -92,7 +95,6 @@ const GuideProfilePage = () => {
         setPhotoUrl(photoData?.publicUrl || null);
       }
 
-      // Reviews
       const { data: reviewData } = await (supabase
         .from("reviews_public" as any)
         .select("id, reviewer_name, rating, comment, created_at, translations")
@@ -102,14 +104,12 @@ const GuideProfilePage = () => {
 
       setReviews(reviewData || []);
 
-      // Badges
       const { data: badgeData } = await supabase
         .from("guide_badges" as any)
         .select("badge_type")
         .eq("guide_user_id", data.user_id);
       setBadges((badgeData as any[] || []).map((b: any) => b.badge_type as BadgeType));
 
-      // Availability
       const { data: availData } = await supabase
         .from("guide_availability" as any)
         .select("date, status")
@@ -142,10 +142,8 @@ const GuideProfilePage = () => {
     const pageUrl = `https://explore-ignite-book.lovable.app/guide/${guide.id}`;
     const imageUrl = photoUrl || "https://explore-ignite-book.lovable.app/og-image.jpg";
 
-    // Title
     document.title = title;
 
-    // Helper to set/create meta tags
     const setMeta = (attr: string, key: string, content: string) => {
       let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
       if (!el) {
@@ -167,7 +165,6 @@ const GuideProfilePage = () => {
     setMeta("name", "twitter:description", description);
     setMeta("name", "twitter:image", imageUrl);
 
-    // Canonical
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonical) {
       canonical = document.createElement("link");
@@ -176,7 +173,6 @@ const GuideProfilePage = () => {
     }
     canonical.setAttribute("href", pageUrl);
 
-    // JSON-LD structured data
     const jsonLdId = "guide-profile-jsonld";
     let script = document.getElementById(jsonLdId) as HTMLScriptElement | null;
     if (!script) {
@@ -205,21 +201,43 @@ const GuideProfilePage = () => {
       })
     });
 
-    // Cleanup
     return () => {
       document.title = "iGuide Tours — Premium Local Tour Guides in USA & Canada";
       const ldScript = document.getElementById(jsonLdId);
       if (ldScript) ldScript.remove();
     };
   }, [guide, photoUrl, reviews]);
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${guide?.form_data.firstName} — Guides Directly`,
+          text: "I found an amazing local guide on Guides Directly — no commission, direct contact.",
+          url: window.location.href
+        });
+      } catch {
+        // user cancelled share
+      }
+    } else {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({ title: "Link copied to clipboard!" });
+    }
+  };
+
+  const handleCopyLink = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    toast({ title: "Link copied!" });
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen" style={{ background: "#0A1628" }}>
         <Navbar />
         <div className="container mx-auto px-4 pt-24 pb-16">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-muted rounded w-48" />
-            <div className="h-64 bg-muted rounded-2xl" />
+            <div className="h-8 rounded w-48" style={{ background: "#1A2F50" }} />
+            <div className="h-64 rounded-2xl" style={{ background: "#1A2F50" }} />
           </div>
         </div>
       </div>
@@ -228,14 +246,14 @@ const GuideProfilePage = () => {
 
   if (notFound || !guide) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen" style={{ background: "#0A1628" }}>
         <Navbar />
         <div className="container mx-auto px-4 pt-24 pb-16 text-center">
-          <h1 className="text-3xl font-display font-bold text-foreground mb-4">
+          <h1 className="text-3xl font-display font-bold mb-4" style={{ color: "#F5F0E8" }}>
             {t("guideProfile.notFound", "Guide not found")}
           </h1>
           <Button variant="outline" asChild>
-            <Link to="/home#meet-guides">
+            <Link to="/guides">
               <ArrowLeft className="w-4 h-4 mr-2" />
               {t("guideProfile.backToGuides", "Back to Guides")}
             </Link>
@@ -253,8 +271,14 @@ const GuideProfilePage = () => {
     ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10
     : 0;
 
+  const credentialLine = fd.firstName === "Michael"
+    ? "Founder & President, iGuide Tours"
+    : fd.firstName === "Mike"
+      ? "President, Chicago Tour-Guide Professionals Association (CTPA)"
+      : null;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ background: "#0A1628" }}>
       <Navbar />
 
       <div className="container mx-auto px-4 pt-24 pb-16">
@@ -265,8 +289,11 @@ const GuideProfilePage = () => {
           transition={{ duration: 0.3 }}
         >
           <Link
-            to="/home#meet-guides"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+            to="/guides"
+            className="inline-flex items-center gap-2 text-sm transition-colors mb-8"
+            style={{ color: "rgba(255,255,255,0.65)" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#F5F0E8")}
+            onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.65)")}
           >
             <ArrowLeft className="w-4 h-4" />
             {t("guideProfile.backToGuides", "Back to Guides")}
@@ -281,9 +308,15 @@ const GuideProfilePage = () => {
             transition={{ duration: 0.5 }}
             className="lg:col-span-1"
           >
-            <div className="bg-card rounded-2xl border border-border/50 overflow-hidden sticky top-24">
+            <div
+              className="rounded-xl overflow-hidden sticky top-24"
+              style={{
+                background: "#1A2F50",
+                border: "1px solid rgba(201,168,76,0.15)",
+              }}
+            >
               {/* Header gradient */}
-              <div className="relative h-32 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent">
+              <div className="relative h-32" style={{ background: "linear-gradient(135deg, rgba(201,168,76,0.2), rgba(26,47,80,0.8))" }}>
                 {guide && (
                   <div className="absolute top-3 right-3 z-10">
                     <SaveGuideButton
@@ -299,25 +332,40 @@ const GuideProfilePage = () => {
                     <img
                       src={photoUrl}
                       alt={`${fd.firstName} ${fd.lastName}`}
-                      className="w-20 h-20 rounded-xl object-cover ring-4 ring-card shadow-lg"
+                      className="w-20 h-20 rounded-xl object-cover shadow-lg"
+                      style={{ boxShadow: "0 0 0 4px #1A2F50, 0 4px 12px rgba(0,0,0,0.3)" }}
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
                         e.currentTarget.nextElementSibling?.classList.remove("hidden");
                       }}
                     />
                   ) : null}
-                  <div className={`w-20 h-20 rounded-xl bg-primary text-secondary font-display font-bold text-2xl flex items-center justify-center ring-4 ring-card shadow-lg ${photoUrl ? "hidden" : ""}`}>
+                  <div
+                    className={`w-20 h-20 rounded-xl font-display font-bold text-2xl flex items-center justify-center shadow-lg ${photoUrl ? "hidden" : ""}`}
+                    style={{
+                      background: "#C9A84C",
+                      color: "#0A1628",
+                      boxShadow: "0 0 0 4px #1A2F50, 0 4px 12px rgba(0,0,0,0.3)",
+                    }}
+                  >
                     {initials}
                   </div>
                 </div>
               </div>
 
               <div className="pt-14 px-6 pb-6 space-y-4">
-                <h1 className="font-display text-2xl font-bold text-foreground">
+                <h1 className="font-display text-2xl font-bold" style={{ color: "#F5F0E8" }}>
                   {fd.firstName} {fd.lastName}
                 </h1>
 
-                {/* Verification badges — primary (large) + secondary row */}
+                {/* Credential line */}
+                {credentialLine && (
+                  <p style={{ fontSize: "13px", color: "#C9A84C", margin: "4px 0" }}>
+                    {credentialLine}
+                  </p>
+                )}
+
+                {/* Verification badges */}
                 {badges.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     <GuideBadge type={getHighestBadge(badges)!} size="md" />
@@ -332,9 +380,9 @@ const GuideProfilePage = () => {
                 {/* Rating */}
                 {reviews.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-primary fill-primary" />
-                    <span className="font-semibold text-foreground">{avgRating}</span>
-                    <span className="text-sm text-muted-foreground">
+                    <Star className="w-4 h-4" style={{ color: "#C9A84C", fill: "#C9A84C" }} />
+                    <span className="font-semibold" style={{ color: "#F5F0E8" }}>{avgRating}</span>
+                    <span className="text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
                       ({reviews.length} {reviews.length === 1 ? t("guides.review") : t("guides.reviews")})
                     </span>
                   </div>
@@ -342,44 +390,65 @@ const GuideProfilePage = () => {
 
                 {/* Service areas */}
                 {guide.service_areas?.length > 0 && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="w-4 h-4 text-primary/70 flex-shrink-0" />
+                  <div className="flex items-center gap-2 text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
+                    <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "rgba(201,168,76,0.7)" }} />
                     <span>{guide.service_areas.map(a => translateOption(t, a)).join(", ")}</span>
                   </div>
                 )}
 
                 {/* Languages */}
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Globe className="w-4 h-4 text-primary/70 flex-shrink-0" />
+                <div className="flex items-center gap-2 text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
+                  <Globe className="w-4 h-4 flex-shrink-0" style={{ color: "rgba(201,168,76,0.7)" }} />
                   <span>{translateOptions(t, fd.languages || []).join(", ")}</span>
                 </div>
 
                 {/* Credentials */}
-                <div className="flex flex-wrap gap-1.5 pt-2 border-t border-border/30">
+                <div className="flex flex-wrap gap-1.5 pt-2" style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }}>
                   {fd.insuranceCompanyName && (
-                    <Badge variant="outline" className="text-xs gap-1 border-green-500/30 text-green-600 bg-green-500/10">
+                    <Badge variant="outline" className="text-xs gap-1" style={{ borderColor: "rgba(45,106,79,0.4)", color: "#52b788", background: "rgba(45,106,79,0.15)" }}>
                       <ShieldCheck className="w-3 h-3" /> {t("guides.insured")}
                     </Badge>
                   )}
                   {fd.licenseNumber && (
-                    <Badge variant="outline" className="text-xs gap-1 border-blue-500/30 text-blue-600 bg-blue-500/10">
+                    <Badge variant="outline" className="text-xs gap-1" style={{ borderColor: "rgba(59,130,246,0.4)", color: "#60a5fa", background: "rgba(59,130,246,0.15)" }}>
                       <CheckCircle2 className="w-3 h-3" /> {t("guides.licensed")}
                     </Badge>
                   )}
                   {fd.certifications && fd.certifications.length > 0 && (
-                    <Badge variant="outline" className="text-xs gap-1 border-purple-500/30 text-purple-600 bg-purple-500/10">
+                    <Badge variant="outline" className="text-xs gap-1" style={{ borderColor: "rgba(168,85,247,0.4)", color: "#c084fc", background: "rgba(168,85,247,0.15)" }}>
                       {t(fd.certifications.length > 1 ? "guides.certs_plural" : "guides.certs", { count: fd.certifications.length })}
                     </Badge>
                   )}
                 </div>
 
-                {/* CTA */}
-                <Button variant="hero" className="w-full" asChild>
-                  <a href="#booking-section">
-                    <CalendarCheck className="w-4 h-4 mr-2" />
-                    {t("guideProfile.requestBooking", "Request a Booking")}
-                  </a>
-                </Button>
+                {/* CTA Buttons */}
+                <div className="flex flex-col gap-3 pt-2">
+                  <button
+                    onClick={() => document.getElementById("contact-section")?.scrollIntoView({ behavior: "smooth" })}
+                    className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 font-semibold transition-opacity hover:opacity-90"
+                    style={{
+                      background: "#C9A84C",
+                      color: "#0A1628",
+                      fontSize: "15px",
+                    }}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Message {fd.firstName}
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 font-semibold transition-opacity hover:opacity-90"
+                    style={{
+                      background: "transparent",
+                      color: "#C9A84C",
+                      border: "1.5px solid #C9A84C",
+                      fontSize: "15px",
+                    }}
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Share This Guide
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -392,25 +461,76 @@ const GuideProfilePage = () => {
             className="lg:col-span-2 space-y-8"
           >
             {/* Bio */}
-            <section className="bg-card rounded-2xl border border-border/50 p-6">
-              <h2 className="font-display text-xl font-bold text-foreground mb-4">
+            <section
+              className="rounded-xl p-6"
+              style={{ background: "#1A2F50", border: "1px solid rgba(201,168,76,0.15)" }}
+            >
+              <h2 className="font-display text-xl font-bold mb-4" style={{ color: "#F5F0E8" }}>
                 {t("guideProfile.about", "About")}
               </h2>
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+              <p className="leading-relaxed whitespace-pre-line" style={{ color: "rgba(255,255,255,0.65)" }}>
                 {translatedBio}
               </p>
             </section>
 
+            {/* Watch & Learn — Video section */}
+            <section
+              className="rounded-xl p-6"
+              style={{ background: "#1A2F50", border: "1px solid rgba(201,168,76,0.15)" }}
+            >
+              <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2" style={{ color: "#F5F0E8" }}>
+                <PlayCircle className="w-5 h-5" style={{ color: "#C9A84C" }} />
+                Watch &amp; Learn
+              </h2>
+              {fd.videoUrl ? (
+                <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
+                  <iframe
+                    src={fd.videoUrl}
+                    className="absolute inset-0 w-full h-full rounded-xl"
+                    style={{ border: "none" }}
+                    allowFullScreen
+                    title={`${fd.firstName}'s introduction video`}
+                  />
+                </div>
+              ) : (
+                <div
+                  className="w-full flex flex-col items-center justify-center rounded-xl"
+                  style={{
+                    aspectRatio: "16/9",
+                    background: "#0A1628",
+                    border: "1px solid rgba(201,168,76,0.2)",
+                  }}
+                >
+                  <PlayCircle className="mb-3" style={{ width: 48, height: 48, color: "rgba(201,168,76,0.4)" }} />
+                  <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>Video coming soon</p>
+                  <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)", marginTop: 4 }}>
+                    Check back to see {fd.firstName}'s introduction video
+                  </p>
+                </div>
+              )}
+            </section>
+
             {/* Specializations */}
             {fd.specializations?.length > 0 && (
-              <section className="bg-card rounded-2xl border border-border/50 p-6">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4">
-                  <Mountain className="w-5 h-5 inline mr-2 text-primary" />
+              <section
+                className="rounded-xl p-6"
+                style={{ background: "#1A2F50", border: "1px solid rgba(201,168,76,0.15)" }}
+              >
+                <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2" style={{ color: "#F5F0E8" }}>
+                  <Mountain className="w-5 h-5" style={{ color: "#C9A84C" }} />
                   {t("guideProfile.specializations", "Specializations")}
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {fd.specializations.map((spec) => (
-                    <Badge key={spec} className="bg-primary/10 text-primary border-primary/20 text-sm py-1 px-3">
+                    <Badge
+                      key={spec}
+                      className="text-sm py-1 px-3"
+                      style={{
+                        background: "rgba(201,168,76,0.1)",
+                        color: "#C9A84C",
+                        borderColor: "rgba(201,168,76,0.2)",
+                      }}
+                    >
                       {translateOption(t, spec)}
                     </Badge>
                   ))}
@@ -420,14 +540,26 @@ const GuideProfilePage = () => {
 
             {/* Tour types */}
             {fd.tourTypes?.length > 0 && (
-              <section className="bg-card rounded-2xl border border-border/50 p-6">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4">
-                  <Camera className="w-5 h-5 inline mr-2 text-primary" />
+              <section
+                className="rounded-xl p-6"
+                style={{ background: "#1A2F50", border: "1px solid rgba(201,168,76,0.15)" }}
+              >
+                <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2" style={{ color: "#F5F0E8" }}>
+                  <Camera className="w-5 h-5" style={{ color: "#C9A84C" }} />
                   {t("guideProfile.tourTypes", "Tour Types")}
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {fd.tourTypes.map((tt) => (
-                    <Badge key={tt} variant="secondary" className="text-sm py-1 px-3">
+                    <Badge
+                      key={tt}
+                      variant="secondary"
+                      className="text-sm py-1 px-3"
+                      style={{
+                        background: "rgba(255,255,255,0.08)",
+                        color: "rgba(255,255,255,0.75)",
+                        borderColor: "rgba(255,255,255,0.1)",
+                      }}
+                    >
                       {translateOption(t, tt)}
                     </Badge>
                   ))}
@@ -437,14 +569,25 @@ const GuideProfilePage = () => {
 
             {/* Target audience */}
             {fd.targetAudience?.length > 0 && (
-              <section className="bg-card rounded-2xl border border-border/50 p-6">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4">
-                  <Users className="w-5 h-5 inline mr-2 text-primary" />
+              <section
+                className="rounded-xl p-6"
+                style={{ background: "#1A2F50", border: "1px solid rgba(201,168,76,0.15)" }}
+              >
+                <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2" style={{ color: "#F5F0E8" }}>
+                  <Users className="w-5 h-5" style={{ color: "#C9A84C" }} />
                   {t("guideProfile.idealFor", "Ideal For")}
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {fd.targetAudience.map((aud) => (
-                    <Badge key={aud} variant="outline" className="text-sm py-1 px-3">
+                    <Badge
+                      key={aud}
+                      variant="outline"
+                      className="text-sm py-1 px-3"
+                      style={{
+                        borderColor: "rgba(201,168,76,0.2)",
+                        color: "rgba(255,255,255,0.7)",
+                      }}
+                    >
                       {aud}
                     </Badge>
                   ))}
@@ -459,19 +602,22 @@ const GuideProfilePage = () => {
             <GuideGallery guideUserId={guide.user_id} />
 
             {/* Reviews */}
-            <section className="bg-card rounded-2xl border border-border/50 p-6">
-              <h2 className="font-display text-xl font-bold text-foreground mb-4">
-                <Star className="w-5 h-5 inline mr-2 text-primary" />
+            <section
+              className="rounded-xl p-6"
+              style={{ background: "#1A2F50", border: "1px solid rgba(201,168,76,0.15)" }}
+            >
+              <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2" style={{ color: "#F5F0E8" }}>
+                <Star className="w-5 h-5" style={{ color: "#C9A84C" }} />
                 {t("guideProfile.reviews", "Reviews")}
                 {reviews.length > 0 && (
-                  <span className="text-sm font-normal text-muted-foreground ml-2">
+                  <span className="text-sm font-normal ml-2" style={{ color: "rgba(255,255,255,0.5)" }}>
                     ({reviews.length})
                   </span>
                 )}
               </h2>
 
               {reviews.length === 0 ? (
-                <p className="text-muted-foreground text-sm">
+                <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
                   {t("guideProfile.noReviews", "No reviews yet.")}
                 </p>
               ) : (
@@ -479,23 +625,31 @@ const GuideProfilePage = () => {
                   {reviews.map((review) => {
                     const translatedComment = review.translations?.[currentLang]?.["comment"] || review.comment;
                     return (
-                      <div key={review.id} className="border-b border-border/30 last:border-0 pb-4 last:pb-0">
+                      <div
+                        key={review.id}
+                        className="last:border-0 pb-4 last:pb-0"
+                        style={{ borderBottom: "1px solid rgba(201,168,76,0.1)" }}
+                      >
                         <div className="flex items-center gap-2 mb-2">
                           <div className="flex items-center gap-1">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`w-3.5 h-3.5 ${i < review.rating ? "text-primary fill-primary" : "text-muted/30"}`}
+                                className="w-3.5 h-3.5"
+                                style={{
+                                  color: i < review.rating ? "#C9A84C" : "rgba(255,255,255,0.15)",
+                                  fill: i < review.rating ? "#C9A84C" : "none",
+                                }}
                               />
                             ))}
                           </div>
-                          <span className="text-sm font-semibold text-foreground">{review.reviewer_name}</span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-sm font-semibold" style={{ color: "#F5F0E8" }}>{review.reviewer_name}</span>
+                          <span className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
                             {new Date(review.created_at).toLocaleDateString()}
                           </span>
                         </div>
                         {translatedComment && (
-                          <p className="text-sm text-muted-foreground">{translatedComment}</p>
+                          <p className="text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>{translatedComment}</p>
                         )}
                       </div>
                     );
@@ -504,7 +658,7 @@ const GuideProfilePage = () => {
               )}
 
               {/* Leave a review link */}
-              <div className="mt-4 pt-4 border-t border-border/30">
+              <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }}>
                 <Button variant="outline" size="sm" asChild>
                   <Link to={`/review?guide=${guide.user_id}`}>
                     {t("guideProfile.leaveReview", "Leave a Review")}
@@ -522,12 +676,80 @@ const GuideProfilePage = () => {
               availableDates={availableDates}
             />
 
+            {/* Social sharing strip */}
+            <div
+              className="flex items-center gap-3 flex-wrap rounded-xl"
+              style={{
+                background: "rgba(201,168,76,0.04)",
+                border: "1px solid rgba(201,168,76,0.1)",
+                padding: "16px 20px",
+              }}
+            >
+              <span className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.65)" }}>
+                Share {fd.firstName}'s profile:
+              </span>
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(`Check out this amazing local guide on Guides Directly: ${window.location.href}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-lg transition-opacity hover:opacity-80"
+                style={{
+                  background: "rgba(37,211,102,0.1)",
+                  border: "1px solid rgba(37,211,102,0.3)",
+                  color: "#25D366",
+                  padding: "8px 16px",
+                  fontSize: "13px",
+                  fontWeight: 500,
+                }}
+              >
+                <MessageCircle className="w-4 h-4" />
+                WhatsApp
+              </a>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-lg transition-opacity hover:opacity-80"
+                style={{
+                  background: "rgba(24,119,242,0.1)",
+                  border: "1px solid rgba(24,119,242,0.3)",
+                  color: "#1877F2",
+                  padding: "8px 16px",
+                  fontSize: "13px",
+                  fontWeight: 500,
+                }}
+              >
+                <Share2 className="w-4 h-4" />
+                Facebook
+              </a>
+              <button
+                onClick={handleCopyLink}
+                className="flex items-center gap-1.5 rounded-lg transition-opacity hover:opacity-80"
+                style={{
+                  background: "rgba(201,168,76,0.1)",
+                  border: "1px solid rgba(201,168,76,0.3)",
+                  color: "#C9A84C",
+                  padding: "8px 16px",
+                  fontSize: "13px",
+                  fontWeight: 500,
+                }}
+              >
+                <LinkIcon className="w-4 h-4" />
+                Copy Link
+              </button>
+            </div>
+
             {/* Contact form */}
-            <GuideContactForm
-              guideName={`${fd.firstName} ${fd.lastName}`}
-              guideUserId={guide.user_id}
-              serviceAreas={guide.service_areas || []}
-            />
+            <div id="contact-section">
+              <h2 className="font-display text-xl font-bold mb-4" style={{ color: "#F5F0E8" }}>
+                Send {fd.firstName} a Message
+              </h2>
+              <GuideContactForm
+                guideName={`${fd.firstName} ${fd.lastName}`}
+                guideUserId={guide.user_id}
+                serviceAreas={guide.service_areas || []}
+              />
+            </div>
           </motion.div>
         </div>
       </div>
