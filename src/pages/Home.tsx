@@ -47,6 +47,9 @@ const Home = () => {
       {/* Trust Bar */}
       <TrustBarSection />
 
+      {/* True Price Moment */}
+      <TruePriceSection />
+
       {/* Section 4 — How It Works */}
       <HowItWorksSection />
 
