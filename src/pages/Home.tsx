@@ -5,6 +5,7 @@ import HeroSection from "@/components/HeroSection";
 import TrustBarSection from "@/components/TrustBarSection";
 import TruePriceSection from "@/components/TruePriceSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
+import MeetGuidesSection from "@/components/MeetGuidesSection";
 import DestinationsSection from "@/components/DestinationsSection";
 import WhyDirectSection from "@/components/WhyDirectSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
