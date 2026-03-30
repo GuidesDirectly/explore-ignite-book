@@ -27,7 +27,7 @@ const corsHeaders = {
 const NOTIFY_EMAIL = "michael@iguidetours.net";
 
 interface NotificationRequest {
-  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request";
+  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request" | "profile_reminder";
   data: Record<string, unknown>;
 }
 
