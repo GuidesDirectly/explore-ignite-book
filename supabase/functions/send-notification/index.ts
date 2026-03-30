@@ -330,21 +330,43 @@ const handler = async (req: Request): Promise<Response> => {
 
       if (!guideEmail) throw new Error("Guide email is required");
 
-      subject = `✅ Application Received — iGuide Tours`;
+      subject = `You're in — welcome to Guides Directly, ${escapeHtml(guideName)}`;
       html = `
-        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-          <div style="background:#1a1f2e;padding:30px;text-align:center;">
-            <h1 style="color:#d4a843;margin:0;">iGuide Tours</h1>
+        <div style="font-family:'Georgia','Times New Roman',serif;max-width:600px;margin:0 auto;">
+          <div style="background:#0A1628;padding:32px 40px;text-align:center;">
+            <h1 style="color:#ffffff;margin:0;font-size:26px;letter-spacing:1px;">GuidesDirectly</h1>
+            <p style="color:rgba(255,255,255,0.5);margin:6px 0 0;font-size:12px;">by iGuide Tours</p>
           </div>
-          <div style="padding:30px;background:#f9f9f9;">
-            <h2 style="color:#1a1f2e;">Hi ${escapeHtml(guideName)}! 👋</h2>
-            <p>Thank you for submitting your guide application to <strong>iGuide Tours</strong>!</p>
-            <p>We've received your application and our team will review it shortly. You'll receive another email once your application has been reviewed.</p>
-            <p>In the meantime, if you have any questions, feel free to reach out to us at <a href="mailto:michael@iguidetours.net">michael@iguidetours.net</a>.</p>
-            <a href="https://explore-ignite-book.lovable.app" style="display:inline-block;background:#d4a843;color:#1a1f2e;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:bold;margin-top:10px;">Visit iGuide Tours</a>
+          <div style="padding:40px;background:#ffffff;">
+            <h2 style="color:#0A1628;font-size:22px;margin:0 0 20px;">Hi ${escapeHtml(guideName)},</h2>
+            <p style="color:#333333;line-height:1.7;font-size:16px;">Your application to join <strong>Guides Directly</strong> has been received. We are genuinely excited to have you here.</p>
+
+            <div style="border-top:1px solid #F0E6C8;margin:28px 0;"></div>
+
+            <h3 style="color:#0A1628;font-size:17px;margin:0 0 12px;">Here is what happens next:</h3>
+            <p style="color:#333333;line-height:1.7;font-size:16px;">Our team will review your profile within 2–3 business days. We look at the quality of your bio, your specializations, and your service areas to ensure every guide on the platform meets our standard.</p>
+
+            <div style="border-top:1px solid #F0E6C8;margin:28px 0;"></div>
+
+            <h3 style="color:#0A1628;font-size:17px;margin:0 0 16px;">While you wait, here are three things you can do to strengthen your application:</h3>
+            <p style="color:#333333;line-height:1.7;font-size:16px;margin:0 0 14px;"><strong style="color:#C9A84C;">✦</strong> Make sure your biography tells your story — not just your credentials. Travelers choose guides they connect with.</p>
+            <p style="color:#333333;line-height:1.7;font-size:16px;margin:0 0 14px;"><strong style="color:#C9A84C;">✦</strong> Be specific about your specializations. "Architecture &amp; History" is more compelling than "City Tours."</p>
+            <p style="color:#333333;line-height:1.7;font-size:16px;margin:0 0 14px;"><strong style="color:#C9A84C;">✦</strong> Think about what makes you different. What will travelers remember about a day spent with you?</p>
+
+            <div style="border-top:1px solid #F0E6C8;margin:28px 0;"></div>
+
+            <p style="color:#333333;line-height:1.7;font-size:16px;">Once approved, your profile goes live and travelers searching in your city can message you directly. No commission taken. Ever.</p>
+
+            <p style="color:#333333;line-height:1.7;font-size:16px;">Questions? Reply to this email or call <strong>+1 (202) 243-8336</strong>.</p>
+
+            <div style="text-align:center;margin:30px 0 10px;">
+              <a href="https://iguidetours.net/about" style="display:inline-block;background:#C9A84C;color:#0A1628;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">Learn What Happens After Approval →</a>
+            </div>
+
+            <p style="color:#333333;font-size:15px;margin-top:28px;">— Michael Zlotnitsky<br/><span style="color:#666;">Founder, Guides Directly</span></p>
           </div>
-          <div style="padding:20px;text-align:center;color:#888;font-size:12px;">
-            <p>iGuide Tours — Premium Private Tours Across North America</p>
+          <div style="padding:20px;text-align:center;background:#F5F5F5;">
+            <p style="color:#999999;font-size:12px;margin:0;line-height:1.6;">© 2025–2026 Guides Directly, powered by iGuide Tours<br/>Bethesda, MD · Washington DC Area<br/>+1 (202) 243-8336</p>
           </div>
         </div>
       `;
