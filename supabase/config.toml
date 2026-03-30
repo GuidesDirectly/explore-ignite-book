@@ -54,4 +54,7 @@ verify_jwt = false
 [functions.create-connect-account]
 verify_jwt = false
 
+[functions.draft-guide-reminder]
+verify_jwt = false
+
 
