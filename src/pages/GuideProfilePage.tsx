@@ -65,6 +65,7 @@ const GuideProfilePage = () => {
   const [notFound, setNotFound] = useState(false);
   const [badges, setBadges] = useState<BadgeType[]>([]);
   const { savedIds, toggleSave, loading: saveLoading } = useSavedGuides();
+  const [bioExpanded, setBioExpanded] = useState(false);
 
   useEffect(() => {
     const fetchGuide = async () => {
@@ -469,8 +470,19 @@ const GuideProfilePage = () => {
                 {t("guideProfile.about", "About")}
               </h2>
               <p className="leading-relaxed whitespace-pre-line" style={{ color: "rgba(255,255,255,0.65)" }}>
-                {translatedBio}
+                {translatedBio.length > 200 && !bioExpanded
+                  ? translatedBio.slice(0, 200) + "..."
+                  : translatedBio}
               </p>
+              {translatedBio.length > 200 && (
+                <span
+                  onClick={() => setBioExpanded(!bioExpanded)}
+                  style={{ color: "#C9A84C", fontSize: "13px", cursor: "pointer" }}
+                  className="inline-block mt-2 hover:underline"
+                >
+                  {bioExpanded ? "Show less" : "Read more"}
+                </span>
+              )}
             </section>
 
             {/* Watch & Learn — Video section */}
