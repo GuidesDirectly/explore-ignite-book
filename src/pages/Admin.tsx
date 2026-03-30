@@ -90,6 +90,7 @@ const Admin = () => {
   const [editFormData, setEditFormData] = useState<GuideApplication["form_data"] | null>(null);
   const [editServiceAreas, setEditServiceAreas] = useState<string[]>([]);
   const [savingGuide, setSavingGuide] = useState(false);
+  const [sendingReminders, setSendingReminders] = useState(false);
   const [expandedTour, setExpandedTour] = useState<string | null>(null);
   const [guidePhotoUrls, setGuidePhotoUrls] = useState<Record<string, string>>({});
 
@@ -272,6 +273,26 @@ const Admin = () => {
   const pendingGuides = guides.filter((g) => g.status === "pending");
   const approvedGuides = guides.filter((g) => g.status === "approved");
   const rejectedGuides = guides.filter((g) => g.status === "rejected");
+  const draftGuides = guides.filter((g) => g.status === "draft");
+
+  const handleSendReminders = async () => {
+    setSendingReminders(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("draft-guide-reminder");
+      if (error) throw error;
+      const sent = data?.sent ?? 0;
+      if (sent > 0) {
+        toast.success(`Sent reminders to ${sent} draft guide${sent > 1 ? "s" : ""}`);
+      } else {
+        toast.info("No draft guides found to remind");
+      }
+    } catch (e) {
+      console.error("Failed to send reminders:", e);
+      toast.error("Failed to send reminders — please try again");
+    } finally {
+      setSendingReminders(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -768,6 +789,33 @@ const Admin = () => {
           <div className="space-y-6">
             {guides.length === 0 && (
               <p className="text-center text-muted-foreground py-12">No guide applications yet.</p>
+            )}
+
+            {/* Draft guide reminder button */}
+            {draftGuides.length > 0 && (
+              <div className="mb-4">
+                <button
+                  onClick={handleSendReminders}
+                  disabled={sendingReminders}
+                  style={{
+                    background: "rgba(201,168,76,0.1)",
+                    border: "1px solid rgba(201,168,76,0.3)",
+                    color: "#C9A84C",
+                    fontSize: "13px",
+                    fontWeight: 500,
+                    borderRadius: "8px",
+                    padding: "8px 16px",
+                    cursor: sendingReminders ? "not-allowed" : "pointer",
+                    opacity: sendingReminders ? 0.6 : 1,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <Mail className="w-4 h-4" />
+                  {sendingReminders ? "Sending..." : `Send Reminders to Draft Guides (${draftGuides.length})`}
+                </button>
+              </div>
             )}
 
             {/* Pending section */}

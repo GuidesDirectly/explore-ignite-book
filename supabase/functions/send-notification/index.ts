@@ -27,14 +27,14 @@ const corsHeaders = {
 const NOTIFY_EMAIL = "michael@iguidetours.net";
 
 interface NotificationRequest {
-  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request";
+  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request" | "profile_reminder";
   data: Record<string, unknown>;
 }
 
-const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request"]);
+const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request", "profile_reminder"]);
 
 // Notification types that can be sent without authentication (public forms)
-const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request", "review_request"]);
+const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request", "review_request", "profile_reminder"]);
 // Notification types that require authentication
 const AUTH_TYPES = new Set(["guide_status", "guide_application", "booking_status"]);
 
@@ -575,6 +575,36 @@ const handler = async (req: Request): Promise<Response> => {
           console.error("Failed to notify guide:", e);
         }
       }
+    } else if (type === "profile_reminder") {
+      const guideName = data.guide_name as string;
+      const guideEmail = data.guide_email as string;
+      const registrationUrl = data.registration_url as string;
+
+      if (!guideEmail) throw new Error("guide_email is required");
+
+      subject = "Complete your Guides Directly profile — your spot is waiting";
+      html = `
+        <div style="font-family:'Georgia',serif;max-width:600px;margin:0 auto;border:1px solid #e8e0d0;">
+          <div style="background:#0A1628;padding:40px 30px;text-align:center;">
+            <h1 style="color:#ffffff;margin:0;font-size:28px;letter-spacing:1px;">Guides Directly</h1>
+            <p style="color:#8a8fa0;margin:8px 0 0;font-size:13px;letter-spacing:2px;text-transform:uppercase;">by iGuide Tours</p>
+          </div>
+          <div style="padding:40px 35px;background:#ffffff;">
+            <h2 style="color:#0A1628;font-size:22px;margin:0 0 20px;">Hi ${escapeHtml(guideName)},</h2>
+            <p style="color:#333;line-height:1.8;font-size:15px;">You started your guide registration on <strong>Guides Directly</strong> but haven't finished yet. Your profile is saved — it takes just a few minutes to complete.</p>
+            <p style="color:#333;line-height:1.8;font-size:15px;">Once approved, travelers searching for guides in your city will be able to find you, message you directly, and book your tours — with zero commission taken from your earnings.</p>
+            <div style="text-align:center;margin:30px 0;">
+              <a href="${escapeHtml(registrationUrl)}" style="display:inline-block;background:#C9A84C;color:#0A1628;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;letter-spacing:0.5px;">Complete Your Profile →</a>
+            </div>
+            <p style="color:#555;line-height:1.7;font-size:14px;">Questions? Reply to this email or call: <strong>+1 (202) 243-8336</strong></p>
+            <p style="color:#333;font-size:15px;margin-top:20px;">— The Guides Directly Team</p>
+          </div>
+          <div style="padding:20px;text-align:center;background:#0A1628;">
+            <p style="color:#8a8fa0;font-size:11px;margin:0;letter-spacing:1px;">Guides Directly by iGuide Tours — Premium Private Tours</p>
+          </div>
+        </div>
+      `;
+      toEmails = [guideEmail];
     } else {
       throw new Error("Invalid notification type");
     }
