@@ -28,6 +28,7 @@ import StripeConnectCard from "@/components/dashboard/StripeConnectCard";
 import AiBanner from "@/components/dashboard/AiBanner";
 import FeedbackInsights from "@/components/dashboard/FeedbackInsights";
 import ToursManager from "@/components/dashboard/ToursManager";
+import SubscriptionManager from "@/components/dashboard/SubscriptionManager";
 
 interface PhotoItem {
   name: string;
