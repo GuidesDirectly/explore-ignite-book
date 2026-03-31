@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { generateGuideSlug } from "@/lib/utils";
 import { MessageCircle, PlusCircle, Check } from "lucide-react";
 import type { BadgeType } from "@/components/GuideBadge";
 
@@ -238,7 +239,7 @@ const MeetGuidesSection = () => {
                           fontSize: 11,
                           padding: "3px 10px",
                         }}
-                        onClick={() => navigate(`/guide/${guide.id}?specialization=${encodeURIComponent(spec)}`)}
+                        onClick={() => navigate(`/guide/${generateGuideSlug(guide.form_data.firstName, guide.form_data.lastName, guide.service_areas?.[0] || "")}?specialization=${encodeURIComponent(spec)}`)}
                         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.22)")}
                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.12)")}
                       >
@@ -260,7 +261,7 @@ const MeetGuidesSection = () => {
 
                 {/* Message button */}
                 <button
-                  onClick={() => navigate(`/guide/${guide.id}`)}
+                  onClick={() => navigate(`/guide/${generateGuideSlug(guide.form_data.firstName, guide.form_data.lastName, guide.service_areas?.[0] || "")}`)}
                   className="w-full flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer"
                   style={{
                     backgroundColor: "#C9A84C",

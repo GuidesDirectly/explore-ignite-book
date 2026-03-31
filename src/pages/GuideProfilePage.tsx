@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { generateGuideSlug, isUUID } from "@/lib/utils";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -71,11 +72,36 @@ const GuideProfilePage = () => {
     const fetchGuide = async () => {
       if (!id) return;
 
-      const { data, error } = await (supabase
-        .from("guide_profiles_public" as any)
-        .select("id, user_id, form_data, service_areas, translations")
-        .eq("id", id)
-        .single() as any);
+      let data: any = null;
+      let error: any = null;
+
+      if (isUUID(id)) {
+        // Fetch by UUID directly
+        const res = await (supabase
+          .from("guide_profiles_public" as any)
+          .select("id, user_id, form_data, service_areas, translations")
+          .eq("id", id)
+          .single() as any);
+        data = res.data;
+        error = res.error;
+      } else {
+        // Slug-based lookup: fetch all approved guides and match by generated slug
+        const res = await (supabase
+          .from("guide_profiles_public" as any)
+          .select("id, user_id, form_data, service_areas, translations")
+          .eq("status", "approved") as any);
+        if (res.data && !res.error) {
+          data = (res.data as any[]).find((g: any) => {
+            const slug = generateGuideSlug(
+              g.form_data?.firstName || "",
+              g.form_data?.lastName || "",
+              (g.service_areas || [])[0] || ""
+            );
+            return slug === id;
+          }) || null;
+        }
+        error = res.error;
+      }
 
       if (error || !data) {
         setNotFound(true);
@@ -136,12 +162,13 @@ const GuideProfilePage = () => {
     const areas = (guide.service_areas || []).join(", ");
     const specs = (fd.specializations || []).join(", ");
     const bio = fd.biography || "";
-    const shortBio = bio.length > 150 ? bio.slice(0, 147) + "…" : bio;
+    const shortBio = bio.length > 160 ? bio.slice(0, 157) + "…" : bio;
+    const slug = generateGuideSlug(fd.firstName, fd.lastName, (guide.service_areas || [])[0] || "");
 
     const title = `${name} — Local Guide in ${areas || "Your City"} | Guides Directly`;
     const description = shortBio || `Book ${name} for private tours in ${areas}. ${specs ? `Specializes in ${specs}.` : ""} Zero commissions, direct booking.`;
-    const pageUrl = `https://explore-ignite-book.lovable.app/guide/${guide.id}`;
-    const imageUrl = photoUrl || "https://explore-ignite-book.lovable.app/og-image.jpg";
+    const pageUrl = `https://www.iguidetours.net/guide/${slug}`;
+    const imageUrl = photoUrl || "https://www.iguidetours.net/og-image.jpg";
 
     document.title = title;
 
@@ -182,28 +209,65 @@ const GuideProfilePage = () => {
       script.type = "application/ld+json";
       document.head.appendChild(script);
     }
-    script.textContent = JSON.stringify({
+
+    const avgRatingValue = reviews.length > 0
+      ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10
+      : 0;
+
+    const jsonLd: Record<string, any> = {
       "@context": "https://schema.org",
-      "@type": "TouristGuide",
+      "@type": "Person",
       "name": name,
+      "jobTitle": "Local Tour Guide",
       "description": shortBio,
       "url": pageUrl,
-      "image": imageUrl,
-      "knowsLanguage": fd.languages || [],
-      "areaServed": (guide.service_areas || []).map(a => ({ "@type": "City", "name": a })),
-      ...(reviews.length > 0 && {
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10,
-          "reviewCount": reviews.length,
-          "bestRating": 5,
-          "worstRating": 1
-        }
-      })
-    });
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Guides Directly",
+        "url": "https://www.iguidetours.net"
+      },
+      "areaServed": {
+        "@type": "City",
+        "name": (guide.service_areas || [])[0] || ""
+      },
+      "knowsLanguage": (fd.languages || []).map((lang: string) => ({
+        "@type": "Language",
+        "name": lang
+      })),
+    };
+
+    if (photoUrl) {
+      jsonLd.image = imageUrl;
+    }
+
+    if ((fd.tourTypes || []).length > 0) {
+      jsonLd.hasOfferCatalog = {
+        "@type": "OfferCatalog",
+        "name": "Tour Services",
+        "itemListElement": fd.tourTypes.map((t: string) => ({
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": t
+          }
+        }))
+      };
+    }
+
+    if (reviews.length > 0) {
+      jsonLd.aggregateRating = {
+        "@type": "AggregateRating",
+        "ratingValue": avgRatingValue,
+        "reviewCount": reviews.length,
+        "bestRating": "5",
+        "worstRating": "1"
+      };
+    }
+
+    script.textContent = JSON.stringify(jsonLd);
 
     return () => {
-      document.title = "iGuide Tours — Premium Local Tour Guides in USA & Canada";
+      document.title = "Guides Directly — Find Local Tour Guides | Zero Commission";
       const ldScript = document.getElementById(jsonLdId);
       if (ldScript) ldScript.remove();
     };

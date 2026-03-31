@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { generateGuideSlug } from "@/lib/utils";
 import { MapPin, Globe, Search, MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -70,6 +71,15 @@ const GuidesPage = () => {
   const [cityFilter, setCityFilter] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("recommended");
+
+  useEffect(() => {
+    document.title = "Find Local Tour Guides | Guides Directly";
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute("content", "Browse verified local tour guides by city and language. Direct contact, zero commission. Washington DC, Chicago, and more.");
+    return () => {
+      document.title = "Guides Directly — Find Local Tour Guides | Zero Commission";
+    };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -331,7 +341,7 @@ const GuidesPage = () => {
                         {specs.map((s) => (
                           <button
                             key={s}
-                            onClick={() => navigate(`/guide/${guide.id}?specialization=${encodeURIComponent(s)}`)}
+                            onClick={() => navigate(`/guide/${generateGuideSlug(fd.firstName || "", fd.lastName || "", city)}?specialization=${encodeURIComponent(s)}`)}
                             className="cursor-pointer"
                             style={{
                               background: "rgba(201,168,76,0.1)",
@@ -350,7 +360,7 @@ const GuidesPage = () => {
 
                     {/* Message button */}
                     <button
-                      onClick={() => navigate(`/guide/${guide.id}`)}
+                      onClick={() => navigate(`/guide/${generateGuideSlug(fd.firstName || "", fd.lastName || "", city)}`)}
                       className="w-full flex items-center justify-center gap-2 font-semibold transition-colors"
                       style={{
                         background: "#C9A84C",
