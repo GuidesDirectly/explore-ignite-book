@@ -373,6 +373,9 @@ const GuideDashboard = () => {
         {/* AI Banner */}
         <AiBanner />
 
+        {/* Subscription Management */}
+        {user && <SubscriptionManager userId={user.id} />}
+
         {/* Analytics Overview */}
         <section>
           <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2 mb-4">

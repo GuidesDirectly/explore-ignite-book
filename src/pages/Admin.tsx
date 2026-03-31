@@ -37,6 +37,8 @@ interface GuideApplication {
   status: string;
   service_areas: string[] | null;
   created_at: string;
+  subscription_tier?: string;
+  subscription_status?: string;
   form_data: {
     firstName: string;
     lastName: string;
