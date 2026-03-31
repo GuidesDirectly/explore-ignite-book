@@ -52,7 +52,7 @@ const App = () => (
           <Route path="/tours" element={<Tours />} />
           <Route path="/guides" element={<GuidesPage />} />
           <Route path="/tour/:guideId" element={<TourDetail />} />
-          <Route path="/book/:guideId" element={<BookingCheckout />} />
+          <Route path="/book/:guideId" element={<Navigate to="/guides" replace />} />
           <Route path="/chat" element={<AiPlannerPage />} />
           <Route path="/review" element={<Review />} />
           <Route path="/testimonials" element={<Testimonials />} />
