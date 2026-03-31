@@ -546,6 +546,32 @@ const Admin = () => {
                         )}
                       </div>
                     )}
+                   </div>
+
+                  {/* Subscription Tier Override */}
+                  <div className="border-t border-border/50 pt-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Subscription Tier</p>
+                    <select
+                      value={guide.subscription_tier || "founding"}
+                      onChange={async (e) => {
+                        const newTier = e.target.value;
+                        const { error } = await supabase
+                          .from("guide_profiles")
+                          .update({ subscription_tier: newTier } as any)
+                          .eq("id", guide.id);
+                        if (error) {
+                          toast.error("Failed to update subscription tier");
+                        } else {
+                          setGuides((prev) => prev.map((g) => g.id === guide.id ? { ...g, subscription_tier: newTier } : g));
+                          toast.success(`Subscription tier set to ${newTier}`);
+                        }
+                      }}
+                      className="text-sm bg-background border border-border rounded-md px-3 py-1.5 text-foreground"
+                    >
+                      <option value="founding">Founding ($0/mo)</option>
+                      <option value="pro">Pro ($29/mo)</option>
+                      <option value="featured">Featured ($59/mo)</option>
+                    </select>
                   </div>
                 </div>
               )}
