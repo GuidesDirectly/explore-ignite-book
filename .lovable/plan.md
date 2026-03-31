@@ -1,38 +1,21 @@
 
 
-# Bug Fix — Guides Page Empty for Logged-In Users
+# Disable Commission Checkout Route
 
-## Root Cause
+## What and Why
+Replace the `/book/:guideId` route with a redirect to `/guides`, disabling the 15% commission checkout page that contradicts the zero-commission model.
 
-The `guide_profiles_public` view is created with `security_invoker=on`, meaning it applies the **caller's** RLS permissions on the base `guide_profiles` table.
+## Change
 
-The base table `guide_profiles` has these SELECT policies:
-- `anon_can_view_approved_guides` — role: **anon** — `status = 'approved'`
-- `Admins can view all profiles` — admin only
-- `Guides can view own profile` — `auth.uid() = user_id`
+**File: `src/App.tsx`**
 
-When a regular authenticated user (not admin, not a guide) visits `/guides`, **none of these policies match**. The anon policy only applies to the `anon` role, not `authenticated`. So zero rows are returned.
-
-The GuidesPage.tsx query itself is correct (`.eq("status", "approved")` is present). No code change needed.
-
-## Fix
-
-Add one RLS policy on `guide_profiles` allowing authenticated users to view approved profiles:
-
-```sql
-CREATE POLICY "authenticated_can_view_approved_guides"
-ON public.guide_profiles
-FOR SELECT
-TO authenticated
-USING (status = 'approved');
-```
-
-## What changes
-- One database migration adding the policy above
+1. Add `Navigate` to the react-router-dom import (line 5)
+2. Replace `<Route path="/book/:guideId" element={<BookingCheckout />} />` with `<Route path="/book/:guideId" element={<Navigate to="/guides" replace />} />`
+3. The `BookingCheckout` import can remain (file is not deleted)
 
 ## What does NOT change
-- No code files modified
-- No frontend changes
-- GuidesPage.tsx stays exactly as-is
-- No other RLS policies modified
+- No other files modified
+- No other routes changed
+- `BookingCheckout.tsx` file remains in codebase
+- No text or image changes
 
