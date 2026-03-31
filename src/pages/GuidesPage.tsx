@@ -73,6 +73,15 @@ const GuidesPage = () => {
   const [sortBy, setSortBy] = useState<SortOption>("recommended");
 
   useEffect(() => {
+    document.title = "Find Local Tour Guides | Guides Directly";
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute("content", "Browse verified local tour guides by city and language. Direct contact, zero commission. Washington DC, Chicago, and more.");
+    return () => {
+      document.title = "Guides Directly — Find Local Tour Guides | Zero Commission";
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       const [guidesRes, reviewsRes] = await Promise.all([
