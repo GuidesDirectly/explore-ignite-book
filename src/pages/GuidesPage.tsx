@@ -360,7 +360,7 @@ const GuidesPage = () => {
 
                     {/* Message button */}
                     <button
-                      onClick={() => navigate(`/guide/${guide.id}`)}
+                      onClick={() => navigate(`/guide/${generateGuideSlug(fd.firstName || "", fd.lastName || "", city)}`)}
                       className="w-full flex items-center justify-center gap-2 font-semibold transition-colors"
                       style={{
                         background: "#C9A84C",

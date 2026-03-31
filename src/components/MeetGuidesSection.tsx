@@ -261,7 +261,7 @@ const MeetGuidesSection = () => {
 
                 {/* Message button */}
                 <button
-                  onClick={() => navigate(`/guide/${guide.id}`)}
+                  onClick={() => navigate(`/guide/${generateGuideSlug(guide.form_data.firstName, guide.form_data.lastName, guide.service_areas?.[0] || "")}`)}
                   className="w-full flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer"
                   style={{
                     backgroundColor: "#C9A84C",
