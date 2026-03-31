@@ -90,6 +90,82 @@ serve(async (req) => {
         .eq("stripe_checkout_session_id", session.id);
     }
 
+    // --- Subscription lifecycle events ---
+
+    if (event.type === "customer.subscription.created" || event.type === "customer.subscription.updated") {
+      const subscription = event.data.object as Stripe.Subscription;
+      const guideUserId = subscription.metadata?.guide_user_id;
+
+      if (guideUserId) {
+        const tier = (() => {
+          const priceId = subscription.items?.data?.[0]?.price?.id;
+          if (priceId === "price_1TGrOMC1U7Smvwep4HvHeBiF") return "featured";
+          if (priceId === "price_1TGrLvC1U7SmvwepyB5krby7") return "pro";
+          return "founding";
+        })();
+
+        const status = subscription.status === "active" || subscription.status === "trialing" ? "active" : "past_due";
+
+        const { error } = await supabase
+          .from("guide_profiles")
+          .update({
+            subscription_status: status,
+            subscription_tier: tier,
+            stripe_subscription_id: subscription.id,
+            subscription_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          })
+          .eq("user_id", guideUserId);
+
+        if (error) console.error(`Failed to update subscription for ${guideUserId}:`, error);
+        else console.log(`Subscription ${event.type} processed for guide ${guideUserId}, tier: ${tier}`);
+      }
+    }
+
+    if (event.type === "customer.subscription.deleted") {
+      const subscription = event.data.object as Stripe.Subscription;
+      const guideUserId = subscription.metadata?.guide_user_id;
+
+      if (guideUserId) {
+        const { error } = await supabase
+          .from("guide_profiles")
+          .update({ subscription_status: "cancelled", subscription_tier: "founding" })
+          .eq("user_id", guideUserId);
+
+        if (error) console.error(`Failed to cancel subscription for ${guideUserId}:`, error);
+        else console.log(`Subscription cancelled for guide ${guideUserId}`);
+      }
+    }
+
+    if (event.type === "invoice.payment_failed") {
+      const invoice = event.data.object as any;
+      const customerId = invoice.customer;
+
+      if (customerId) {
+        const { error } = await supabase
+          .from("guide_profiles")
+          .update({ subscription_status: "past_due" })
+          .eq("stripe_customer_id", customerId);
+
+        if (error) console.error(`Failed to set past_due for customer ${customerId}:`, error);
+        else console.log(`Payment failed for customer ${customerId}, set to past_due`);
+      }
+    }
+
+    if (event.type === "invoice.payment_succeeded") {
+      const invoice = event.data.object as any;
+      const customerId = invoice.customer;
+
+      if (customerId) {
+        const { error } = await supabase
+          .from("guide_profiles")
+          .update({ subscription_status: "active" })
+          .eq("stripe_customer_id", customerId);
+
+        if (error) console.error(`Failed to set active for customer ${customerId}:`, error);
+        else console.log(`Payment succeeded for customer ${customerId}, set to active`);
+      }
+    }
+
     return new Response(JSON.stringify({ received: true }), {
       headers: { "Content-Type": "application/json" },
     });

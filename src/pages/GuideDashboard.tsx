@@ -28,6 +28,7 @@ import StripeConnectCard from "@/components/dashboard/StripeConnectCard";
 import AiBanner from "@/components/dashboard/AiBanner";
 import FeedbackInsights from "@/components/dashboard/FeedbackInsights";
 import ToursManager from "@/components/dashboard/ToursManager";
+import SubscriptionManager from "@/components/dashboard/SubscriptionManager";
 
 interface PhotoItem {
   name: string;
@@ -371,6 +372,9 @@ const GuideDashboard = () => {
       <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
         {/* AI Banner */}
         <AiBanner />
+
+        {/* Subscription Management */}
+        {user && <SubscriptionManager userId={user.id} />}
 
         {/* Analytics Overview */}
         <section>

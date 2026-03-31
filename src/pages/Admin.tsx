@@ -37,6 +37,8 @@ interface GuideApplication {
   status: string;
   service_areas: string[] | null;
   created_at: string;
+  subscription_tier?: string;
+  subscription_status?: string;
   form_data: {
     firstName: string;
     lastName: string;
@@ -375,6 +377,9 @@ const Admin = () => {
                 <Badge variant="secondary" className={`text-xs ${guide.status === "approved" ? "bg-primary/10 text-primary" : guide.status === "rejected" ? "bg-destructive/10 text-destructive" : "bg-accent text-accent-foreground"}`}>
                   {guide.status}
                 </Badge>
+                <Badge variant="outline" className={`text-xs capitalize ${guide.subscription_tier === "featured" ? "border-primary text-primary" : guide.subscription_tier === "pro" ? "border-yellow-500 text-yellow-600" : "border-border text-muted-foreground"}`}>
+                  {guide.subscription_tier || "founding"}
+                </Badge>
               </div>
 
               {/* Contact info */}
@@ -541,6 +546,32 @@ const Admin = () => {
                         )}
                       </div>
                     )}
+                   </div>
+
+                  {/* Subscription Tier Override */}
+                  <div className="border-t border-border/50 pt-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Subscription Tier</p>
+                    <select
+                      value={guide.subscription_tier || "founding"}
+                      onChange={async (e) => {
+                        const newTier = e.target.value;
+                        const { error } = await supabase
+                          .from("guide_profiles")
+                          .update({ subscription_tier: newTier } as any)
+                          .eq("id", guide.id);
+                        if (error) {
+                          toast.error("Failed to update subscription tier");
+                        } else {
+                          setGuides((prev) => prev.map((g) => g.id === guide.id ? { ...g, subscription_tier: newTier } : g));
+                          toast.success(`Subscription tier set to ${newTier}`);
+                        }
+                      }}
+                      className="text-sm bg-background border border-border rounded-md px-3 py-1.5 text-foreground"
+                    >
+                      <option value="founding">Founding ($0/mo)</option>
+                      <option value="pro">Pro ($29/mo)</option>
+                      <option value="featured">Featured ($59/mo)</option>
+                    </select>
                   </div>
                 </div>
               )}
