@@ -1,103 +1,77 @@
 
 
-# Stripe Subscription Billing System
+# SEO Enhancement — Four Targeted Improvements
 
-## Overview
-Add guide subscription billing with three tiers (Founding $0, Pro $29, Featured $59), Stripe Checkout integration, webhook handling, dashboard UI, and admin manual override.
+## Improvement 1 — Update index.html Defaults
 
-## Task 1 — Database Migration
+**File: `index.html`**
 
-Add 5 columns to `guide_profiles` using a validation trigger (not CHECK constraints, per guidelines):
+- Change `<title>` to `"Guides Directly — Find Local Tour Guides | Zero Commission | Washington DC & Beyond"`
+- Update `<meta name="description">` to the new copy about zero commission, city/language search
+- Add `<meta name="robots" content="index, follow">`
+- Change `<meta name="theme-color">` from `#0284c7` to `#0A1628`
+- Update `<link rel="canonical">` from lovable.app URL to `https://www.iguidetours.net`
+- Update OG/Twitter titles and descriptions to match
+- Update JSON-LD `name`, `description`, and `url` to use "Guides Directly" / iguidetours.net
 
-```sql
-ALTER TABLE public.guide_profiles
-  ADD COLUMN subscription_tier text DEFAULT 'founding',
-  ADD COLUMN subscription_status text DEFAULT 'active',
-  ADD COLUMN stripe_customer_id text,
-  ADD COLUMN stripe_subscription_id text,
-  ADD COLUMN subscription_current_period_end timestamptz;
+## Improvement 2 — GuidesPage SEO
 
--- Validation trigger instead of CHECK constraints
-CREATE OR REPLACE FUNCTION public.validate_subscription_fields()
-RETURNS trigger LANGUAGE plpgsql SET search_path TO 'public' AS $$
-BEGIN
-  IF NEW.subscription_tier IS NOT NULL AND NEW.subscription_tier NOT IN ('founding', 'pro', 'featured') THEN
-    RAISE EXCEPTION 'subscription_tier must be founding, pro, or featured';
-  END IF;
-  IF NEW.subscription_status IS NOT NULL AND NEW.subscription_status NOT IN ('active', 'inactive', 'past_due', 'cancelled') THEN
-    RAISE EXCEPTION 'subscription_status must be active, inactive, past_due, or cancelled';
-  END IF;
-  RETURN NEW;
-END;
-$$;
+**File: `src/pages/GuidesPage.tsx`**
 
-CREATE TRIGGER trg_validate_subscription
-  BEFORE INSERT OR UPDATE ON public.guide_profiles
-  FOR EACH ROW EXECUTE FUNCTION public.validate_subscription_fields();
+- Add `useEffect` that sets `document.title` to `"Find Local Tour Guides | Guides Directly"` and updates the meta description
+- Cleanup function restores default title on unmount
 
--- Set all existing guides
-UPDATE public.guide_profiles
-  SET subscription_tier = 'founding', subscription_status = 'active'
-  WHERE subscription_tier IS NULL;
-```
+## Improvement 3 — Slug-based Guide URLs
 
-## Task 2 — Edge Function: guide-subscribe
+**Files: `src/pages/GuideProfilePage.tsx`, `src/pages/GuidesPage.tsx`, `src/components/MeetGuidesSection.tsx`, `src/App.tsx`**
 
-Create `supabase/functions/guide-subscribe/index.ts`:
-- CORS headers matching existing functions
-- Validate input: `guide_user_id`, `price_id`, `success_url`, `cancel_url`
-- Verify guide exists in `guide_profiles`
-- Get or create Stripe customer (lookup `stripe_customer_id`, else create from auth.users email, save back)
-- Create Stripe Checkout Session with `mode: "subscription"`, the given `price_id`, and `metadata: { guide_user_id }`
-- Return `{ url: session.url }`
-- Uses `STRIPE_SECRET_KEY` and `SUPABASE_SERVICE_ROLE_KEY` (both already configured)
+A shared `generateGuideSlug(firstName, lastName, city)` helper function producing clean URLs like `michael-zlotnitsky-washington-dc`.
 
-## Task 3 — Update stripe-webhook
+**App.tsx**: No new route needed — the existing `/guide/:id` route already catches both UUIDs and slugs since `:id` is a generic param.
 
-File: `supabase/functions/stripe-webhook/index.ts`
+**GuideProfilePage.tsx**:
+- Add `isUUID()` helper and `generateGuideSlug()` helper
+- Update `fetchGuide` (line 71): if param is UUID, fetch by `id` as now; if not UUID, fetch all approved guides and match by generated slug
+- Update SEO `useEffect`: canonical URL and JSON-LD `url` use `https://www.iguidetours.net/guide/${slug}` instead of lovable.app UUID URL
+- Cleanup title uses new "Guides Directly" default
 
-Add 5 new event handlers after existing `checkout.session.expired` block:
+**GuidesPage.tsx** (lines 334, 353): Update `navigate(/guide/${guide.id})` calls to use `navigate(/guide/${generateGuideSlug(...)})`.
 
-- `customer.subscription.created` — extract `guide_user_id` from `subscription.metadata`, update `guide_profiles` with `subscription_status='active'`, `stripe_subscription_id`, `subscription_current_period_end`
-- `customer.subscription.updated` — same update logic
-- `customer.subscription.deleted` — set `subscription_status='cancelled'`
-- `invoice.payment_failed` — find guide by `stripe_customer_id` from invoice customer, set `subscription_status='past_due'`
-- `invoice.payment_succeeded` — find guide by `stripe_customer_id`, set `subscription_status='active'`
+**MeetGuidesSection.tsx** (lines 241, 263): Same slug-based navigation updates.
 
-No existing handlers modified.
+**AiTourPlanner.tsx** (line 362): This uses a `guideId` variable that may be a UUID from AI results — leave as-is (UUID fallback still works).
 
-## Task 4 — Subscription UI Component
+**GuideDashboard.tsx** (line 461): Guide viewing own profile — leave as UUID (internal link).
 
-Create `src/components/dashboard/SubscriptionManager.tsx`:
-- Fetches guide's `subscription_tier`, `subscription_status`, `subscription_current_period_end` from `guide_profiles`
-- Displays current plan badge and status
-- Three plan cards side by side (Founding/Pro/Featured) with feature lists as specified
-- Upgrade buttons call `guide-subscribe` edge function via `supabase.functions.invoke()` and redirect to returned Stripe URL
-- Contact fallback note at bottom
-- Props: `userId: string`
+## Improvement 4 — Enhanced JSON-LD Schema
 
-Add to `GuideDashboard.tsx`:
-- Import and render `<SubscriptionManager userId={user.id} />` after the AI Banner section (before Analytics)
+**File: `src/pages/GuideProfilePage.tsx`** (lines 185-203)
 
-## Task 5 — Admin Subscription Column
+Replace current `TouristGuide` schema with enhanced `Person` schema:
+- Add `jobTitle: "Local Tour Guide"`
+- Add `worksFor` Organization block (Guides Directly / iguidetours.net)
+- Add `hasOfferCatalog` mapping `tourTypes` to `Offer` objects
+- Add `areaServed` as single City (primary area)
+- Map `languages` to `Language` objects with `name` property
+- Conditionally include `image` and `aggregateRating`
 
-In `src/pages/Admin.tsx`:
-- Add `subscription_tier` to the `GuideApplication` interface
-- In `renderGuideCard`, after the status badge, add a subscription tier badge
-- Add a `<select>` dropdown (founding/pro/featured) that updates `guide_profiles.subscription_tier` directly via Supabase client
-- Dropdown only shown when guide card is expanded
+## Technical Details
+
+- `generateGuideSlug` is duplicated in 3 files (GuideProfilePage, GuidesPage, MeetGuidesSection). Could extract to a shared util but keeping it inline per the spec's simplicity. Alternatively place in `src/lib/utils.ts` and import — I'll use the shared util approach for DRY code.
+- Slug matching: fetch guides with `.eq("status", "approved")` then filter client-side by generated slug. Not ideal at scale but works for current guide count.
+- Both UUID and slug URLs continue to work — no breaking changes.
 
 ## Files Changed
-1. New migration SQL (5 columns + validation trigger)
-2. New file: `supabase/functions/guide-subscribe/index.ts`
-3. Modified: `supabase/functions/stripe-webhook/index.ts` (add 5 event handlers)
-4. New file: `src/components/dashboard/SubscriptionManager.tsx`
-5. Modified: `src/pages/GuideDashboard.tsx` (import + render SubscriptionManager)
-6. Modified: `src/pages/Admin.tsx` (subscription badge + dropdown)
+1. `index.html` — title, meta tags, canonical, JSON-LD
+2. `src/lib/utils.ts` — add `generateGuideSlug` helper
+3. `src/pages/GuidesPage.tsx` — SEO useEffect + slug navigation
+4. `src/pages/GuideProfilePage.tsx` — slug routing, SEO URLs, enhanced JSON-LD
+5. `src/components/MeetGuidesSection.tsx` — slug navigation
 
 ## What does NOT change
-- `create-checkout-session` — untouched
-- `BookingCheckout.tsx` — untouched
+- No visual/styling changes
+- No routing structure changes (reuses existing `/guide/:id` param)
 - No images generated
-- No existing components modified beyond specified additions
+- `BookingCheckout.tsx` untouched
+- `create-checkout-session` untouched
 
