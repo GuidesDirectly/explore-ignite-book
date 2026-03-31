@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { generateGuideSlug } from "@/lib/utils";
 import { MessageCircle, PlusCircle, Check } from "lucide-react";
 import type { BadgeType } from "@/components/GuideBadge";
 
