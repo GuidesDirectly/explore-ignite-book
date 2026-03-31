@@ -377,6 +377,9 @@ const Admin = () => {
                 <Badge variant="secondary" className={`text-xs ${guide.status === "approved" ? "bg-primary/10 text-primary" : guide.status === "rejected" ? "bg-destructive/10 text-destructive" : "bg-accent text-accent-foreground"}`}>
                   {guide.status}
                 </Badge>
+                <Badge variant="outline" className={`text-xs capitalize ${guide.subscription_tier === "featured" ? "border-primary text-primary" : guide.subscription_tier === "pro" ? "border-yellow-500 text-yellow-600" : "border-border text-muted-foreground"}`}>
+                  {guide.subscription_tier || "founding"}
+                </Badge>
               </div>
 
               {/* Contact info */}
