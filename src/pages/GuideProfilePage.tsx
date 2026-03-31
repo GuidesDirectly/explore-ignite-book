@@ -72,11 +72,36 @@ const GuideProfilePage = () => {
     const fetchGuide = async () => {
       if (!id) return;
 
-      const { data, error } = await (supabase
-        .from("guide_profiles_public" as any)
-        .select("id, user_id, form_data, service_areas, translations")
-        .eq("id", id)
-        .single() as any);
+      let data: any = null;
+      let error: any = null;
+
+      if (isUUID(id)) {
+        // Fetch by UUID directly
+        const res = await (supabase
+          .from("guide_profiles_public" as any)
+          .select("id, user_id, form_data, service_areas, translations")
+          .eq("id", id)
+          .single() as any);
+        data = res.data;
+        error = res.error;
+      } else {
+        // Slug-based lookup: fetch all approved guides and match by generated slug
+        const res = await (supabase
+          .from("guide_profiles_public" as any)
+          .select("id, user_id, form_data, service_areas, translations")
+          .eq("status", "approved") as any);
+        if (res.data && !res.error) {
+          data = (res.data as any[]).find((g: any) => {
+            const slug = generateGuideSlug(
+              g.form_data?.firstName || "",
+              g.form_data?.lastName || "",
+              (g.service_areas || [])[0] || ""
+            );
+            return slug === id;
+          }) || null;
+        }
+        error = res.error;
+      }
 
       if (error || !data) {
         setNotFound(true);
