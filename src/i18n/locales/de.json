@@ -277,7 +277,22 @@
     "featured3": "Hotel- und Concierge-Empfehlungen",
     "featured4": "Upgrade auf verifiziertes Abzeichen",
     "featured5": "Priorisierter Support",
-    "perMonth": "/Monat"
+    "perMonth": "/Monat",
+    "section": {
+      "label": "Für Guides",
+      "title": "Arbeiten Sie direkt mit Reisenden weltweit",
+      "subtitle": "Behalten Sie Ihre Einnahmen. Bestimmen Sie Ihre Preise. Wählen Sie Ihre Kunden.",
+      "costNote": "Der Beitritt ist während der Startphase kostenlos. Zukünftige kostenpflichtige Tools sind immer optional.",
+      "cta": "Jetzt bewerben",
+      "feat1": "Null Provisionen — für immer",
+      "feat2": "Globales Reisendenpublikum",
+      "feat3": "Direkte Beziehungen zu Reisenden",
+      "whyEarlyTitle": "Warum früh beitreten?",
+      "early1": "Prioritäre Sichtbarkeit",
+      "early2": "Frühe Reiseanfragen",
+      "early3": "Gründer-Guide-Status",
+      "aiToolsNote": "Enthält KI-gestützte Geschäftstools, die Ihnen bei Preisgestaltung und Planung helfen."
+    }
   },
   "trust": {
     "label": "Warum uns vertrauen",

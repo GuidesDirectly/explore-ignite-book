@@ -277,7 +277,22 @@
     "featured3": "Referências de hotéis e concierges",
     "featured4": "Atualização do distintivo verificado",
     "featured5": "Suporte prioritário",
-    "perMonth": "/mês"
+    "perMonth": "/mês",
+    "section": {
+      "label": "Para Guias",
+      "title": "Trabalhe diretamente com viajantes do mundo todo",
+      "subtitle": "Mantenha seus ganhos. Controle seus preços. Escolha seus clientes.",
+      "costNote": "A adesão é atualmente gratuita durante o lançamento. Ferramentas pagas futuras serão sempre opcionais.",
+      "cta": "Candidatar-se",
+      "feat1": "Zero comissões — sempre",
+      "feat2": "Público global de viajantes",
+      "feat3": "Relacionamento direto com viajantes",
+      "whyEarlyTitle": "Por que participar cedo?",
+      "early1": "Visibilidade prioritária",
+      "early2": "Pedidos antecipados de viajantes",
+      "early3": "Status de guia fundador",
+      "aiToolsNote": "Inclui ferramentas de negócios com IA para ajudá-lo a precificar e planejar de forma eficaz."
+    }
   },
   "trust": {
     "label": "Por Que Confiar em Nós",

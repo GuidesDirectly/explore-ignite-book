@@ -277,7 +277,22 @@
     "featured3": "Références d'hôtels et de conciergerie",
     "featured4": "Mise à niveau du badge vérifié",
     "featured5": "Support prioritaire",
-    "perMonth": "/mois"
+    "perMonth": "/mois",
+    "section": {
+      "label": "Pour les Guides",
+      "title": "Travaillez directement avec des voyageurs du monde entier",
+      "subtitle": "Gardez vos revenus. Fixez vos prix. Choisissez vos clients.",
+      "costNote": "L'inscription est actuellement gratuite pendant le lancement. Les outils payants futurs seront toujours optionnels.",
+      "cta": "Postuler",
+      "feat1": "Zéro commission — toujours",
+      "feat2": "Audience mondiale de voyageurs",
+      "feat3": "Relations directes avec les voyageurs",
+      "whyEarlyTitle": "Pourquoi rejoindre tôt ?",
+      "early1": "Visibilité prioritaire",
+      "early2": "Demandes précoces de voyageurs",
+      "early3": "Statut de guide fondateur",
+      "aiToolsNote": "Comprend des outils professionnels alimentés par l'IA pour vous aider à tarifer et planifier efficacement."
+    }
   },
   "trust": {
     "label": "Pourquoi nous faire confiance",

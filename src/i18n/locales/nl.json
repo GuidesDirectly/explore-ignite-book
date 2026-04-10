@@ -277,7 +277,22 @@
     "featured3": "Verwijzingen naar hotels en conciërges",
     "featured4": "Upgrade met geverifieerd badge",
     "featured5": "Prioritaire ondersteuning",
-    "perMonth": "/maand"
+    "perMonth": "/maand",
+    "section": {
+      "label": "Voor Gidsen",
+      "title": "Werk direct samen met reizigers wereldwijd",
+      "subtitle": "Behoud je inkomsten. Bepaal je prijzen. Kies je klanten.",
+      "costNote": "Deelname is momenteel gratis tijdens de lancering. Toekomstige betaalde tools zijn altijd optioneel.",
+      "cta": "Aanmelden",
+      "feat1": "Nul commissie — ooit",
+      "feat2": "Wereldwijd reizigerspubliek",
+      "feat3": "Directe relaties met reizigers",
+      "whyEarlyTitle": "Waarom vroeg aansluiten?",
+      "early1": "Prioritaire zichtbaarheid",
+      "early2": "Vroege reizigersverzoeken",
+      "early3": "Oprichtergids-status",
+      "aiToolsNote": "Bevat AI-aangedreven zakelijke tools om u te helpen bij het prijzen en plannen."
+    }
   },
   "trust": {
     "label": "Waarom Ons Vertrouwen",

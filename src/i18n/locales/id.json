@@ -277,7 +277,22 @@
     "featured3": "Referral hotel dan concierge",
     "featured4": "Peningkatan lencana terverifikasi",
     "featured5": "Dukungan prioritas",
-    "perMonth": "/bulan"
+    "perMonth": "/bulan",
+    "section": {
+      "label": "Untuk Pemandu",
+      "title": "Bekerja Langsung dengan Wisatawan di Seluruh Dunia",
+      "subtitle": "Simpan penghasilan Anda. Kendalikan harga Anda. Pilih klien Anda.",
+      "costNote": "Bergabung saat ini gratis selama peluncuran. Alat berbayar di masa depan akan selalu opsional.",
+      "cta": "Daftar untuk Bergabung",
+      "feat1": "Nol komisi — selamanya",
+      "feat2": "Audiens wisatawan global",
+      "feat3": "Hubungan langsung dengan wisatawan",
+      "whyEarlyTitle": "Mengapa Bergabung Lebih Awal?",
+      "early1": "Visibilitas prioritas",
+      "early2": "Permintaan wisatawan awal",
+      "early3": "Status pemandu pendiri",
+      "aiToolsNote": "Termasuk alat bisnis bertenaga AI untuk membantu Anda menentukan harga dan merencanakan secara efektif."
+    }
   },
   "trust": {
     "label": "Mengapa Percaya Kami",

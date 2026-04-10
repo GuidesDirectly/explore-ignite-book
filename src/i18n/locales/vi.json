@@ -277,7 +277,22 @@
     "featured3": "Giới thiệu từ khách sạn và dịch vụ trợ giúp khách hàng",
     "featured4": "Nâng cấp huy hiệu đã xác minh",
     "featured5": "Hỗ trợ ưu tiên",
-    "perMonth": "/tháng"
+    "perMonth": "/tháng",
+    "section": {
+      "label": "Dành cho Hướng dẫn viên",
+      "title": "Làm việc trực tiếp với du khách trên toàn thế giới",
+      "subtitle": "Giữ thu nhập của bạn. Kiểm soát giá cả. Chọn khách hàng.",
+      "costNote": "Tham gia hiện tại miễn phí trong giai đoạn ra mắt. Các công cụ trả phí trong tương lai sẽ luôn là tùy chọn.",
+      "cta": "Đăng ký tham gia",
+      "feat1": "Không hoa hồng — mãi mãi",
+      "feat2": "Đối tượng du khách toàn cầu",
+      "feat3": "Quan hệ trực tiếp với du khách",
+      "whyEarlyTitle": "Tại sao nên tham gia sớm?",
+      "early1": "Ưu tiên hiển thị",
+      "early2": "Yêu cầu du khách sớm",
+      "early3": "Tư cách hướng dẫn viên sáng lập",
+      "aiToolsNote": "Bao gồm các công cụ kinh doanh hỗ trợ bởi AI giúp bạn định giá và lên kế hoạch hiệu quả."
+    }
   },
   "trust": {
     "label": "Tại sao tin tưởng chúng tôi",
