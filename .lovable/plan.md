@@ -1,53 +1,54 @@
 
 
-# Guide Dashboard Brand Alignment — Dark Navy + Gold
+# Translation System Integration — Wire Hardcoded Components into i18n
 
 ## Summary
-Apply dark navy background and gold accent styling to GuideDashboard.tsx and SubscriptionManager.tsx. No functionality or routing changes.
+Add ~100 new translation keys to `en.json` under 4 new groups, then replace all hardcoded English strings in 4 components with `t()` calls. No visual, styling, routing, or logic changes. Non-English locale files untouched.
 
-## Files Modified (2 only)
+## Files Modified (5 total)
 
-### 1. `src/pages/GuideDashboard.tsx`
+### 1. `src/i18n/locales/en.json`
+Append 4 new key groups before the closing `}` (after the existing `badge` group at line 698):
+- `truePrice` — 8 keys
+- `whyDirect` — 17 keys
+- `aiCta` — 13 keys
+- `forGuides` — 42 keys (includes hero, commission, features, pricing tiers, founding features, pro features, featured features, founder bios, final CTA)
 
-**Page background** (line 342): `bg-background` → inline style `backgroundColor: '#0A1628'`
+All keys exactly as specified in the prompt. No existing keys modified.
 
-**Header** (line 344): `bg-card` → inline style `backgroundColor: '#1A2F50'`, border color to gold `rgba(201,168,76,0.15)`, text colors to `#F5F0E8`
+### 2. `src/components/TruePriceSection.tsx`
+- Add `import { useTranslation } from "react-i18next"` and `const { t } = useTranslation()`
+- Replace 8 hardcoded strings with `t("truePrice.*")` calls
+- No styling changes
 
-**StatCard component** (lines 53-76): Change `bg-card border-border/50` to inline styles for `#1A2F50` background, gold border, text colors `#F5F0E8` for primary and `rgba(255,255,255,0.65)` for muted
+### 3. `src/components/WhyDirectSection.tsx`
+- Add useTranslation import and hook
+- Replace the 6 `otherPlatformItems` and 6 `guidesDirectlyItems` arrays to use `t()` — move them inside the component body so the hook is available
+- Replace heading, subheading, column headers, footer — 5 more `t()` calls
+- No styling changes
 
-**Loading state** (line 335): `bg-background` → `#0A1628`
+### 4. `src/components/TravelerAiCta.tsx`
+- Add useTranslation import and hook
+- Move `benefits` array inside component to access `t()`
+- Replace 13 hardcoded strings with `t("aiCta.*")` calls
+- No styling changes
 
-**Section headings** (lines 381, 429, 494): `text-foreground` → `text-[#F5F0E8]`
+### 5. `src/pages/ForGuidesPage.tsx`
+- Add `import { useTranslation } from "react-i18next"` and `const { t } = useTranslation()`
+- Move `features`, `foundingFeatures`, `proFeatures`, `featuredFeatures` arrays inside component to access `t()`
+- Replace all ~42 hardcoded strings with `t("forGuides.*")` calls
+- For "View Michael's Profile" link: `t("forGuides.viewProfile", { name: g.name.split(" ")[0] })`
+- Founder data (names, bios, titles, cities) stays hardcoded — these are proper nouns / personal data, not translatable UI strings
+- No styling or routing changes
 
-**All `bg-card` sections** (lines 428, 492): Add inline styles for `#1A2F50` bg and gold border
+## What does NOT change
+- No existing translation keys modified
+- No non-English locale files touched (handled separately)
+- No visual design, styling, or layout changes
+- No routing or logic changes
+- No images generated
+- GuidesPage.tsx and Admin.tsx deferred to next prompt
 
-**Muted text** throughout: `text-muted-foreground` → `text-[rgba(255,255,255,0.65)]` or `text-white/65`
-
-**Primary icon color**: Keep `text-primary` as-is (already blue, acceptable) or switch to gold `text-[#C9A84C]`
-
-**Edit Profile button**: Keep variant outline but adjust border/text to gold tones
-
-### 2. `src/components/dashboard/SubscriptionManager.tsx`
-
-**Upgrade buttons** (lines 199-208): Replace `bg-primary text-primary-foreground hover:bg-primary/90` with:
-- `bg-[#C9A84C] text-[#0A1628] font-semibold hover:bg-[#B8924A] border-none`
-
-**Section wrapper** (line 138): `bg-card border-border/50` → `bg-[#1A2F50] border-[rgba(201,168,76,0.15)]`
-
-**Loading wrapper** (line 122): Same card styling update
-
-**Plan cards** (line 169): `border-border/50` → `border-[rgba(201,168,76,0.15)]`, current plan highlight uses gold border instead of primary
-
-**Text colors**: `text-foreground` → `text-[#F5F0E8]`, `text-muted-foreground` → `text-white/65`
-
-**Badges**: Adjust to work on dark background
-
-**Contact email link**: `text-primary` → `text-[#C9A84C]`
-
-**"Current Plan" button**: Remains disabled/grey — no change to its styling or handlers
-
-## What stays the same
-- All onClick handlers, routing, data fetching, state management
-- All child dashboard components (not modified)
-- No new files created, no images generated
+## Technical note on arrays
+Components like `WhyDirectSection` use static arrays defined outside the component. Since `t()` requires the hook (only available inside the component), these arrays will be moved inside the component function body. This is a standard React pattern and has zero visual impact.
 
