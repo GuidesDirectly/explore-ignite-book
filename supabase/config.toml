@@ -57,4 +57,7 @@ verify_jwt = false
 [functions.draft-guide-reminder]
 verify_jwt = false
 
+[functions.translate-i18n-keys]
+verify_jwt = true
+
 
