@@ -7,9 +7,9 @@ const ForGuidesSection = () => {
   const { t } = useTranslation();
 
   const earlyBenefits = [
-    { icon: Star, text: t("forGuides.early1") },
-    { icon: Users, text: t("forGuides.early2") },
-    { icon: Shield, text: t("forGuides.early3") },
+    { icon: Star, text: t("forGuides.section.early1") },
+    { icon: Users, text: t("forGuides.section.early2") },
+    { icon: Shield, text: t("forGuides.section.early3") },
   ];
 
 
@@ -24,23 +24,23 @@ const ForGuidesSection = () => {
           className="max-w-4xl mx-auto text-center"
         >
           <p className="text-sm font-semibold uppercase tracking-[0.2em] mb-4" style={{ color: "hsl(45, 80%, 65%)" }}>
-            {t("forGuides.label")}
+            {t("forGuides.section.label")}
           </p>
           <h2 className="font-display text-4xl md:text-6xl font-bold mb-4" style={{ color: "hsl(40, 33%, 97%)" }}>
-            {t("forGuides.title")}
+            {t("forGuides.section.title")}
           </h2>
           <p className="text-xl mb-4 max-w-2xl mx-auto" style={{ color: "hsl(40, 33%, 80%)" }}>
-            {t("forGuides.subtitle")}
+            {t("forGuides.section.subtitle")}
           </p>
           <p className="text-base mb-12 max-w-2xl mx-auto font-semibold" style={{ color: "hsl(45, 80%, 70%)" }}>
-            {t("forGuides.costNote")}
+            {t("forGuides.section.costNote")}
           </p>
 
           <div className="grid sm:grid-cols-3 gap-6 mb-8">
             {[
-              { icon: DollarSign, text: t("forGuides.feat1") },
-              { icon: Globe, text: t("forGuides.feat2") },
-              { icon: Users, text: t("forGuides.feat3") },
+              { icon: DollarSign, text: t("forGuides.section.feat1") },
+              { icon: Globe, text: t("forGuides.section.feat2") },
+              { icon: Users, text: t("forGuides.section.feat3") },
             ].map(({ icon: Icon, text }, i) => (
               <motion.div
                 key={i}
@@ -61,7 +61,7 @@ const ForGuidesSection = () => {
 
           <p className="flex items-center justify-center gap-2 text-sm mb-8" style={{ color: "hsl(40, 33%, 75%)" }}>
             <Bot className="w-4 h-4 text-primary" />
-            Includes AI-powered business tools to help you price and plan effectively.
+            {t("forGuides.section.aiToolsNote")}
           </p>
 
           {/* Why join early */}
@@ -73,7 +73,7 @@ const ForGuidesSection = () => {
             className="rounded-xl border p-6 mb-10 max-w-2xl mx-auto"
             style={{ borderColor: "hsla(45, 80%, 65%, 0.2)", background: "hsla(220, 30%, 10%, 0.4)" }}
           >
-            <p className="font-semibold mb-4" style={{ color: "hsl(45, 80%, 70%)" }}>{t("forGuides.whyEarlyTitle")}</p>
+            <p className="font-semibold mb-4" style={{ color: "hsl(45, 80%, 70%)" }}>{t("forGuides.section.whyEarlyTitle")}</p>
             <div className="grid sm:grid-cols-3 gap-4">
               {earlyBenefits.map(({ icon: Icon, text }, i) => (
                 <div key={i} className="flex flex-col items-center gap-2">
@@ -85,7 +85,7 @@ const ForGuidesSection = () => {
           </motion.div>
 
           <Button variant="hero" size="lg" className="text-base px-10 py-6" asChild>
-            <a href="/guide-register">{t("forGuides.cta")}</a>
+            <a href="/guide-register">{t("forGuides.section.cta")}</a>
           </Button>
         </motion.div>
       </div>
