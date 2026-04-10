@@ -277,7 +277,22 @@
     "featured3": "Referencias de hoteles y conserjería",
     "featured4": "Mejora de insignia verificada",
     "featured5": "Soporte prioritario",
-    "perMonth": "/mes"
+    "perMonth": "/mes",
+    "section": {
+      "label": "Para Guías",
+      "title": "Trabaja directamente con viajeros de todo el mundo",
+      "subtitle": "Conserva tus ganancias. Controla tus precios. Elige a tus clientes.",
+      "costNote": "Unirse es actualmente gratis durante el lanzamiento. Las herramientas de pago futuras siempre serán opcionales.",
+      "cta": "Solicitar unirse",
+      "feat1": "Cero comisiones — siempre",
+      "feat2": "Audiencia global de viajeros",
+      "feat3": "Relaciones directas con viajeros",
+      "whyEarlyTitle": "¿Por qué unirse temprano?",
+      "early1": "Visibilidad prioritaria",
+      "early2": "Solicitudes tempranas de viajeros",
+      "early3": "Estatus de guía fundador",
+      "aiToolsNote": "Incluye herramientas empresariales con IA para ayudarte a fijar precios y planificar eficazmente."
+    }
   },
   "trust": {
     "label": "Por qué confiar en nosotros",

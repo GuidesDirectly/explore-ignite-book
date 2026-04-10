@@ -277,7 +277,22 @@
     "featured3": "Hotell- och conciergereferenser",
     "featured4": "Uppgradering av verifierat märke",
     "featured5": "Prioriterad support",
-    "perMonth": "/månad"
+    "perMonth": "/månad",
+    "section": {
+      "label": "För Guider",
+      "title": "Arbeta direkt med resenärer världen över",
+      "subtitle": "Behåll dina intäkter. Kontrollera dina priser. Välj dina kunder.",
+      "costNote": "Det är för närvarande gratis att gå med under lanseringen. Framtida betalverktyg kommer alltid att vara valfria.",
+      "cta": "Ansök om att gå med",
+      "feat1": "Noll provision — alltid",
+      "feat2": "Global resenärspublik",
+      "feat3": "Direkta relationer med resenärer",
+      "whyEarlyTitle": "Varför gå med tidigt?",
+      "early1": "Prioriterad synlighet",
+      "early2": "Tidiga resenärsförfrågningar",
+      "early3": "Grundarguide-status",
+      "aiToolsNote": "Inkluderar AI-drivna affärsverktyg som hjälper dig att prissätta och planera effektivt."
+    }
   },
   "trust": {
     "label": "Varför Lita på Oss",

@@ -277,7 +277,22 @@
     "featured3": "Polecenia hoteli i konsjerżów",
     "featured4": "Ulepszenie odznaki zweryfikowanej",
     "featured5": "Priorytetowe wsparcie",
-    "perMonth": "/miesiąc"
+    "perMonth": "/miesiąc",
+    "section": {
+      "label": "Dla Przewodników",
+      "title": "Pracuj bezpośrednio z podróżnikami na całym świecie",
+      "subtitle": "Zatrzymaj swoje zarobki. Kontroluj swoje ceny. Wybieraj swoich klientów.",
+      "costNote": "Dołączenie jest obecnie bezpłatne w okresie uruchomienia. Przyszłe płatne narzędzia zawsze będą opcjonalne.",
+      "cta": "Złóż wniosek o dołączenie",
+      "feat1": "Zero prowizji — na zawsze",
+      "feat2": "Globalna publiczność podróżników",
+      "feat3": "Bezpośrednie relacje z podróżnikami",
+      "whyEarlyTitle": "Dlaczego dołączyć wcześnie?",
+      "early1": "Priorytetowa widoczność",
+      "early2": "Wczesne zapytania podróżników",
+      "early3": "Status przewodnika-założyciela",
+      "aiToolsNote": "Zawiera narzędzia biznesowe oparte na AI, które pomogą Ci w ustalaniu cen i planowaniu."
+    }
   },
   "trust": {
     "label": "Dlaczego nam ufają",

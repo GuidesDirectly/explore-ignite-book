@@ -277,7 +277,22 @@
     "featured3": "Otel ve konsiyerj referansları",
     "featured4": "Doğrulanmış rozet yükseltmesi",
     "featured5": "Öncelikli destek",
-    "perMonth": "/ay"
+    "perMonth": "/ay",
+    "section": {
+      "label": "Rehberler İçin",
+      "title": "Dünya genelindeki gezginlerle doğrudan çalışın",
+      "subtitle": "Kazancınızı koruyun. Fiyatlarınızı kontrol edin. Müşterilerinizi seçin.",
+      "costNote": "Lansman süresince katılım şu anda ücretsizdir. Gelecekteki ücretli araçlar her zaman isteğe bağlı olacaktır.",
+      "cta": "Katılmak için başvurun",
+      "feat1": "Sıfır komisyon — her zaman",
+      "feat2": "Küresel gezgin kitlesi",
+      "feat3": "Gezginlerle doğrudan ilişkiler",
+      "whyEarlyTitle": "Neden erken katılmalısınız?",
+      "early1": "Öncelikli görünürlük",
+      "early2": "Erken gezgin talepleri",
+      "early3": "Kurucu rehber statüsü",
+      "aiToolsNote": "Fiyatlandırma ve planlama konusunda size yardımcı olacak AI destekli iş araçları içerir."
+    }
   },
   "trust": {
     "label": "Bize Neden Güvenmelisiniz",

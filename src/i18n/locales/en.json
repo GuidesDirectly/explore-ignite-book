@@ -175,20 +175,6 @@
     "item4": "Transparent communication",
     "item5": "Support local professionals directly"
   },
-  "forGuides": {
-    "label": "For Guides",
-    "title": "Work Directly With Travelers Worldwide",
-    "subtitle": "Keep your earnings. Control your pricing. Choose your clients.",
-    "costNote": "Joining is currently free during launch. Future paid tools will always be optional.",
-    "cta": "Apply to Join",
-    "feat1": "Zero commissions — ever",
-    "feat2": "Global traveler audience",
-    "feat3": "Direct traveler relationships",
-    "whyEarlyTitle": "Why Join Early?",
-    "early1": "Priority visibility",
-    "early2": "Early traveler requests",
-    "early3": "Founding guide status"
-  },
   "trust": {
     "label": "Why Trust Us",
     "title": "Built on Transparency",
@@ -744,6 +730,21 @@
     "footer": "Free for all travelers · No account required · Powered by Claude AI"
   },
   "forGuides": {
+    "section": {
+      "label": "For Guides",
+      "title": "Work Directly With Travelers Worldwide",
+      "subtitle": "Keep your earnings. Control your pricing. Choose your clients.",
+      "costNote": "Joining is currently free during launch. Future paid tools will always be optional.",
+      "cta": "Apply to Join",
+      "feat1": "Zero commissions — ever",
+      "feat2": "Global traveler audience",
+      "feat3": "Direct traveler relationships",
+      "whyEarlyTitle": "Why Join Early?",
+      "early1": "Priority visibility",
+      "early2": "Early traveler requests",
+      "early3": "Founding guide status",
+      "aiToolsNote": "Includes AI-powered business tools to help you price and plan effectively."
+    },
     "heroEyebrow": "FOR PROFESSIONAL TOUR GUIDES",
     "heroHeadline": "Own your clients. Keep every dollar.",
     "heroSubheading": "Guides Directly is the only platform where you keep 100% of what you earn — forever. No commission. No middlemen. Just you and your travelers.",
