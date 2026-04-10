@@ -279,19 +279,19 @@
     "featured5": "优先支持",
     "perMonth": "/月",
     "section": {
-      "label": "面向导游",
-      "title": "与全球旅行者直接合作",
-      "subtitle": "保留您的收入。控制您的定价。选择您的客户。",
-      "costNote": "在发布期间，加入目前是免费的。未来的付费工具将始终是可选的。",
-      "cta": "申请加入",
-      "feat1": "零佣金 — 永远",
-      "feat2": "全球旅行者受众",
-      "feat3": "与旅行者的直接关系",
-      "whyEarlyTitle": "为什么要尽早加入？",
-      "early1": "优先展示",
-      "early2": "早期旅行者请求",
-      "early3": "创始导游身份",
-      "aiToolsNote": "包含AI驱动的商业工具，帮助您有效定价和规划。"
+      "label": "致导游",
+      "title": "拥有您的客户。保留每一分钱。",
+      "subtitle": "唯一一个让您 100% 保留所赚取收入的平台 — 永久如此。无佣金。无中间商。",
+      "costNote": "对我们的前 50 名 Founding Guide 永久免费。",
+      "cta": "作为 Founding Guide 加入 — 免费",
+      "feat1": "零佣金 — 始终如一",
+      "feat2": "您的专属 Google 个人资料页",
+      "feat3": "直接与旅行者建立联系",
+      "whyEarlyTitle": "为什么要作为 Founding Guide 加入？",
+      "early1": "永久免费 — 永不改变",
+      "early2": "首批入驻新城市的权限",
+      "early3": "个人资料页上的 Founding Guide 徽章",
+      "aiToolsNote": "包含 AI Content Co-Pilot — 立即以 21 种语言进行写作。"
     }
   },
   "trust": {

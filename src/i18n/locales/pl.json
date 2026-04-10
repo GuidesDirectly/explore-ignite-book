@@ -279,19 +279,19 @@
     "featured5": "Priorytetowe wsparcie",
     "perMonth": "/miesiąc",
     "section": {
-      "label": "Dla Przewodników",
-      "title": "Pracuj bezpośrednio z podróżnikami na całym świecie",
-      "subtitle": "Zatrzymaj swoje zarobki. Kontroluj swoje ceny. Wybieraj swoich klientów.",
-      "costNote": "Dołączenie jest obecnie bezpłatne w okresie uruchomienia. Przyszłe płatne narzędzia zawsze będą opcjonalne.",
-      "cta": "Złóż wniosek o dołączenie",
+      "label": "DLA PRZEWODNIKÓW",
+      "title": "Zadbaj o własnych klientów. Zachowaj każdego dolara.",
+      "subtitle": "Jedyna platforma, na której zachowujesz 100% swoich zarobków — na zawsze. Bez prowizji. Bez pośredników.",
+      "costNote": "Bezpłatnie na zawsze dla naszych pierwszych 50 osób typu Founding Guide.",
+      "cta": "Dołącz jako Founding Guide — bezpłatnie",
       "feat1": "Zero prowizji — na zawsze",
-      "feat2": "Globalna publiczność podróżników",
-      "feat3": "Bezpośrednie relacje z podróżnikami",
-      "whyEarlyTitle": "Dlaczego dołączyć wcześnie?",
-      "early1": "Priorytetowa widoczność",
-      "early2": "Wczesne zapytania podróżników",
-      "early3": "Status przewodnika-założyciela",
-      "aiToolsNote": "Zawiera narzędzia biznesowe oparte na AI, które pomogą Ci w ustalaniu cen i planowaniu."
+      "feat2": "Twoja własna strona profilowa Google",
+      "feat3": "Bezpośrednie relacje z podróżnymi",
+      "whyEarlyTitle": "Dlaczego warto dołączyć jako Founding Guide?",
+      "early1": "Bezpłatnie na zawsze — to się nigdy nie zmieni",
+      "early2": "Pierwszeństwo dostępu do nowych miast",
+      "early3": "Odznaka Founding Guide na profilu",
+      "aiToolsNote": "Zawiera narzędzie AI Content Co-Pilot — pisz natychmiastowo w 21 językach."
     }
   },
   "trust": {

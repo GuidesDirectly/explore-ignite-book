@@ -279,19 +279,19 @@
     "featured5": "Supporto prioritario",
     "perMonth": "/mese",
     "section": {
-      "label": "Per le Guide",
-      "title": "Lavora direttamente con i viaggiatori di tutto il mondo",
-      "subtitle": "Tieni i tuoi guadagni. Controlla i tuoi prezzi. Scegli i tuoi clienti.",
-      "costNote": "L'iscrizione è attualmente gratuita durante il lancio. Gli strumenti a pagamento futuri saranno sempre opzionali.",
-      "cta": "Candidati",
+      "label": "PER LE GUIDE TURISTICHE",
+      "title": "I tuoi clienti sono tuoi. Tieni ogni centesimo.",
+      "subtitle": "L'unica piattaforma dove tieni il 100% di quello che guadagni — per sempre. Nessuna commissione. Nessun intermediario.",
+      "costNote": "Gratis per sempre per i nostri primi 50 founding guides.",
+      "cta": "Unisciti come Founding Guide — Gratis",
       "feat1": "Zero commissioni — mai",
-      "feat2": "Pubblico di viaggiatori globale",
-      "feat3": "Relazioni dirette con i viaggiatori",
-      "whyEarlyTitle": "Perché iscriversi presto?",
-      "early1": "Visibilità prioritaria",
-      "early2": "Richieste precoci dei viaggiatori",
-      "early3": "Status di guida fondatrice",
-      "aiToolsNote": "Include strumenti aziendali basati sull'IA per aiutarti a stabilire prezzi e pianificare in modo efficace."
+      "feat2": "La tua pagina profilo Google",
+      "feat3": "Rapporti diretti con i viaggiatori",
+      "whyEarlyTitle": "Perché iscriversi come Founding Guide?",
+      "early1": "Gratis per sempre — non cambierà mai",
+      "early2": "Accesso prioritario alle nuove città",
+      "early3": "Badge di Founding Guide sul profilo",
+      "aiToolsNote": "Include AI Content Co-Pilot — scrivi in 21 lingue istantaneamente."
     }
   },
   "trust": {
