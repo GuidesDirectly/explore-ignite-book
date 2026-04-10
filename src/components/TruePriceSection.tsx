@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const TruePriceSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section
       className="w-full py-[72px]"
@@ -16,7 +19,7 @@ const TruePriceSection = () => {
             letterSpacing: "0.12em",
           }}
         >
-          THE GUIDES DIRECTLY DIFFERENCE
+          {t("truePrice.eyebrow")}
         </p>
 
         {/* Main statement */}
@@ -24,8 +27,7 @@ const TruePriceSection = () => {
           className="font-serif font-bold mb-6 text-[28px] md:text-[40px]"
           style={{ color: "#0A1628", lineHeight: 1.3 }}
         >
-          On other platforms, your guide keeps 70&nbsp;cents of every dollar you
-          spend. Here, they keep 100%.
+          {t("truePrice.headline")}
         </h2>
 
         {/* Supporting text */}
@@ -38,8 +40,7 @@ const TruePriceSection = () => {
             maxWidth: 560,
           }}
         >
-          That means better guides, fairer prices, and a human who is genuinely
-          invested in your experience — not just fulfilling a booking.
+          {t("truePrice.subheading")}
         </p>
 
         {/* Stat pills */}
@@ -56,10 +57,10 @@ const TruePriceSection = () => {
               className="block font-serif font-bold text-[36px] md:text-[48px] mb-1"
               style={{ color: "#C0392B" }}
             >
-              30%
+              {t("truePrice.otherPercent")}
             </span>
             <span style={{ color: "rgba(10,22,40,0.6)", fontSize: 14 }}>
-              taken by other platforms
+              {t("truePrice.otherLabel")}
             </span>
           </div>
 
@@ -75,10 +76,10 @@ const TruePriceSection = () => {
               className="block font-serif font-bold text-[36px] md:text-[48px] mb-1"
               style={{ color: "#2D6A4F" }}
             >
-              0%
+              {t("truePrice.ourPercent")}
             </span>
             <span style={{ color: "rgba(10,22,40,0.6)", fontSize: 14 }}>
-              taken by Guides Directly
+              {t("truePrice.ourLabel")}
             </span>
           </div>
         </div>
@@ -100,7 +101,7 @@ const TruePriceSection = () => {
             (e.currentTarget.style.backgroundColor = "#C9A84C")
           }
         >
-          Find a Guide — Pay Them Directly
+          {t("truePrice.cta")}
         </Link>
       </div>
     </section>
