@@ -94,10 +94,10 @@ const HeroSection = () => {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
           >
             <Button variant="hero" size="lg" asChild>
-              <Link to="/guides">Find a Guide</Link>
+              <Link to="/guides">{t("hero.cta1")}</Link>
             </Button>
             <Button variant="heroOutline" size="lg" asChild>
-              <Link to="/guide-register">I'm a Guide — Join Free</Link>
+              <Link to="/guide-register">{t("hero.cta2")}</Link>
             </Button>
           </motion.div>
 
@@ -109,7 +109,7 @@ const HeroSection = () => {
             className="mx-auto w-full max-w-2xl mb-12"
           >
             <p className="text-[13px] text-white/85 text-center mb-3">
-              Find your guide — search by city and language
+              {t("hero.searchLabel")}
             </p>
             <form
               onSubmit={handleSubmit}
@@ -125,7 +125,7 @@ const HeroSection = () => {
                   autoComplete="off"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  placeholder="Which city are you visiting?"
+                  placeholder={t("hero.cityPlaceholder")}
                   className="w-full bg-transparent text-sm text-white placeholder:text-white/60 border-none outline-none focus:outline-none focus:ring-0"
                 />
               </div>
@@ -143,7 +143,7 @@ const HeroSection = () => {
                   className="w-full bg-transparent text-sm text-white border-none outline-none focus:outline-none focus:ring-0 appearance-none cursor-pointer"
                   style={{ WebkitAppearance: "none" }}
                 >
-                  <option value="" className="bg-[hsl(220,30%,8%)] text-white">Any Language</option>
+                  <option value="" className="bg-[hsl(220,30%,8%)] text-white">{t("hero.languagePlaceholder")}</option>
                   {LANGUAGES.filter(Boolean).map((lang) => (
                     <option key={lang} value={lang} className="bg-[hsl(220,30%,8%)] text-white">
                       {lang}

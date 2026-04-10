@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { ShieldCheck, DollarSign, Globe, MessageCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface StatCard {
   icon: React.ElementType;
@@ -10,20 +11,22 @@ interface StatCard {
   textValue?: string;
 }
 
-const stats: StatCard[] = [
-  { icon: ShieldCheck, value: 0, suffix: "%", label: "Commission — ever" },
-  { icon: DollarSign, value: 100, suffix: "%", label: "Goes directly to your guide" },
-  { icon: Globe, value: 21, suffix: "", label: "Languages spoken by our guides" },
-  { icon: MessageCircle, value: 0, suffix: "", label: "Guide to traveler connection", isText: true, textValue: "Direct" },
-];
-
 const DURATION = 1200;
 
 const TrustBarSection = () => {
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [counts, setCounts] = useState<number[]>(stats.map(() => 0));
   const [visible, setVisible] = useState(false);
+
+  const stats: StatCard[] = [
+    { icon: ShieldCheck, value: 0, suffix: "%", label: t("trustBar.stat1Label") },
+    { icon: DollarSign, value: 100, suffix: "%", label: t("trustBar.stat2Label") },
+    { icon: Globe, value: 21, suffix: "", label: t("trustBar.stat3Label") },
+    { icon: MessageCircle, value: 0, suffix: "", label: t("trustBar.stat4Label"), isText: true, textValue: t("trustBar.stat4Value") },
+  ];
+
+  const [counts, setCounts] = useState<number[]>(stats.map(() => 0));
 
   const animate = useCallback(() => {
     const start = performance.now();
