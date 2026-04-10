@@ -17,7 +17,7 @@
     "subtitle": "Keine Provisionen. Keine Mittelsmänner. Nur echte Experten.",
     "searchPlaceholder": "Wo suchen Sie einen Guide?",
     "cta1": "Guides finden",
-    "cta2": "Guide werden",
+    "cta2": "Ich bin ein Reiseführer — Kostenlos beitreten",
     "trust1": "Geprüfte Guides",
     "trust2": "Direktkontakt",
     "trust3": "Individuelle Touren",
@@ -30,7 +30,10 @@
     "avgRating": "Durchschnittsbewertung",
     "happyTravelers": "Zufriedene Reisende",
     "citiesCovered": "Städte",
-    "noMiddlemen": "Keine Vermittler. Keine Provisionen. Direkte Kommunikation."
+    "noMiddlemen": "Keine Vermittler. Keine Provisionen. Direkte Kommunikation.",
+    "searchLabel": "Finden Sie Ihren Reiseführer — Suche nach Stadt und Sprache",
+    "cityPlaceholder": "Welche Stadt besuchen Sie?",
+    "languagePlaceholder": "Beliebige Sprache"
   },
   "valueProp": {
     "label": "Warum wir anders sind",
@@ -781,5 +784,12 @@
     "demoConfirm": "✓ Reiseroute in 8 Sekunden erstellt",
     "cta": "Planen Sie Ihre Reise →",
     "footer": "Kostenlos für alle Reisenden · Kein Konto erforderlich · Angetrieben von Claude AI"
+  },
+  "trustBar": {
+    "stat1Label": "Provision — niemals",
+    "stat2Label": "Geht direkt an Ihren Reiseführer",
+    "stat3Label": "Von unseren Reiseführern gesprochene Sprachen",
+    "stat4Label": "Verbindung zwischen Reiseführer und Reisendem",
+    "stat4Value": "Direkt"
   }
 }

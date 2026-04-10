@@ -18,7 +18,7 @@
     "noMiddlemen": "Không trung gian. Không hoa hồng. Liên lạc trực tiếp.",
     "searchPlaceholder": "Bạn muốn hướng dẫn viên ở đâu?",
     "cta1": "Tìm Hướng dẫn viên",
-    "cta2": "Trở thành HDV",
+    "cta2": "Tôi là Hướng dẫn viên — Tham gia miễn phí",
     "trust1": "HDV được xác minh",
     "trust2": "Liên hệ trực tiếp",
     "trust3": "Thành phố & Sinh thái",
@@ -30,7 +30,10 @@
     "whyCommissionFree": "Tại sao không hoa hồng quan trọng",
     "avgRating": "Đánh giá trung bình",
     "happyTravelers": "Du khách hài lòng",
-    "citiesCovered": "Thành phố phục vụ"
+    "citiesCovered": "Thành phố phục vụ",
+    "searchLabel": "Tìm hướng dẫn viên của bạn — tìm kiếm theo thành phố và ngôn ngữ",
+    "cityPlaceholder": "Bạn đang ghé thăm thành phố nào?",
+    "languagePlaceholder": "Bất kỳ ngôn ngữ nào"
   },
   "valueProp": {
     "label": "Tại sao chúng tôi khác biệt",
@@ -702,5 +705,12 @@
     "demoConfirm": "✓ Lịch trình được xây dựng trong 8 giây",
     "cta": "Bắt đầu lên kế hoạch cho chuyến đi của bạn →",
     "footer": "Miễn phí cho tất cả du khách · Không cần tài khoản · Được cung cấp bởi Claude AI"
+  },
+  "trustBar": {
+    "stat1Label": "Hoa hồng — không bao giờ",
+    "stat2Label": "Đi thẳng đến hướng dẫn viên của bạn",
+    "stat3Label": "Các ngôn ngữ được hướng dẫn viên của chúng tôi nói",
+    "stat4Label": "Kết nối giữa hướng dẫn viên và du khách",
+    "stat4Value": "Trực tiếp"
   }
 }

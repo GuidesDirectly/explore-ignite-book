@@ -18,7 +18,7 @@
     "noMiddlemen": "Inga mellanhänder. Inga provisioner. Direkt kommunikation.",
     "searchPlaceholder": "Var vill du ha en guide?",
     "cta1": "Hitta en Guide",
-    "cta2": "Bli Guide",
+    "cta2": "Jag är en guide — Gå med gratis",
     "trust1": "Verifierade Guider",
     "trust2": "Direktkontakt",
     "trust3": "Stad & Ekoturism",
@@ -30,7 +30,10 @@
     "whyCommissionFree": "Varför Provisionsfritt Är Viktigt",
     "avgRating": "Genomsnittsbetyg",
     "happyTravelers": "Nöjda Resenärer",
-    "citiesCovered": "Städer Tillgängliga"
+    "citiesCovered": "Städer Tillgängliga",
+    "searchLabel": "Hitta din guide — sök efter stad och språk",
+    "cityPlaceholder": "Vilken stad besöker du?",
+    "languagePlaceholder": "Valfritt språk"
   },
   "valueProp": {
     "label": "Varför Vi Är Annorlunda",
@@ -702,5 +705,12 @@
     "demoConfirm": "✓ Färdplan skapad på 8 sekunder",
     "cta": "Börja planera din resa →",
     "footer": "Gratis för alla resenärer · Inget konto krävs · Drivs av Claude AI"
+  },
+  "trustBar": {
+    "stat1Label": "Provision — någonsin",
+    "stat2Label": "Går direkt till din guide",
+    "stat3Label": "Språk som talas av våra guider",
+    "stat4Label": "Guide-resenär-anslutning",
+    "stat4Value": "Direkt"
   }
 }

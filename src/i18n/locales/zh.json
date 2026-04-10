@@ -17,7 +17,7 @@
     "subtitle": "零佣金。零中间商。只有真正的专家。",
     "searchPlaceholder": "您想在哪里找导游？",
     "cta1": "寻找导游",
-    "cta2": "成为导游",
+    "cta2": "我是向导 — 免费加入",
     "trust1": "认证导游",
     "trust2": "直接联系",
     "trust3": "定制旅游",
@@ -30,7 +30,10 @@
     "avgRating": "平均评分",
     "happyTravelers": "满意游客",
     "citiesCovered": "覆盖城市",
-    "noMiddlemen": "无中间商。无佣金。直接沟通。"
+    "noMiddlemen": "无中间商。无佣金。直接沟通。",
+    "searchLabel": "寻找您的向导 — 按城市和语言搜索",
+    "cityPlaceholder": "您将访问哪个城市？",
+    "languagePlaceholder": "任何语言"
   },
   "valueProp": {
     "label": "为什么我们与众不同",
@@ -703,5 +706,12 @@
     "demoConfirm": "✓ 8 秒内构建行程",
     "cta": "开始规划您的旅程 →",
     "footer": "所有旅行者免费 · 无需账户 · 由 Claude AI 提供支持"
+  },
+  "trustBar": {
+    "stat1Label": "佣金 — 绝无",
+    "stat2Label": "直接支付给您的向导",
+    "stat3Label": "我们的向导所说的语言",
+    "stat4Label": "向导与旅行者联系",
+    "stat4Value": "直接"
   }
 }

@@ -18,7 +18,7 @@
     "noMiddlemen": "Tanpa perantara. Tanpa komisi. Komunikasi langsung.",
     "searchPlaceholder": "Di mana Anda ingin pemandu?",
     "cta1": "Cari Pemandu",
-    "cta2": "Jadi Pemandu",
+    "cta2": "Saya Pemandu — Gabung Gratis",
     "trust1": "Pemandu Terverifikasi",
     "trust2": "Kontak Langsung",
     "trust3": "Kota & Ekowisata",
@@ -30,7 +30,10 @@
     "whyCommissionFree": "Mengapa Tanpa Komisi Penting",
     "avgRating": "Rating Rata-rata",
     "happyTravelers": "Wisatawan Puas",
-    "citiesCovered": "Kota Dilayani"
+    "citiesCovered": "Kota Dilayani",
+    "searchLabel": "Temukan pemandu Anda — cari berdasarkan kota dan bahasa",
+    "cityPlaceholder": "Kota mana yang akan Anda kunjungi?",
+    "languagePlaceholder": "Bahasa Apa Pun"
   },
   "valueProp": {
     "label": "Mengapa Kami Berbeda",
@@ -702,5 +705,12 @@
     "demoConfirm": "✓ Itinerary dibangun dalam 8 detik",
     "cta": "Mulai Rencanakan Perjalanan Anda →",
     "footer": "Gratis untuk semua wisatawan · Tidak perlu akun · Didukung oleh Claude AI"
+  },
+  "trustBar": {
+    "stat1Label": "Komisi — tidak pernah",
+    "stat2Label": "Langsung ke pemandu Anda",
+    "stat3Label": "Bahasa yang dituturkan oleh pemandu kami",
+    "stat4Label": "Koneksi pemandu ke pelancong",
+    "stat4Value": "Langsung"
   }
 }

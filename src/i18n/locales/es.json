@@ -17,7 +17,7 @@
     "subtitle": "Sin comisiones. Sin intermediarios. Solo expertos reales.",
     "searchPlaceholder": "¿Dónde quieres un guía?",
     "cta1": "Encontrar guías",
-    "cta2": "Convertirse en guía",
+    "cta2": "Soy un guía — Únete gratis",
     "trust1": "Guías verificados",
     "trust2": "Contacto directo",
     "trust3": "Tours personalizados",
@@ -30,7 +30,10 @@
     "avgRating": "Calificación promedio",
     "happyTravelers": "Viajeros felices",
     "citiesCovered": "Ciudades",
-    "noMiddlemen": "Sin intermediarios. Sin comisiones. Comunicación directa."
+    "noMiddlemen": "Sin intermediarios. Sin comisiones. Comunicación directa.",
+    "searchLabel": "Encuentra tu guía — busca por ciudad e idioma",
+    "cityPlaceholder": "¿Qué ciudad estás visitando?",
+    "languagePlaceholder": "Cualquier idioma"
   },
   "valueProp": {
     "label": "Por qué somos diferentes",
@@ -781,5 +784,12 @@
     "demoConfirm": "✓ Itinerario creado en 8 segundos",
     "cta": "Empieza a planificar tu viaje →",
     "footer": "Gratis para todos los viajeros · No se requiere cuenta · Impulsado por Claude AI"
+  },
+  "trustBar": {
+    "stat1Label": "Comisión — nunca",
+    "stat2Label": "Va directamente a tu guía",
+    "stat3Label": "Idiomas hablados por nuestros guías",
+    "stat4Label": "Conexión guía-viajero",
+    "stat4Value": "Directa"
   }
 }

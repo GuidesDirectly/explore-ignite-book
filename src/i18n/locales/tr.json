@@ -18,7 +18,7 @@
     "noMiddlemen": "Aracı yok. Komisyon yok. Doğrudan iletişim.",
     "searchPlaceholder": "Nerede rehber istiyorsunuz?",
     "cta1": "Rehber Bul",
-    "cta2": "Rehber Ol",
+    "cta2": "Ben bir Rehberim — Ücretsiz Katılın",
     "trust1": "Doğrulanmış Rehberler",
     "trust2": "Doğrudan İletişim",
     "trust3": "Şehir & Ekoturizm",
@@ -30,7 +30,10 @@
     "whyCommissionFree": "Komisyonsuz Olmanın Önemi",
     "avgRating": "Ortalama Puan",
     "happyTravelers": "Mutlu Gezginler",
-    "citiesCovered": "Kapsanan Şehirler"
+    "citiesCovered": "Kapsanan Şehirler",
+    "searchLabel": "Rehberinizi bulun — şehre ve dile göre arama yapın",
+    "cityPlaceholder": "Hangi şehri ziyaret ediyorsunuz?",
+    "languagePlaceholder": "Herhangi bir dil"
   },
   "valueProp": {
     "label": "Neden Farklıyız",
@@ -702,5 +705,12 @@
     "demoConfirm": "✓ Seyahat planı 8 saniyede oluşturuldu",
     "cta": "Seyahatinizi Planlamaya Başlayın →",
     "footer": "Tüm gezginler için ücretsiz · Hesap gerekmez · Claude AI tarafından desteklenmektedir"
+  },
+  "trustBar": {
+    "stat1Label": "Komisyon — asla",
+    "stat2Label": "Doğrudan rehberinize gider",
+    "stat3Label": "Rehberlerimizin konuştuğu diller",
+    "stat4Label": "Rehberden gezgine bağlantı",
+    "stat4Value": "Doğrudan"
   }
 }
