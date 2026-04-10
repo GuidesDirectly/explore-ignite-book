@@ -279,19 +279,19 @@
     "featured5": "Prioriterad support",
     "perMonth": "/månad",
     "section": {
-      "label": "För Guider",
-      "title": "Arbeta direkt med resenärer världen över",
-      "subtitle": "Behåll dina intäkter. Kontrollera dina priser. Välj dina kunder.",
-      "costNote": "Det är för närvarande gratis att gå med under lanseringen. Framtida betalverktyg kommer alltid att vara valfria.",
-      "cta": "Ansök om att gå med",
-      "feat1": "Noll provision — alltid",
-      "feat2": "Global resenärspublik",
+      "label": "FÖR RESEGUIDER",
+      "title": "Äg dina kundrelationer. Behåll varje krona.",
+      "subtitle": "Den enda plattformen där du behåller 100 % av det du tjänar — för alltid. Ingen provision. Inga mellanhänder.",
+      "costNote": "Gratis för alltid för våra första 50 Founding Guides.",
+      "cta": "Gå med som en Founding Guide — Gratis",
+      "feat1": "Noll provision — någonsin",
+      "feat2": "Din egen Google-profilsida",
       "feat3": "Direkta relationer med resenärer",
-      "whyEarlyTitle": "Varför gå med tidigt?",
-      "early1": "Prioriterad synlighet",
-      "early2": "Tidiga resenärsförfrågningar",
-      "early3": "Grundarguide-status",
-      "aiToolsNote": "Inkluderar AI-drivna affärsverktyg som hjälper dig att prissätta och planera effektivt."
+      "whyEarlyTitle": "Varför gå med som en Founding Guide?",
+      "early1": "Gratis för alltid — ändras aldrig",
+      "early2": "Förstahandsval vid nya städer",
+      "early3": "Founding Guide-märke på profilen",
+      "aiToolsNote": "Inkluderar AI Content Co-Pilot — skriv på 21 språk direkt."
     }
   },
   "trust": {

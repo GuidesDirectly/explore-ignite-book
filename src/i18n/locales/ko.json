@@ -279,19 +279,19 @@
     "featured5": "우선 지원",
     "perMonth": "/월",
     "section": {
-      "label": "가이드를 위해",
-      "title": "전 세계 여행자와 직접 일하세요",
-      "subtitle": "수익을 유지하세요. 가격을 통제하세요. 고객을 선택하세요.",
-      "costNote": "출시 기간 동안 가입은 현재 무료입니다. 향후 유료 도구는 항상 선택 사항입니다.",
-      "cta": "가입 신청",
-      "feat1": "수수료 제로 — 영원히",
-      "feat2": "글로벌 여행자 청중",
-      "feat3": "여행자와의 직접적인 관계",
-      "whyEarlyTitle": "왜 일찍 가입해야 할까요?",
-      "early1": "우선 노출",
-      "early2": "초기 여행자 요청",
-      "early3": "창립 가이드 지위",
-      "aiToolsNote": "효과적인 가격 책정 및 계획을 돕는 AI 기반 비즈니스 도구가 포함되어 있습니다."
+      "label": "가이드용",
+      "title": "당신의 고객을 직접 관리하세요. 수익은 100% 당신의 것입니다.",
+      "subtitle": "수익의 100%를 그대로 가져가는 유일한 플랫폼 — 영원히. 수수료도, 중간 단계도 없습니다.",
+      "costNote": "첫 50명의 Founding Guide에게는 영원히 무료입니다.",
+      "cta": "Founding Guide로 가입하기 — 무료",
+      "feat1": "제로 수수료 — 평생",
+      "feat2": "본인만의 Google 프로필 페이지",
+      "feat3": "여행자와의 직접적인 관계 형성",
+      "whyEarlyTitle": "왜 Founding Guide로 참여해야 하나요?",
+      "early1": "영원히 무료 — 절대 변하지 않습니다",
+      "early2": "새로운 도시에 대한 우선 접근권",
+      "early3": "프로필에 Founding Guide 배지 부여",
+      "aiToolsNote": "AI Content Co-Pilot 포함 — 즉시 21개 언어로 글을 써보세요."
     }
   },
   "trust": {

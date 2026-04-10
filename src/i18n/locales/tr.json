@@ -279,19 +279,19 @@
     "featured5": "Öncelikli destek",
     "perMonth": "/ay",
     "section": {
-      "label": "Rehberler İçin",
-      "title": "Dünya genelindeki gezginlerle doğrudan çalışın",
-      "subtitle": "Kazancınızı koruyun. Fiyatlarınızı kontrol edin. Müşterilerinizi seçin.",
-      "costNote": "Lansman süresince katılım şu anda ücretsizdir. Gelecekteki ücretli araçlar her zaman isteğe bağlı olacaktır.",
-      "cta": "Katılmak için başvurun",
+      "label": "TUR REHBERLERİ İÇİN",
+      "title": "Müşterilerinizin sahibi olun. Her kuruşu cebinizde tutun.",
+      "subtitle": "Kazandığınızın %100'ünün sizde kaldığı tek platform — sonsuza kadar. Komisyon yok. Aracı yok.",
+      "costNote": "İlk 50 Founding Guide üyemiz için sonsuza dek ücretsiz.",
+      "cta": "Sonsuza Dek Ücretsiz — Founding Guide Olarak Katıl",
       "feat1": "Sıfır komisyon — her zaman",
-      "feat2": "Küresel gezgin kitlesi",
-      "feat3": "Gezginlerle doğrudan ilişkiler",
-      "whyEarlyTitle": "Neden erken katılmalısınız?",
-      "early1": "Öncelikli görünürlük",
-      "early2": "Erken gezgin talepleri",
-      "early3": "Kurucu rehber statüsü",
-      "aiToolsNote": "Fiyatlandırma ve planlama konusunda size yardımcı olacak AI destekli iş araçları içerir."
+      "feat2": "Kendi Google profil sayfanız",
+      "feat3": "Gezginlerle doğrudan ilişki",
+      "whyEarlyTitle": "Neden Founding Guide olarak katılmalısınız?",
+      "early1": "Sonsuza dek ücretsiz — asla değişmez",
+      "early2": "Yeni şehirlere ilk erişim hakkı",
+      "early3": "Profilde Founding Guide rozeti",
+      "aiToolsNote": "AI Content Co-Pilot içerir — anında 21 dilde yazın."
     }
   },
   "trust": {
