@@ -17,7 +17,7 @@
     "subtitle": "Zero prowizji. Zero pośredników. Tylko prawdziwi eksperci.",
     "searchPlaceholder": "Gdzie szukasz przewodnika?",
     "cta1": "Znajdź przewodników",
-    "cta2": "Zostań przewodnikiem",
+    "cta2": "Jestem przewodnikiem — Dołącz za darmo",
     "trust1": "Zweryfikowani przewodnicy",
     "trust2": "Bezpośredni kontakt",
     "trust3": "Indywidualne wycieczki",
@@ -30,7 +30,10 @@
     "avgRating": "Średnia ocena",
     "happyTravelers": "Zadowolonych turystów",
     "citiesCovered": "Miast",
-    "noMiddlemen": "Bez pośredników. Bez prowizji. Bezpośrednia komunikacja."
+    "noMiddlemen": "Bez pośredników. Bez prowizji. Bezpośrednia komunikacja.",
+    "searchLabel": "Znajdź swojego przewodnika — szukaj według miasta i języka",
+    "cityPlaceholder": "Jakie miasto odwiedzasz?",
+    "languagePlaceholder": "Dowolny język"
   },
   "valueProp": {
     "label": "Dlaczego jesteśmy inni",
@@ -703,5 +706,12 @@
     "demoConfirm": "✓ Plan podróży zbudowany w 8 sekund",
     "cta": "Rozpocznij planowanie swojej podróży →",
     "footer": "Bezpłatnie dla wszystkich podróżnych · Nie требуется konto · Obsługiwane przez Claude AI"
+  },
+  "trustBar": {
+    "stat1Label": "Prowizja — nigdy",
+    "stat2Label": "Idzie bezpośrednio do Twojego przewodnika",
+    "stat3Label": "Języki, którymi posługują się nasi przewodnicy",
+    "stat4Label": "Połączenie przewodnik-podróżny",
+    "stat4Value": "Bezpośrednie"
   }
 }

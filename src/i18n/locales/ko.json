@@ -18,7 +18,7 @@
     "noMiddlemen": "중개인 없음. 수수료 없음. 직접 소통.",
     "searchPlaceholder": "어디에서 가이드를 원하시나요?",
     "cta1": "가이드 찾기",
-    "cta2": "가이드 등록",
+    "cta2": "저는 가이드입니다 — 무료 가입",
     "trust1": "검증된 가이드",
     "trust2": "직접 연락",
     "trust3": "도시 & 생태 관광",
@@ -30,7 +30,10 @@
     "whyCommissionFree": "수수료 없는 이유",
     "avgRating": "평균 평점",
     "happyTravelers": "만족한 여행자",
-    "citiesCovered": "운영 도시"
+    "citiesCovered": "운영 도시",
+    "searchLabel": "가이드 찾기 — 도시 및 언어별 검색",
+    "cityPlaceholder": "어떤 도시를 방문하시나요?",
+    "languagePlaceholder": "모든 언어"
   },
   "valueProp": {
     "label": "우리가 다른 이유",
@@ -702,5 +705,12 @@
     "demoConfirm": "✓ 8초 만에 일정 생성 완료",
     "cta": "여행 계획 시작하기 →",
     "footer": "모든 여행자에게 무료 · 계정 불필요 · Claude AI 지원"
+  },
+  "trustBar": {
+    "stat1Label": "수수료 — 전혀 없음",
+    "stat2Label": "가이드에게 직접 전달됩니다",
+    "stat3Label": "저희 가이드가 구사하는 언어",
+    "stat4Label": "가이드와 여행자의 연결",
+    "stat4Value": "직접"
   }
 }

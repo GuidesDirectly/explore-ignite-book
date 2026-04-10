@@ -17,7 +17,7 @@
     "subtitle": "手数料なし。仲介なし。本物の専門家だけ。",
     "searchPlaceholder": "どこでガイドを探していますか？",
     "cta1": "ガイドを探す",
-    "cta2": "ガイドになる",
+    "cta2": "私はガイドです — 無料で参加",
     "trust1": "認定済みガイド",
     "trust2": "直接連絡",
     "trust3": "カスタムツアー",
@@ -30,7 +30,10 @@
     "avgRating": "平均評価",
     "happyTravelers": "満足した旅行者",
     "citiesCovered": "対応都市",
-    "noMiddlemen": "仲介なし。手数料なし。直接コミュニケーション。"
+    "noMiddlemen": "仲介なし。手数料なし。直接コミュニケーション。",
+    "searchLabel": "ガイドを見つける — 都市と言語で検索",
+    "cityPlaceholder": "どの都市を訪れますか？",
+    "languagePlaceholder": "任意の言語"
   },
   "valueProp": {
     "label": "なぜ私たちが違うのか",
@@ -703,5 +706,12 @@
     "demoConfirm": "✓ 8秒で旅程を作成しました",
     "cta": "旅の計画を開始する →",
     "footer": "すべての旅行者向け無料 · アカウント不要 · Claude AI搭載"
+  },
+  "trustBar": {
+    "stat1Label": "手数料 — なし",
+    "stat2Label": "ガイドに直接支払われます",
+    "stat3Label": "当社のガイドが話す言語",
+    "stat4Label": "ガイドと旅行者のつながり",
+    "stat4Value": "直接"
   }
 }

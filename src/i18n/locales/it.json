@@ -18,7 +18,7 @@
     "noMiddlemen": "Nessun intermediario. Nessuna commissione. Comunicazione diretta.",
     "searchPlaceholder": "Dove vuoi una guida?",
     "cta1": "Trova una Guida",
-    "cta2": "Diventa Guida",
+    "cta2": "Sono una Guida — Unisciti Gratuitamente",
     "trust1": "Guide Verificate",
     "trust2": "Contatto Diretto",
     "trust3": "Città ed Ecoturismo",
@@ -30,7 +30,10 @@
     "whyCommissionFree": "Perché Zero Commissioni è Importante",
     "avgRating": "Valutazione Media",
     "happyTravelers": "Viaggiatori Soddisfatti",
-    "citiesCovered": "Città Coperte"
+    "citiesCovered": "Città Coperte",
+    "searchLabel": "Trova la tua guida — cerca per città e lingua",
+    "cityPlaceholder": "Quale città stai visitando?",
+    "languagePlaceholder": "Qualsiasi Lingua"
   },
   "valueProp": {
     "label": "Perché Siamo Diversi",
@@ -702,5 +705,12 @@
     "demoConfirm": "✓ Itinerario creato in 8 secondi",
     "cta": "Inizia a Pianificare il tuo Viaggio →",
     "footer": "Gratuito per tutti i viaggiatori · Nessun account richiesto · Alimentato da Claude AI"
+  },
+  "trustBar": {
+    "stat1Label": "Commissione — mai",
+    "stat2Label": "Va direttamente alla tua guida",
+    "stat3Label": "Lingue parlate dalle nostre guide",
+    "stat4Label": "Connessione guida-viaggiatore",
+    "stat4Value": "Diretta"
   }
 }

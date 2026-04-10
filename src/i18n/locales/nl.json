@@ -18,7 +18,7 @@
     "noMiddlemen": "Geen tussenpersonen. Geen commissies. Direct contact.",
     "searchPlaceholder": "Waar wilt u een gids?",
     "cta1": "Vind een Gids",
-    "cta2": "Word Gids",
+    "cta2": "Ik ben gids — Word gratis lid",
     "trust1": "Geverifieerde Gidsen",
     "trust2": "Direct Contact",
     "trust3": "Stad & Ecotoerisme",
@@ -30,7 +30,10 @@
     "whyCommissionFree": "Waarom Commissievrij Belangrijk Is",
     "avgRating": "Gemiddelde Beoordeling",
     "happyTravelers": "Tevreden Reizigers",
-    "citiesCovered": "Steden Beschikbaar"
+    "citiesCovered": "Steden Beschikbaar",
+    "searchLabel": "Vind je gids — zoek op stad en taal",
+    "cityPlaceholder": "Welke stad bezoek je?",
+    "languagePlaceholder": "Elke taal"
   },
   "valueProp": {
     "label": "Waarom Wij Anders Zijn",
@@ -702,5 +705,12 @@
     "demoConfirm": "✓ Reisplan opgesteld in 8 seconden",
     "cta": "Begin met het plannen van uw reis →",
     "footer": "Gratis voor alle reizigers · Geen account vereist · Aangedreven door Claude AI"
+  },
+  "trustBar": {
+    "stat1Label": "Commissie — ooit",
+    "stat2Label": "Gaat rechtstreeks naar je gids",
+    "stat3Label": "Talen gesproken door onze gidsen",
+    "stat4Label": "Gids-reiziger verbinding",
+    "stat4Value": "Direct"
   }
 }
