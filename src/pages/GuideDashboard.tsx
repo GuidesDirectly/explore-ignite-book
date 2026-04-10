@@ -63,15 +63,18 @@ const StatCard = ({
   subValue?: string;
   accent?: boolean;
 }) => (
-  <div className="bg-card rounded-xl border border-border/50 p-5 flex flex-col gap-2">
-    <div className="flex items-center gap-2 text-muted-foreground">
-      <Icon className={`w-4 h-4 ${accent ? "text-primary" : ""}`} />
+  <div
+    className="rounded-xl p-5 flex flex-col gap-2"
+    style={{ backgroundColor: '#1A2F50', border: '1px solid rgba(201,168,76,0.15)' }}
+  >
+    <div className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
+      <Icon className={`w-4 h-4 ${accent ? "text-[#C9A84C]" : ""}`} />
       <span className="text-xs font-semibold uppercase tracking-wide">{label}</span>
     </div>
-    <p className={`font-display text-3xl font-bold ${accent ? "text-primary" : "text-foreground"}`}>
+    <p className={`font-display text-3xl font-bold ${accent ? "text-[#C9A84C]" : ""}`} style={accent ? undefined : { color: '#F5F0E8' }}>
       {value}
     </p>
-    {subValue && <p className="text-xs text-muted-foreground">{subValue}</p>}
+    {subValue && <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>{subValue}</p>}
   </div>
 );
 
@@ -332,16 +335,16 @@ const GuideDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0A1628' }}>
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ backgroundColor: '#0A1628' }}>
       {/* Header */}
-      <header className="border-b border-border px-6 py-4 flex items-center justify-between bg-card">
+      <header className="px-6 py-4 flex items-center justify-between" style={{ backgroundColor: '#1A2F50', borderBottom: '1px solid rgba(201,168,76,0.15)' }}>
         <div className="flex items-center gap-3">
           <a href="/">
             <img
@@ -350,18 +353,19 @@ const GuideDashboard = () => {
               className="h-8 w-8 rounded-full object-cover"
             />
           </a>
-          <h1 className="font-display text-xl font-bold text-foreground">
+          <h1 className="font-display text-xl font-bold" style={{ color: '#F5F0E8' }}>
             {t("guideDashboard.title", "Guide Dashboard")}
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground hidden sm:inline">
+          <span className="text-sm hidden sm:inline" style={{ color: 'rgba(255,255,255,0.65)' }}>
             {guideName}
           </span>
           <Button
             variant="outline"
             size="sm"
             onClick={() => navigate("/guide-register")}
+            className="border-[#C9A84C] text-[#C9A84C] hover:bg-[#C9A84C]/10"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
             {t("guideDashboard.editProfile", "Edit Profile")}
@@ -378,8 +382,8 @@ const GuideDashboard = () => {
 
         {/* Analytics Overview */}
         <section>
-          <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2 mb-4">
-            <BarChart3 className="w-5 h-5 text-primary" />
+          <h2 className="font-display text-xl font-bold flex items-center gap-2 mb-4" style={{ color: '#F5F0E8' }}>
+            <BarChart3 className="w-5 h-5 text-[#C9A84C]" />
             {t("guideDashboard.analytics", "Analytics Overview")}
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -425,29 +429,30 @@ const GuideDashboard = () => {
 
         {/* Recent Reviews */}
         {analytics.recentReviews.length > 0 && (
-          <section className="bg-card rounded-2xl border border-border/50 p-6">
-            <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-primary" />
+          <section className="rounded-2xl p-6" style={{ backgroundColor: '#1A2F50', border: '1px solid rgba(201,168,76,0.15)' }}>
+            <h2 className="font-display text-lg font-bold flex items-center gap-2 mb-4" style={{ color: '#F5F0E8' }}>
+              <TrendingUp className="w-5 h-5 text-[#C9A84C]" />
               {t("guideDashboard.recentReviews", "Recent Reviews")}
             </h2>
             <div className="space-y-4">
               {analytics.recentReviews.map((review, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-col gap-1 pb-4 border-b border-border/30 last:border-0 last:pb-0"
+                  className="flex flex-col gap-1 pb-4 last:border-0 last:pb-0"
+                  style={{ borderBottom: '1px solid rgba(201,168,76,0.1)' }}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-foreground">
+                    <span className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>
                       {review.reviewer_name}
                     </span>
                     {renderStars(review.rating)}
                   </div>
                   {review.comment && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">
+                    <p className="text-sm line-clamp-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
                       {review.comment}
                     </p>
                   )}
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>
                     {new Date(review.created_at).toLocaleDateString()}
                   </span>
                 </div>
@@ -489,12 +494,12 @@ const GuideDashboard = () => {
         {user && <AvailabilityManager userId={user.id} />}
 
         {/* Portfolio Photos Section */}
-        <section className="bg-card rounded-2xl border border-border/50 p-6">
+        <section className="rounded-2xl p-6" style={{ backgroundColor: '#1A2F50', border: '1px solid rgba(201,168,76,0.15)' }}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
-              <Images className="w-5 h-5 text-primary" />
+            <h2 className="font-display text-xl font-bold flex items-center gap-2" style={{ color: '#F5F0E8' }}>
+              <Images className="w-5 h-5 text-[#C9A84C]" />
               {t("guideDashboard.portfolioPhotos", "Portfolio Photos")}
-              <span className="text-sm font-normal text-muted-foreground">
+              <span className="text-sm font-normal" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 ({photos.length}/{MAX_PHOTOS})
               </span>
             </h2>
@@ -505,6 +510,11 @@ const GuideDashboard = () => {
                   ? "bg-muted text-muted-foreground cursor-not-allowed"
                   : "bg-primary text-primary-foreground hover:bg-primary/90"
               }`}
+              style={
+                uploading || photos.length >= MAX_PHOTOS
+                  ? undefined
+                  : { backgroundColor: '#C9A84C', color: '#0A1628' }
+              }
             >
               {uploading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -525,7 +535,7 @@ const GuideDashboard = () => {
             </label>
           </div>
 
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.65)' }}>
             {t(
               "guideDashboard.portfolioHint",
               "Upload photos from your tours to showcase your experience. Accepted formats: JPG, PNG, WebP. Max 5MB each."
@@ -533,9 +543,9 @@ const GuideDashboard = () => {
           </p>
 
           {photos.length === 0 ? (
-            <div className="border-2 border-dashed border-border rounded-xl p-12 text-center">
-              <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground text-sm">
+            <div className="border-2 border-dashed rounded-xl p-12 text-center" style={{ borderColor: 'rgba(201,168,76,0.3)' }}>
+              <Upload className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.65)' }} />
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>
                 {t(
                   "guideDashboard.noPhotosYet",
                   "No portfolio photos yet. Upload some to attract more travelers!"
@@ -547,7 +557,8 @@ const GuideDashboard = () => {
               {photos.map((photo) => (
                 <div
                   key={photo.name}
-                  className="relative group aspect-[4/3] rounded-xl overflow-hidden border border-border/50"
+                  className="relative group aspect-[4/3] rounded-xl overflow-hidden"
+                  style={{ border: '1px solid rgba(201,168,76,0.15)' }}
                 >
                   <img
                     src={photo.url}
