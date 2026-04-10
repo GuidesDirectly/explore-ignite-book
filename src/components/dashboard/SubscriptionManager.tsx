@@ -119,9 +119,9 @@ const SubscriptionManager = ({ userId }: SubscriptionManagerProps) => {
 
   if (loading) {
     return (
-      <section className="bg-card rounded-2xl border border-border/50 p-6">
+      <section className="rounded-2xl p-6" style={{ backgroundColor: '#1A2F50', border: '1px solid rgba(201,168,76,0.15)' }}>
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          <Loader2 className="w-6 h-6 animate-spin text-[#C9A84C]" />
         </div>
       </section>
     );
@@ -135,20 +135,20 @@ const SubscriptionManager = ({ userId }: SubscriptionManagerProps) => {
   const statusColor = currentStatus === "active" ? "bg-primary/10 text-primary" : currentStatus === "past_due" ? "bg-yellow-500/10 text-yellow-600" : "bg-destructive/10 text-destructive";
 
   return (
-    <section className="bg-card rounded-2xl border border-border/50 p-6">
+    <section className="rounded-2xl p-6" style={{ backgroundColor: '#1A2F50', border: '1px solid rgba(201,168,76,0.15)' }}>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
-          <Crown className="w-5 h-5 text-primary" />
+        <h2 className="font-display text-xl font-bold flex items-center gap-2" style={{ color: '#F5F0E8' }}>
+          <Crown className="w-5 h-5 text-[#C9A84C]" />
           {t("guideDashboard.subscription", "Subscription")}
         </h2>
         <div className="flex items-center gap-2">
           <Badge className={`text-xs ${statusColor}`}>{tierLabel}</Badge>
-          <Badge variant="outline" className="text-xs capitalize">{currentStatus}</Badge>
+          <Badge variant="outline" className="text-xs capitalize border-[#C9A84C]/30 text-[#C9A84C]">{currentStatus}</Badge>
         </div>
       </div>
 
       {periodEnd && currentTier !== "founding" && (
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.65)' }}>
           Next billing date: {new Date(periodEnd).toLocaleDateString()}
         </p>
       )}
@@ -166,26 +166,26 @@ const SubscriptionManager = ({ userId }: SubscriptionManagerProps) => {
           return (
             <div
               key={plan.tier}
-              className={`rounded-xl border p-5 flex flex-col ${
-                isCurrent
-                  ? "border-primary bg-primary/5"
-                  : "border-border/50"
-              }`}
+              className="rounded-xl p-5 flex flex-col"
+              style={{
+                backgroundColor: isCurrent ? 'rgba(201,168,76,0.08)' : 'transparent',
+                border: isCurrent ? '1px solid rgba(201,168,76,0.4)' : '1px solid rgba(201,168,76,0.15)',
+              }}
             >
               <div className="flex items-center gap-2 mb-3">
-                <Icon className={`w-5 h-5 ${isCurrent ? "text-primary" : "text-muted-foreground"}`} />
-                <h3 className="font-display font-bold text-foreground">{plan.name}</h3>
+                <Icon className={`w-5 h-5 ${isCurrent ? "text-[#C9A84C]" : ""}`} style={isCurrent ? undefined : { color: 'rgba(255,255,255,0.65)' }} />
+                <h3 className="font-display font-bold" style={{ color: '#F5F0E8' }}>{plan.name}</h3>
               </div>
 
               <div className="mb-4">
-                <span className="font-display text-3xl font-bold text-foreground">{plan.price}</span>
-                <span className="text-sm text-muted-foreground">{plan.period}</span>
+                <span className="font-display text-3xl font-bold" style={{ color: '#F5F0E8' }}>{plan.price}</span>
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>{plan.period}</span>
               </div>
 
               <ul className="space-y-2 mb-6 flex-1">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <li key={feature} className="flex items-start gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                    <Check className="w-4 h-4 text-[#C9A84C] mt-0.5 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -199,7 +199,8 @@ const SubscriptionManager = ({ userId }: SubscriptionManagerProps) => {
                 <Button
                   onClick={() => handleUpgrade(plan.tier as "pro" | "featured")}
                   disabled={!!upgrading}
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="w-full font-semibold border-none hover:opacity-90"
+                  style={{ backgroundColor: '#C9A84C', color: '#0A1628' }}
                 >
                   {upgrading === plan.tier ? (
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -221,9 +222,9 @@ const SubscriptionManager = ({ userId }: SubscriptionManagerProps) => {
       </div>
 
       {/* Fallback contact */}
-      <p className="text-sm text-muted-foreground text-center">
+      <p className="text-sm text-center" style={{ color: 'rgba(255,255,255,0.65)' }}>
         Having billing issues? Contact us at{" "}
-        <a href="mailto:michael@iguidetours.net" className="text-primary hover:underline">
+        <a href="mailto:michael@iguidetours.net" className="text-[#C9A84C] hover:underline">
           michael@iguidetours.net
         </a>{" "}
         and we will manually activate your plan.
