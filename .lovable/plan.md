@@ -1,58 +1,46 @@
 
 
-Let me explore the remaining files to plan precisely.
-<lov-tool-use id="toolu_vrtx_01MztjyVrKR9dQpsuPfke4Bk" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/GuidesPage.tsx\"}">
-</lov-tool-use>
+## Plan — Fix duplicate cards + tour images on /tours
 
-<lov-tool-use id="toolu_vrtx_01N3f1ZDMDEU2dC3D6gYJyDm" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/GuideProfilePage.tsx\"}">
-</lov-tool-use>
+### Issue 1: Duplicate cards (Tours.tsx, lines ~115–145)
+Current loop creates one listing per `city × tourType`, producing 6+ cards per guide. Change to **one listing per guide** (per city if they serve multiple, but collapsed across tour types).
 
-<lov-tool-use id="toolu_vrtx_01GDyUd65P8vp8g2rtS661MH" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/Admin.tsx\"}">
-</lov-tool-use>
+Fix in `src/pages/Tours.tsx`:
+- Replace the nested `cities.forEach → tourTypes.forEach` with a single pass: one listing per guide (use primary city = first `service_areas`).
+- Store full `tourTypes: string[]` array on the listing instead of a single `tourType: string`.
+- Update `TourListing` interface: `tourType: string` → `tourTypes: string[]`.
+- Filter logic (`filterType`): match if `t.tourTypes.includes(filterType)` instead of equality.
+- Search string includes joined `tourTypes`.
+- Price lookup: use the lowest available price across the guide's published tours, or `null` if none.
+- Link target: keep `/tour/${guideUserId}` but drop the `?type=` param (or pass first type) since the card now represents the guide overall.
 
-<lov-tool-use id="toolu_vrtx_01HtxxHxFk2QDnFhkTcVHTq9" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/GuidesPage.tsx\"}">
-</lov-tool-use>
+### Issue 2: Tour card images (TourCard.tsx)
+Current fallback uses `tour.photoUrl` which is the guide's profile face photo. Replace with city-based Unsplash destination images when no dedicated tour photo exists.
 
-<lov-tool-use id="toolu_vrtx_01GWyFRerhXH1qnuAWXaKvj7" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/GuideProfilePage.tsx\"}">
-</lov-tool-use>
+Fix in `src/components/TourCard.tsx`:
+- Add a `getCityImage(city: string)` helper mapping:
+  - `Washington DC` / `Washington` → `https://images.unsplash.com/photo-1617581629397-a72507c3de9e` (DC monuments)
+  - `Los Angeles` / `Hollywood` → `https://images.unsplash.com/photo-1503891450247-ee5f8ec46dc3` (LA skyline)
+  - `Chicago` → `https://images.unsplash.com/photo-1494522855154-9297ac14b55f` (Chicago skyline)
+  - default → `https://images.unsplash.com/photo-1488646953014-85cb44e25828` (generic travel)
+- Stop passing the guide profile photo as `photoUrl`. In `Tours.tsx` set `photoUrl: null` (or remove the storage lookup entirely — saves N requests per page load).
+- `TourCard` always renders city image via `getCityImage(tour.city)` with `?w=800&q=80&auto=format&fit=crop` query for sizing.
+- Render `tourTypes` as small chips below the title (replace single tour type badge in top-left with a primary "Tours" badge, list types as chips inside the card body).
 
-<lov-tool-use id="toolu_vrtx_01NFDeHLa9kiJqn7jSEsVZxc" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/Admin.tsx\"}">
-</lov-tool-use>
-I have enough context. The plan is clear — present concise plan and stop.
-
-<lov-plan>
-
-## Plan — Finish Founding Guide UI placements (4 items, single pass)
-
-### 1. `src/pages/GuidesPage.tsx` — wire founding badges
-The hook + `foundingUserIds` state already exist (lines 70, 72) but never gets populated and the badge is never rendered. Add:
-- After fetching guides, query `guide_profiles` for `subscription_plan_id = foundingProgram.foundingPlanId` AND `status='approved'` AND `activation_status='active'`, build `Set<user_id>`, store via `setFoundingUserIds`.
-- In the card render (around line 290, near VERIFIED badge), render `<FoundingGuideBadge size="sm" />` if `foundingUserIds.has(guide.user_id)`.
-
-### 2. `src/pages/GuideProfilePage.tsx` — header badge
-- Import `useFoundingProgram` + `FoundingGuideBadge`.
-- Add `isFounding` state. After the existing guide fetch, run a single `guide_profiles` lookup by `user_id` for `subscription_plan_id` and compare to `foundingProgram.foundingPlanId`.
-- Render `<FoundingGuideBadge size="md" />` immediately after the `<h1>` name (around line 424) inside a flex wrapper.
-
-### 3. `src/components/dashboard/ActivationFunnel.tsx` — founding section
-Add a new section above the existing stats grid:
-- Pull `useFoundingProgram` data → render counter card "X of 50 claimed · Y remaining" + countdown "Free period ends in N days (Dec 31, 2026)" computed from `freeUntil`.
-- Below it, a `<Collapsible>` (Radix already in project) listing founding guides (filter existing `guide_profiles` query by `subscription_plan_id === foundingPlanId`): show name, `activation_status` badge, formatted `updated_at`. Reuses existing fetch pattern; adds one extra select for plan_id on the existing query.
-
-### 4. `src/pages/Admin.tsx` — guide-row badges
-- Import `useFoundingProgram` + `FoundingGuideBadge`.
-- In `renderGuideCard` (line 347), after the existing tier `<Badge>` at line 381–383, render `<FoundingGuideBadge size="sm" />` if `guide.subscription_plan_id === foundingProgram?.foundingPlanId`.
-- Add `subscription_plan_id` to the `GuideApplication` interface (line 35–59).
+### Card heading update
+- Title: `"Tours with {guideName}"` (was `"{tourType} in {city}"`).
+- Tour-type chips row: render `tour.tourTypes.slice(0, 4)` as small `<Badge variant="secondary">` chips with the existing emoji map.
 
 ### Files touched
-- `src/pages/GuidesPage.tsx` (wire fetch + badge)
-- `src/pages/GuideProfilePage.tsx` (badge in header)
-- `src/components/dashboard/ActivationFunnel.tsx` (counter + countdown + collapsible list)
-- `src/pages/Admin.tsx` (badge in guide rows + interface field)
+- `src/pages/Tours.tsx` — collapse loop, drop photo fetch, update interface, fix filter/search/sort.
+- `src/components/TourCard.tsx` — city-image helper, tour-type chips, title change.
 
-### No changes
-- Database, edge functions, Stripe, Header/Hero/Nav, design tokens.
+### Out of scope (untouched)
+- "Contact for pricing" copy — kept.
+- Header / Hero / Navbar — kept.
+- Filter UI, sort UI, search bar — kept.
+- All other pages.
 
-### After implementation
+### After
 Publish.
 
