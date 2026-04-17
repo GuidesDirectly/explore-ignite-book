@@ -27,6 +27,8 @@ import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import PasswordStrengthMeter, { isPasswordStrong } from "@/components/PasswordStrengthMeter";
 import { checkPasswordBreached } from "@/lib/hibp";
 import { scanFileForViruses } from "@/lib/scanUpload";
+import { useFoundingProgram } from "@/hooks/useFoundingProgram";
+import { Crown, AlertTriangle } from "lucide-react";
 
 
 // Service area presets now come from the shared destinations data
