@@ -439,9 +439,12 @@ const GuideProfilePage = () => {
               </div>
 
               <div className="pt-14 px-6 pb-6 space-y-4">
-                <h1 className="font-display text-2xl font-bold" style={{ color: "#F5F0E8" }}>
-                  {fd.firstName} {fd.lastName}
-                </h1>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="font-display text-2xl font-bold" style={{ color: "#F5F0E8" }}>
+                    {fd.firstName} {fd.lastName}
+                  </h1>
+                  {isFounding && <FoundingGuideBadge size="md" />}
+                </div>
 
                 {/* Credential line */}
                 {credentialLine && (

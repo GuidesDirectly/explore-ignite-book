@@ -10,6 +10,8 @@ import ActivationFunnel from "@/components/dashboard/ActivationFunnel";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import logoImg from "@/assets/logo.jpg";
+import FoundingGuideBadge from "@/components/FoundingGuideBadge";
+import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 
 interface Inquiry {
   id: string;
@@ -40,6 +42,7 @@ interface GuideApplication {
   created_at: string;
   subscription_tier?: string;
   subscription_status?: string;
+  subscription_plan_id?: string | null;
   form_data: {
     firstName: string;
     lastName: string;
@@ -78,6 +81,7 @@ interface TourPlan {
 }
 
 const Admin = () => {
+  const { data: foundingProgram } = useFoundingProgram();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState<any>(null);
@@ -381,6 +385,10 @@ const Admin = () => {
                 <Badge variant="outline" className={`text-xs capitalize ${guide.subscription_tier === "featured" ? "border-primary text-primary" : guide.subscription_tier === "pro" ? "border-yellow-500 text-yellow-600" : "border-border text-muted-foreground"}`}>
                   {guide.subscription_tier || "founding"}
                 </Badge>
+                {foundingProgram?.foundingPlanId &&
+                  guide.subscription_plan_id === foundingProgram.foundingPlanId && (
+                    <FoundingGuideBadge size="sm" />
+                  )}
               </div>
 
               {/* Contact info */}
