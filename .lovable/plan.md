@@ -1,29 +1,44 @@
 
 
-# Build Approved — Switching to Default Mode to Execute
+# Security Hardening — Execution Order Locked
 
-The plan is locked. I'm currently in plan mode (read-only) and cannot run migrations, deploy Edge Functions, or write files. Approving this plan switches me to default mode so I can execute Phases 1–7 in one continuous run.
+User approved. Plan is identical to last presentation. Switching to default mode to execute the 5-step sequence.
 
-## Execution order on approval
+## Execution sequence (continuous, no pauses)
 
-1. **Phase 1** — Migration: rename `subscription_plans` rows to Founding/Pro/Featured at $0/$29/$59 (name, slug, price_monthly only — no Stripe ID changes)
-2. **Phase 2** — Migration: add 7 activation columns to `guide_profiles`, index, backfill approved guides → `active` on Founding plan
-3. **🛑 PAUSE** — Run and show:
+1. **Pre-flight inspection** (read-only)
+   - Read current `guide_profiles_public` view definition via `supabase--read_query`
+   - Verify `'guide'` exists in `app_role` enum
+   - List `storage.objects` policies for `guide-photos` and `branding`
+   - Grep frontend for direct anon reads of `guide_profiles` base table
+
+2. **Single migration** with 4 fixes:
+   - **Fix 1:** Drop `anon_can_view_approved_guides` + `authenticated_can_view_approved_guides` on `guide_profiles`. Recreate `guide_profiles_public` view with strict whitelist (id, user_id, service_areas, translations, created_at, sanitized form_data subset only — excludes form_data raw, suspension_reason, payment_reminder_count, last_reminder_sent_at, subscription_plan_id, all stripe_*, phone, address). Grant SELECT to anon + authenticated.
+   - **Fix 2:** Drop `Users can view own swaps` on `itinerary_swaps`. Add token-gated SELECT (matches `tour_plans` x-update-token pattern) + admin SELECT.
+   - **Fix 3:** Drop permissive insert on `guide-photos`. Add INSERT/UPDATE/DELETE policies requiring `has_role(auth.uid(), 'guide'::app_role)` AND owner folder match. (If enum lacks 'guide', use inline `EXISTS user_roles` subquery.)
+   - **Fix 4:** Drop bucket-wide SELECT on `guide-photos` and `branding`. Recreate as path-required (`name IS NOT NULL`) to disable enumeration.
+
+3. **Test A** — anon reads base table (expect 0 rows / permission denied):
    ```sql
-   SELECT COUNT(*), activation_status FROM guide_profiles GROUP BY activation_status;
+   SET ROLE anon;
+   SELECT id, form_data, suspension_reason FROM public.guide_profiles LIMIT 1;
+   RESET ROLE;
    ```
-   Wait for your "go" before Phase 3.
-4. **Phase 3** — Migration: drop + recreate `anon_can_view_approved_guides` and `authenticated_can_view_approved_guides` RLS policies to require `activation_status='active'`
-5. **Phase 4** — Email infra: `app_settings.notification_webhook_url`, `notify_email()` helper, 4 triggers (guide_profiles INSERT/UPDATE, bookings INSERT, inquiries INSERT); extend `send-notification` with 11 typed handlers; remove duplicate client-side invokes from 4 form components
-6. **Phase 5** — Activation system: update `guide-subscribe` (Free branch), `stripe-webhook` (set activation fields), create `guide-activation-reminders` (daily cron with reminders + expiry sweep + 30-day suspension)
-7. **Phase 6** — Frontend: `<ActivationGate />` (3 states), status badges in `GuideDashboard`, `<ActivationFunnel />` admin widget with MRR estimate
-8. **Phase 7** — Cron: `vault.create_secret('<YOUR_SERVICE_ROLE_KEY>', 'service_role_key', ...)` with replace-me comment, `app_settings` URL row, `cron.schedule('daily-activation-reminders', '0 9 * * *', ...)` reading key from `vault.decrypted_secrets`
 
-## Reminders honored
-- Pause after Phase 2 with verification query — yes
-- `<YOUR_SERVICE_ROLE_KEY>` placeholder, never the real key in code — yes
-- No Header/Hero/design changes — yes
-- No Stripe price ID changes — yes
+4. **Test B** — anon reads public view (expect rows returned):
+   ```sql
+   SET ROLE anon;
+   SELECT id, user_id FROM public.guide_profiles_public LIMIT 5;
+   RESET ROLE;
+   ```
 
-Approve to begin Phase 1.
+5. **Security scanner re-run** + Supabase linter — show all results.
+
+## Out of scope (per your instruction)
+- Stripe webhook `verify_jwt = false` — kept
+- Public booking INSERT — kept
+- Tour plan token validation — kept
+
+## Publish gate
+Will NOT publish. Will display all 5 results and wait for explicit "approve publish" before any further action.
 
