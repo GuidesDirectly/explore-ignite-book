@@ -23,6 +23,8 @@ import SaveGuideButton from "@/components/SaveGuideButton";
 import { useSavedGuides } from "@/hooks/useSavedGuides";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import FoundingGuideBadge from "@/components/FoundingGuideBadge";
+import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 
 interface GuideData {
   id: string;
@@ -67,6 +69,24 @@ const GuideProfilePage = () => {
   const [badges, setBadges] = useState<BadgeType[]>([]);
   const { savedIds, toggleSave, loading: saveLoading } = useSavedGuides();
   const [bioExpanded, setBioExpanded] = useState(false);
+  const { data: foundingProgram } = useFoundingProgram();
+  const [isFounding, setIsFounding] = useState(false);
+
+  // Detect founding-guide status once we know both the guide user_id and plan id
+  useEffect(() => {
+    const check = async () => {
+      if (!guide?.user_id || !foundingProgram?.foundingPlanId) return;
+      const { data } = await supabase
+        .from("guide_profiles")
+        .select("subscription_plan_id")
+        .eq("user_id", guide.user_id)
+        .maybeSingle();
+      setIsFounding(
+        !!data && (data as any).subscription_plan_id === foundingProgram.foundingPlanId
+      );
+    };
+    check();
+  }, [guide?.user_id, foundingProgram?.foundingPlanId]);
 
   useEffect(() => {
     const fetchGuide = async () => {
@@ -419,9 +439,12 @@ const GuideProfilePage = () => {
               </div>
 
               <div className="pt-14 px-6 pb-6 space-y-4">
-                <h1 className="font-display text-2xl font-bold" style={{ color: "#F5F0E8" }}>
-                  {fd.firstName} {fd.lastName}
-                </h1>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="font-display text-2xl font-bold" style={{ color: "#F5F0E8" }}>
+                    {fd.firstName} {fd.lastName}
+                  </h1>
+                  {isFounding && <FoundingGuideBadge size="md" />}
+                </div>
 
                 {/* Credential line */}
                 {credentialLine && (
