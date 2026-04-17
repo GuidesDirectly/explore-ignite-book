@@ -369,6 +369,43 @@ const GuidesPage = () => {
                       </p>
                     )}
 
+                    {/* Tour count pill or empty-state note */}
+                    {(() => {
+                      const count = tourCounts[guide.user_id] || 0;
+                      if (count > 0) {
+                        return (
+                          <div style={{ padding: "0 16px 8px" }}>
+                            <span
+                              style={{
+                                display: "inline-block",
+                                fontSize: 11,
+                                fontWeight: 600,
+                                color: "#C9A84C",
+                                background: "rgba(201,168,76,0.12)",
+                                border: "1px solid rgba(201,168,76,0.35)",
+                                borderRadius: 999,
+                                padding: "3px 10px",
+                              }}
+                            >
+                              🎟️ {count} tour{count !== 1 ? "s" : ""} available
+                            </span>
+                          </div>
+                        );
+                      }
+                      return (
+                        <p
+                          style={{
+                            fontSize: 12,
+                            fontStyle: "italic",
+                            color: "rgba(255,255,255,0.5)",
+                            padding: "0 16px 8px",
+                          }}
+                        >
+                          No tours listed yet — contact to inquire
+                        </p>
+                      );
+                    })()}
+
                     {/* Bio */}
                     {bio && (
                       <p style={{ fontSize: 13, lineHeight: 1.6, color: "rgba(255,255,255,0.55)", padding: "0 16px 12px" }}>
