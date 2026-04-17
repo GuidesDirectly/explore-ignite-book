@@ -1,69 +1,58 @@
 
 
-## Final Plan — Founding Guide Campaign (with additions)
+Let me explore the remaining files to plan precisely.
+<lov-tool-use id="toolu_vrtx_01MztjyVrKR9dQpsuPfke4Bk" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/GuidesPage.tsx\"}">
+</lov-tool-use>
 
-All previously approved scope stands. Two additions confirmed:
+<lov-tool-use id="toolu_vrtx_01N3f1ZDMDEU2dC3D6gYJyDm" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/GuideProfilePage.tsx\"}">
+</lov-tool-use>
 
-### Addition to Part 4 — "50th spot claimed" handling
-After incrementing `founding_guide_current_count` in `guide-subscribe`, if the new count `== 50`:
-- Send admin alert via `send-notification` (new type `founding_spots_filled`):
-  - To: `allharmony@gmail.com`
-  - Subject: "All 50 Founding Guide spots are claimed!"
-  - Body: confirms all spots filled, notes new guides now go to paid flow, includes ISO timestamp of fill event.
-- Frontend: `GuideRegister.tsx` already reads `founding_guide_current_count` on mount. When `remaining <= 0`, render a clear "Founding Guide spots are now full — join as a Pro guide for $29/mo" message in place of the gold banner. (No extra logic needed — driven by the same setting.)
+<lov-tool-use id="toolu_vrtx_01GDyUd65P8vp8g2rtS661MH" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/Admin.tsx\"}">
+</lov-tool-use>
 
-Add the corresponding `founding_spots_filled` case to `send-notification/index.ts` template switch.
+<lov-tool-use id="toolu_vrtx_01HtxxHxFk2QDnFhkTcVHTq9" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/GuidesPage.tsx\"}">
+</lov-tool-use>
 
-### Confirmation — `useFoundingProgram` hook caching
-Single fetch on mount, stored in `useState`, no refetch on render:
-```ts
-const [data, setData] = useState<{
-  foundingPlanId: string | null;
-  limit: number;
-  currentCount: number;
-  remaining: number;
-  freeUntil: string;
-  lockedPrice: number;
-  isFull: boolean;
-} | null>(null);
+<lov-tool-use id="toolu_vrtx_01GWyFRerhXH1qnuAWXaKvj7" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/GuideProfilePage.tsx\"}">
+</lov-tool-use>
 
-useEffect(() => {
-  let cancelled = false;
-  (async () => {
-    const [plan, settings] = await Promise.all([
-      supabase.from("subscription_plans").select("id").eq("slug", "founding").maybeSingle(),
-      supabase.from("app_settings").select("key, value")
-        .in("key", ["founding_guide_limit","founding_guide_current_count","founding_guide_free_until","founding_guide_locked_price"]),
-    ]);
-    if (cancelled) return;
-    // build object, setData(...)
-  })();
-  return () => { cancelled = true; };
-}, []);
-```
-Components import this hook → one network call per page load, shared by `GuideRegister`, `MeetGuidesSection`, `ActivationGate`, `ActivationFunnel`, `GuidesPage`, `GuideProfilePage`, `Admin`, and the `FoundingGuideBadge` detector.
+<lov-tool-use id="toolu_vrtx_01NFDeHLa9kiJqn7jSEsVZxc" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/Admin.tsx\"}">
+</lov-tool-use>
+I have enough context. The plan is clear — present concise plan and stop.
 
-### Unchanged from prior approved plan
-Parts 1, 2, 3, 5, 6, 7 exactly as previously approved. No design/Header/Hero/nav changes. No Stripe price ID changes.
+<lov-plan>
 
-### Files (final)
-| Type | Path |
-|------|------|
-| New | `src/components/FoundingGuideBadge.tsx` |
-| New | `src/hooks/useFoundingProgram.ts` |
-| Edit | `src/pages/GuideRegister.tsx` |
-| Edit | `src/components/MeetGuidesSection.tsx` |
-| Edit | `src/pages/GuideProfilePage.tsx` |
-| Edit | `src/pages/GuidesPage.tsx` |
-| Edit | `src/pages/Admin.tsx` |
-| Edit | `src/components/dashboard/ActivationGate.tsx` |
-| Edit | `src/components/dashboard/ActivationFunnel.tsx` |
-| Edit | `supabase/functions/guide-activation-reminders/index.ts` (3 new jobs + 3 email types) |
-| Edit | `supabase/functions/guide-subscribe/index.ts` (founding branch + 50th-spot alert) |
-| Edit | `supabase/functions/send-notification/index.ts` (5 new email types: `founding_guide_welcome`, `founding_30day_warning`, `founding_7day_warning`, `founding_expired`, `founding_spots_filled`) |
+## Plan — Finish Founding Guide UI placements (4 items, single pass)
 
-### Risks / Notes (unchanged)
-- Counter increment is read-modify-write; acceptable at 50-guide volume.
-- Date logic in cron is UTC; safe to deploy now (no fires until Dec 1, 2026).
-- Admin alert hard-coded to `allharmony@gmail.com` per request.
+### 1. `src/pages/GuidesPage.tsx` — wire founding badges
+The hook + `foundingUserIds` state already exist (lines 70, 72) but never gets populated and the badge is never rendered. Add:
+- After fetching guides, query `guide_profiles` for `subscription_plan_id = foundingProgram.foundingPlanId` AND `status='approved'` AND `activation_status='active'`, build `Set<user_id>`, store via `setFoundingUserIds`.
+- In the card render (around line 290, near VERIFIED badge), render `<FoundingGuideBadge size="sm" />` if `foundingUserIds.has(guide.user_id)`.
+
+### 2. `src/pages/GuideProfilePage.tsx` — header badge
+- Import `useFoundingProgram` + `FoundingGuideBadge`.
+- Add `isFounding` state. After the existing guide fetch, run a single `guide_profiles` lookup by `user_id` for `subscription_plan_id` and compare to `foundingProgram.foundingPlanId`.
+- Render `<FoundingGuideBadge size="md" />` immediately after the `<h1>` name (around line 424) inside a flex wrapper.
+
+### 3. `src/components/dashboard/ActivationFunnel.tsx` — founding section
+Add a new section above the existing stats grid:
+- Pull `useFoundingProgram` data → render counter card "X of 50 claimed · Y remaining" + countdown "Free period ends in N days (Dec 31, 2026)" computed from `freeUntil`.
+- Below it, a `<Collapsible>` (Radix already in project) listing founding guides (filter existing `guide_profiles` query by `subscription_plan_id === foundingPlanId`): show name, `activation_status` badge, formatted `updated_at`. Reuses existing fetch pattern; adds one extra select for plan_id on the existing query.
+
+### 4. `src/pages/Admin.tsx` — guide-row badges
+- Import `useFoundingProgram` + `FoundingGuideBadge`.
+- In `renderGuideCard` (line 347), after the existing tier `<Badge>` at line 381–383, render `<FoundingGuideBadge size="sm" />` if `guide.subscription_plan_id === foundingProgram?.foundingPlanId`.
+- Add `subscription_plan_id` to the `GuideApplication` interface (line 35–59).
+
+### Files touched
+- `src/pages/GuidesPage.tsx` (wire fetch + badge)
+- `src/pages/GuideProfilePage.tsx` (badge in header)
+- `src/components/dashboard/ActivationFunnel.tsx` (counter + countdown + collapsible list)
+- `src/pages/Admin.tsx` (badge in guide rows + interface field)
+
+### No changes
+- Database, edge functions, Stripe, Header/Hero/Nav, design tokens.
+
+### After implementation
+Publish.
 
