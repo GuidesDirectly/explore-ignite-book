@@ -24,6 +24,7 @@ import { useSavedGuides } from "@/hooks/useSavedGuides";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import FoundingGuideBadge from "@/components/FoundingGuideBadge";
+import SpotlightBanner from "@/components/SpotlightBanner";
 import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 
 interface GuideData {
@@ -71,19 +72,23 @@ const GuideProfilePage = () => {
   const [bioExpanded, setBioExpanded] = useState(false);
   const { data: foundingProgram } = useFoundingProgram();
   const [isFounding, setIsFounding] = useState(false);
+  const [isSpotlight, setIsSpotlight] = useState(false);
 
-  // Detect founding-guide status once we know both the guide user_id and plan id
+  // Detect founding-guide + spotlight status once we know the guide user_id
   useEffect(() => {
     const check = async () => {
-      if (!guide?.user_id || !foundingProgram?.foundingPlanId) return;
+      if (!guide?.user_id) return;
       const { data } = await supabase
         .from("guide_profiles")
-        .select("subscription_plan_id")
+        .select("subscription_plan_id, is_spotlight")
         .eq("user_id", guide.user_id)
         .maybeSingle();
+      if (!data) return;
       setIsFounding(
-        !!data && (data as any).subscription_plan_id === foundingProgram.foundingPlanId
+        !!foundingProgram?.foundingPlanId &&
+          (data as any).subscription_plan_id === foundingProgram.foundingPlanId
       );
+      setIsSpotlight(!!(data as any).is_spotlight);
     };
     check();
   }, [guide?.user_id, foundingProgram?.foundingPlanId]);
@@ -443,6 +448,7 @@ const GuideProfilePage = () => {
                   <h1 className="font-display text-2xl font-bold" style={{ color: "#F5F0E8" }}>
                     {fd.firstName} {fd.lastName}
                   </h1>
+                  {isSpotlight && <SpotlightBanner size="md" />}
                   {isFounding && <FoundingGuideBadge size="md" />}
                 </div>
 

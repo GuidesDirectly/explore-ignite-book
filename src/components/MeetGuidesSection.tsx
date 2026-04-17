@@ -40,31 +40,26 @@ const MeetGuidesSection = () => {
     }
 
     const fetchGuides = async () => {
-      // 1. Get user_ids of all approved+active guides on the founding plan
-      const { data: foundingProfiles, error: fpError } = await supabase
-        .from("guide_profiles")
-        .select("user_id")
-        .eq("subscription_plan_id", foundingPlanId)
-        .eq("status", "approved")
-        .eq("activation_status", "active");
-
-      if (fpError || !foundingProfiles || foundingProfiles.length === 0) {
-        setLoading(false);
-        return;
-      }
-
-      const userIds = foundingProfiles.map((p: any) => p.user_id);
-
-      // 2. Fetch the public, sanitised projection for those users
+      // 1. Fetch all approved+active founding guides directly from the public view
+      // (now exposes subscription_plan_id, so single-query is sufficient).
       const { data: guideData, error } = await (supabase
         .from("guide_profiles_public" as any)
-        .select("id, user_id, form_data, service_areas")
-        .in("user_id", userIds) as any);
+        .select("id, user_id, form_data, service_areas, subscription_plan_id")
+        .eq("subscription_plan_id", foundingPlanId)
+        .order("created_at", { ascending: true }) as any);
 
-      if (error || !guideData) {
+      if (error) {
+        console.warn("MeetGuidesSection: founding fetch failed", error);
+      }
+
+      if (!guideData || guideData.length === 0) {
+        // Defensive fallback: no founding guides found via plan_id — leave grid empty.
+        console.warn("MeetGuidesSection: no founding guides matched plan id", foundingPlanId);
         setLoading(false);
         return;
       }
+
+      const userIds = (guideData as any[]).map((g: any) => g.user_id);
 
       // 3. Fetch badges
       const { data: badgeData } = await supabase
