@@ -5,6 +5,8 @@ import { generateGuideSlug } from "@/lib/utils";
 import { MapPin, Globe, Search, MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import FoundingGuideBadge from "@/components/FoundingGuideBadge";
+import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 import dcImg from "@/assets/hero-dc.jpg";
 import chicagoImg from "@/assets/city-cards/chicago.jpg";
 
@@ -65,7 +67,9 @@ interface ReviewStats {
 
 const GuidesPage = () => {
   const navigate = useNavigate();
+  const { data: foundingProgram } = useFoundingProgram();
   const [guides, setGuides] = useState<GuideProfile[]>([]);
+  const [foundingUserIds, setFoundingUserIds] = useState<Set<string>>(new Set());
   const [reviewStats, setReviewStats] = useState<Record<string, ReviewStats>>({});
   const [loading, setLoading] = useState(true);
   const [cityFilter, setCityFilter] = useState("");
