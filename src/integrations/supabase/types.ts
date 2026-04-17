@@ -219,6 +219,7 @@ export type Database = {
           current_step: number
           form_data: Json
           id: string
+          is_spotlight: boolean
           last_reminder_sent_at: string | null
           payment_reminder_count: number
           service_areas: string[] | null
@@ -244,6 +245,7 @@ export type Database = {
           current_step?: number
           form_data?: Json
           id?: string
+          is_spotlight?: boolean
           last_reminder_sent_at?: string | null
           payment_reminder_count?: number
           service_areas?: string[] | null
@@ -269,6 +271,7 @@ export type Database = {
           current_step?: number
           form_data?: Json
           id?: string
+          is_spotlight?: boolean
           last_reminder_sent_at?: string | null
           payment_reminder_count?: number
           service_areas?: string[] | null
@@ -600,6 +603,13 @@ export type Database = {
             referencedRelation: "guide_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "saved_guides_guide_profile_id_fkey"
+            columns: ["guide_profile_id"]
+            isOneToOne: false
+            referencedRelation: "guide_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       subscription_plans: {
@@ -812,6 +822,13 @@ export type Database = {
             referencedRelation: "guide_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "tours_guide_profile_id_fkey"
+            columns: ["guide_profile_id"]
+            isOneToOne: false
+            referencedRelation: "guide_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       traveler_profiles: {
@@ -991,12 +1008,44 @@ export type Database = {
           created_at: string | null
           form_data: Json | null
           id: string | null
+          is_spotlight: boolean | null
           service_areas: string[] | null
           status: string | null
+          subscription_plan_id: string | null
           translations: Json | null
           user_id: string | null
         }
-        Relationships: []
+        Insert: {
+          created_at?: string | null
+          form_data?: never
+          id?: string | null
+          is_spotlight?: boolean | null
+          service_areas?: string[] | null
+          status?: string | null
+          subscription_plan_id?: string | null
+          translations?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          form_data?: never
+          id?: string | null
+          is_spotlight?: boolean | null
+          service_areas?: string[] | null
+          status?: string | null
+          subscription_plan_id?: string | null
+          translations?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_profiles_subscription_plan_id_fkey"
+            columns: ["subscription_plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews_guide: {
         Row: {
