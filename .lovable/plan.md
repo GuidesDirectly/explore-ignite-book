@@ -1,27 +1,69 @@
 
 
-This is a Cloudflare R2 infrastructure timeout on Lovable's deploy pipeline — not a code issue, not a build cache issue, not a queue issue I can clear. The error happens AFTER your build succeeds, when Lovable tries to get temporary R2 credentials to upload `dist/` to storage. The Cloudflare API call is timing out before responding.
+## Final Plan — Founding Guide Campaign (with additions)
 
-I cannot:
-- Force-rebuild from chat (Publish runs the same pipeline regardless)
-- Clear Lovable's deploy cache (no tool exposes that)
-- Bypass the R2 upload step (it's how all Lovable hosting works)
-- Touch the deployment queue
+All previously approved scope stands. Two additions confirmed:
 
-What actually resolves this:
+### Addition to Part 4 — "50th spot claimed" handling
+After incrementing `founding_guide_current_count` in `guide-subscribe`, if the new count `== 50`:
+- Send admin alert via `send-notification` (new type `founding_spots_filled`):
+  - To: `allharmony@gmail.com`
+  - Subject: "All 50 Founding Guide spots are claimed!"
+  - Body: confirms all spots filled, notes new guides now go to paid flow, includes ISO timestamp of fill event.
+- Frontend: `GuideRegister.tsx` already reads `founding_guide_current_count` on mount. When `remaining <= 0`, render a clear "Founding Guide spots are now full — join as a Pro guide for $29/mo" message in place of the gold banner. (No extra logic needed — driven by the same setting.)
 
-**Option A — Retry Publish (most likely to work)**
-R2 credential timeouts are typically transient (Cloudflare API hiccup, regional edge issue). Retries minutes apart usually succeed. You've hit it 4+ times in a row, which suggests a longer regional incident — wait 10–15 minutes then retry once.
+Add the corresponding `founding_spots_filled` case to `send-notification/index.ts` template switch.
 
-**Option B — Make a no-op code change to invalidate any cached artifact, then Publish**
-If Lovable is retrying the exact same `dist` hash and failing on a poisoned upload reference, a trivial source change (e.g., bump a version comment in `index.html`) forces a fresh build artifact with a new hash. Low confidence this helps, but it's the only code-side lever.
+### Confirmation — `useFoundingProgram` hook caching
+Single fetch on mount, stored in `useState`, no refetch on render:
+```ts
+const [data, setData] = useState<{
+  foundingPlanId: string | null;
+  limit: number;
+  currentCount: number;
+  remaining: number;
+  freeUntil: string;
+  lockedPrice: number;
+  isFull: boolean;
+} | null>(null);
 
-**Option C — Contact Lovable support**
-This error is on Lovable's deploy infrastructure. If retries keep failing for >30 min, support is the correct escalation path — they can see the R2 account state and Cloudflare API health directly. Reference the error: `r2/temp-access-credentials timeout, account a1a943b2f1c489548190e750427f39b8`.
+useEffect(() => {
+  let cancelled = false;
+  (async () => {
+    const [plan, settings] = await Promise.all([
+      supabase.from("subscription_plans").select("id").eq("slug", "founding").maybeSingle(),
+      supabase.from("app_settings").select("key, value")
+        .in("key", ["founding_guide_limit","founding_guide_current_count","founding_guide_free_until","founding_guide_locked_price"]),
+    ]);
+    if (cancelled) return;
+    // build object, setData(...)
+  })();
+  return () => { cancelled = true; };
+}, []);
+```
+Components import this hook → one network call per page load, shared by `GuideRegister`, `MeetGuidesSection`, `ActivationGate`, `ActivationFunnel`, `GuidesPage`, `GuideProfilePage`, `Admin`, and the `FoundingGuideBadge` detector.
 
-**Custom domain note:** `iguidetours.net` is already wired to this project. Once any successful publish completes, the new build serves on iguidetours.net automatically — no domain reconfiguration needed.
+### Unchanged from prior approved plan
+Parts 1, 2, 3, 5, 6, 7 exactly as previously approved. No design/Header/Hero/nav changes. No Stripe price ID changes.
 
-**Recommended order:** Wait 10 min → retry Publish (Option A). If still failing → Option B (I bump a build marker). If still failing after that → Option C (support).
+### Files (final)
+| Type | Path |
+|------|------|
+| New | `src/components/FoundingGuideBadge.tsx` |
+| New | `src/hooks/useFoundingProgram.ts` |
+| Edit | `src/pages/GuideRegister.tsx` |
+| Edit | `src/components/MeetGuidesSection.tsx` |
+| Edit | `src/pages/GuideProfilePage.tsx` |
+| Edit | `src/pages/GuidesPage.tsx` |
+| Edit | `src/pages/Admin.tsx` |
+| Edit | `src/components/dashboard/ActivationGate.tsx` |
+| Edit | `src/components/dashboard/ActivationFunnel.tsx` |
+| Edit | `supabase/functions/guide-activation-reminders/index.ts` (3 new jobs + 3 email types) |
+| Edit | `supabase/functions/guide-subscribe/index.ts` (founding branch + 50th-spot alert) |
+| Edit | `supabase/functions/send-notification/index.ts` (5 new email types: `founding_guide_welcome`, `founding_30day_warning`, `founding_7day_warning`, `founding_expired`, `founding_spots_filled`) |
 
-Want me to proceed with Option B now (bump a build marker in `index.html` to force a fresh artifact), or wait and retry Publish first?
+### Risks / Notes (unchanged)
+- Counter increment is read-modify-write; acceptable at 50-guide volume.
+- Date logic in cron is UTC; safe to deploy now (no fires until Dec 1, 2026).
+- Admin alert hard-coded to `allharmony@gmail.com` per request.
 
