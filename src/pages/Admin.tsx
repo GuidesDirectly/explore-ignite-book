@@ -1032,6 +1032,82 @@ const Admin = () => {
             })}
           </div>
         )}
+
+        {/* Published Tours Tab */}
+        {tab === "published_tours" && (
+          <div className="space-y-6">
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-card rounded-xl border border-border p-6">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Total Published</p>
+                <p className="text-3xl font-bold text-primary">
+                  {publishedTours.filter((t) => t.status === "published").length}
+                </p>
+              </div>
+              <div className="bg-card rounded-xl border border-border p-6">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Total Drafts</p>
+                <p className="text-3xl font-bold text-muted-foreground">
+                  {publishedTours.filter((t) => t.status === "draft").length}
+                </p>
+              </div>
+            </div>
+
+            {/* Table */}
+            {publishedTours.length === 0 ? (
+              <p className="text-center text-muted-foreground py-12">No tours yet.</p>
+            ) : (
+              <div className="bg-card rounded-xl border border-border overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/30">
+                      <tr className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        <th className="px-4 py-3">Title</th>
+                        <th className="px-4 py-3">Guide</th>
+                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3 text-right">Views</th>
+                        <th className="px-4 py-3 text-right">Inquiries</th>
+                        <th className="px-4 py-3">Created</th>
+                        <th className="px-4 py-3 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {publishedTours.map((t) => (
+                        <tr key={t.id} className="border-t border-border hover:bg-muted/20">
+                          <td className="px-4 py-3 text-foreground font-medium">{t.title}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{t.guideName}</td>
+                          <td className="px-4 py-3">
+                            <Badge
+                              variant="secondary"
+                              className={`text-xs ${t.status === "published" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
+                            >
+                              {t.status}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-right text-foreground">{t.view_count}</td>
+                          <td className="px-4 py-3 text-right text-foreground">{t.inquiry_count}</td>
+                          <td className="px-4 py-3 text-muted-foreground">
+                            {new Date(t.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                toggleTourStatus(t.id, t.status === "published" ? "draft" : "published")
+                              }
+                            >
+                              {t.status === "published" ? "Unpublish" : "Publish"}
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
