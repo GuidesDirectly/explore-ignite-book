@@ -32,6 +32,7 @@ export interface TourListing {
   price: number | null;
   currency: string;
   createdAt: string | null;
+  isSpotlight?: boolean;
 }
 
 const Tours = () => {
@@ -49,7 +50,7 @@ const Tours = () => {
     const fetchTours = async () => {
       const { data: guideData } = await (supabase
         .from("guide_profiles_public" as any)
-        .select("id, user_id, form_data, service_areas, translations, created_at") as any);
+        .select("id, user_id, form_data, service_areas, translations, created_at, is_spotlight") as any);
 
       if (!guideData) {
         setLoading(false);
@@ -116,6 +117,7 @@ const Tours = () => {
           price: priceInfo?.price ?? null,
           currency: priceInfo?.currency || "USD",
           createdAt: g.created_at ?? null,
+          isSpotlight: !!g.is_spotlight,
         };
       });
 
@@ -157,21 +159,26 @@ const Tours = () => {
     const arr = [...filtered];
     switch (sortBy) {
       case "price-low":
-        return arr.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
+        arr.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
+        break;
       case "price-high":
-        return arr.sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
+        arr.sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
+        break;
       case "rating":
-        return arr.sort((a, b) => b.rating - a.rating);
+        arr.sort((a, b) => b.rating - a.rating);
+        break;
       case "newest":
-        return arr.sort((a, b) => {
+        arr.sort((a, b) => {
           if (!b.createdAt && !a.createdAt) return 0;
           if (!b.createdAt) return -1;
           if (!a.createdAt) return 1;
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
-      default:
-        return arr;
+        break;
     }
+    // Spotlight guides always rendered first within current sort
+    arr.sort((a, b) => (b.isSpotlight ? 1 : 0) - (a.isSpotlight ? 1 : 0));
+    return arr;
   }, [filtered, sortBy]);
 
   const activeFilterCount = [filterCity, filterType, filterLanguage].filter(v => v && v !== "all").length;

@@ -193,7 +193,8 @@ const ForGuidesPage = () => {
                 <span className="text-white font-serif font-bold text-[40px]">$0</span>
                 <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 14 }}>{t("forGuides.perMonth")}</span>
               </div>
-              <p className="text-[13px] mb-6" style={{ color: "rgba(255,255,255,0.5)" }}>{t("forGuides.tier1Sub")}</p>
+              <p className="text-[13px] mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>{t("forGuides.tier1Sub")}</p>
+              <p className="text-[13px] mb-6" style={{ color: "rgba(255,255,255,0.7)" }}>{t("forGuides.tier1SubLine2")}</p>
               <ul className="flex-1 space-y-3 mb-8">
                 {foundingFeatures.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-[14px]" style={{ color: "rgba(255,255,255,0.8)" }}>
@@ -283,6 +284,60 @@ const ForGuidesPage = () => {
           <p className="text-center mt-10 text-[14px]" style={{ color: "rgba(255,255,255,0.5)" }}>
             {t("forGuides.pricingDisclaimer")}
           </p>
+
+          {/* Spotlight Add-on box */}
+          <div
+            className="mt-12 rounded-xl p-8"
+            style={{
+              background: "linear-gradient(135deg, rgba(201,168,76,0.10) 0%, rgba(201,168,76,0.04) 100%)",
+              border: "1.5px solid rgba(201,168,76,0.5)",
+              boxShadow: "0 8px 32px rgba(201,168,76,0.12)",
+            }}
+          >
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <Star size={20} style={{ color: "#C9A84C", fill: "#C9A84C" }} />
+                  <h3 className="font-serif font-bold text-[20px] md:text-[24px]" style={{ color: "#C9A84C" }}>
+                    {t("forGuides.spotlightTitle")}
+                  </h3>
+                </div>
+                <p className="text-[13px] mb-5" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  {t("forGuides.spotlightAvailability")}
+                </p>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-5">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <li
+                      key={n}
+                      className="flex items-start gap-2 text-[14px]"
+                      style={{ color: "rgba(255,255,255,0.85)" }}
+                    >
+                      <Check size={16} className="mt-0.5 shrink-0" style={{ color: "#C9A84C" }} />
+                      {t(`forGuides.spotlightFeat${n}`)}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[13px] italic" style={{ color: "rgba(255,255,255,0.55)" }}>
+                  {t("forGuides.spotlightNote")}
+                </p>
+              </div>
+              <div className="flex flex-col items-stretch md:items-end gap-2 md:min-w-[180px]">
+                <a
+                  href="mailto:allharmony@gmail.com?subject=Spotlight%20Guide%20Enrollment&body=I'd%20like%20to%20add%20Spotlight%20to%20my%20guide%20profile."
+                  className="font-semibold rounded-lg text-[15px] px-6 py-3 text-center transition-colors inline-flex items-center justify-center gap-2"
+                  style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#B8924A")}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#C9A84C")}
+                >
+                  <Star size={16} style={{ fill: "#0A1628" }} />
+                  {t("forGuides.spotlightCta")}
+                </a>
+                <p className="text-[11px] text-center md:text-right" style={{ color: "rgba(255,255,255,0.45)" }}>
+                  $49/mo · Manual enrollment
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

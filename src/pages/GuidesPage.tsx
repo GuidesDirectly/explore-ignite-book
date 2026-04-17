@@ -6,6 +6,7 @@ import { MapPin, Globe, Search, MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FoundingGuideBadge from "@/components/FoundingGuideBadge";
+import SpotlightBanner from "@/components/SpotlightBanner";
 import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 import dcImg from "@/assets/hero-dc.jpg";
 import chicagoImg from "@/assets/city-cards/chicago.jpg";
@@ -57,6 +58,7 @@ interface GuideProfile {
   translations: any;
   status: string | null;
   created_at: string | null;
+  is_spotlight?: boolean | null;
 }
 
 interface ReviewStats {
@@ -91,7 +93,7 @@ const GuidesPage = () => {
       const [guidesRes, reviewsRes] = await Promise.all([
         supabase
           .from("guide_profiles_public")
-          .select("id, user_id, form_data, service_areas, translations, status, created_at")
+          .select("id, user_id, form_data, service_areas, translations, status, created_at, is_spotlight")
           .eq("status", "approved"),
         supabase
           .from("reviews_public")
@@ -155,6 +157,9 @@ const GuidesPage = () => {
     } else if (sortBy === "newest") {
       result.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     }
+
+    // Spotlight guides always rendered first within the current result set
+    result.sort((a, b) => (b.is_spotlight ? 1 : 0) - (a.is_spotlight ? 1 : 0));
 
     return result;
   }, [guides, cityFilter, languageFilter, sortBy, reviewStats]);
@@ -298,9 +303,10 @@ const GuidesPage = () => {
                           VERIFIED
                         </span>
                       )}
-                      {foundingUserIds.has(guide.user_id) && (
-                        <div className="absolute top-3 right-3" style={{ zIndex: 1 }}>
-                          <FoundingGuideBadge size="sm" />
+                      {(foundingUserIds.has(guide.user_id) || guide.is_spotlight) && (
+                        <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5" style={{ zIndex: 1 }}>
+                          {guide.is_spotlight && <SpotlightBanner size="sm" />}
+                          {foundingUserIds.has(guide.user_id) && <FoundingGuideBadge size="sm" />}
                         </div>
                       )}
                     </div>
