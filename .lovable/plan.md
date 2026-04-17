@@ -1,49 +1,27 @@
 
 
-# Final Hardening Pass — Single Migration + 7 Finding Updates
+This is a Cloudflare R2 infrastructure timeout on Lovable's deploy pipeline — not a code issue, not a build cache issue, not a queue issue I can clear. The error happens AFTER your build succeeds, when Lovable tries to get temporary R2 credentials to upload `dist/` to storage. The Cloudflare API call is timing out before responding.
 
-## Migration (one file)
-```sql
-CREATE OR REPLACE VIEW public.reviews_public
-WITH (security_invoker = true) AS
-SELECT id, guide_user_id, reviewer_name, rating, comment, hidden, created_at, translations
-FROM public.reviews
-WHERE hidden = false;
-```
-Switches view to `security_invoker = true` → resolves Supabase linter "Security Definer View" error. Public reads still work because base `reviews` table has no public SELECT policy blocking sanitized columns when accessed via the invoker's role through this view's grants. Confirm `GRANT SELECT ON public.reviews_public TO anon, authenticated` is still in place after `CREATE OR REPLACE` (it persists — Postgres preserves grants on `CREATE OR REPLACE VIEW`).
+I cannot:
+- Force-rebuild from chat (Publish runs the same pipeline regardless)
+- Clear Lovable's deploy cache (no tool exposes that)
+- Bypass the R2 upload step (it's how all Lovable hosting works)
+- Touch the deployment queue
 
-**Note:** With `security_invoker=true`, the view runs RLS as the caller. Anon currently has no SELECT policy on base `reviews`. To keep `reviews_public` returning rows for anon, I will add a minimal policy:
-```sql
-CREATE POLICY "Public can read non-hidden reviews"
-ON public.reviews FOR SELECT TO anon, authenticated
-USING (hidden = false);
-```
-Then `REVOKE SELECT (reviewer_email) ON public.reviews FROM anon, authenticated` is already in place from the previous migration → email stays hidden, view works.
+What actually resolves this:
 
-## Mark findings (single batch via security--manage_security_finding)
+**Option A — Retry Publish (most likely to work)**
+R2 credential timeouts are typically transient (Cloudflare API hiccup, regional edge issue). Retries minutes apart usually succeed. You've hit it 4+ times in a row, which suggests a longer regional incident — wait 10–15 minutes then retry once.
 
-**Ignore — by design (4):**
-1. Reviewer email visible to review-owning guide → "By design, dispute resolution and review responses"
-2. Traveler emails in payments readable by guides → "By design, zero-commission direct contact model"
-3. Traveler emails in bookings readable by guides → "By design, zero-commission direct contact model"
-4. Traveler emails in conversations readable by guides → "By design, zero-commission direct contact model"
+**Option B — Make a no-op code change to invalidate any cached artifact, then Publish**
+If Lovable is retrying the exact same `dist` hash and failing on a poisoned upload reference, a trivial source change (e.g., bump a version comment in `index.html`) forces a fresh build artifact with a new hash. Low confidence this helps, but it's the only code-side lever.
 
-**Ignore — false positive (3):**
-5. Guide billing/Stripe details publicly readable → "False positive, verified by Test A: anon SELECT on guide_profiles returns permission denied; public view exposes only sanitized whitelist"
-6. analytics_events no SELECT for non-admins → "Intentional, admin-only telemetry data"
-7. Non-admin users may insert own role records → "False positive, no INSERT policy on user_roles means denied by default"
+**Option C — Contact Lovable support**
+This error is on Lovable's deploy infrastructure. If retries keep failing for >30 min, support is the correct escalation path — they can see the R2 account state and Cloudflare API health directly. Reference the error: `r2/temp-access-credentials timeout, account a1a943b2f1c489548190e750427f39b8`.
 
-I'll fetch current scanner findings first to map each item to its exact `internal_id` + `scanner_name` before calling the manage tool.
+**Custom domain note:** `iguidetours.net` is already wired to this project. Once any successful publish completes, the new build serves on iguidetours.net automatically — no domain reconfiguration needed.
 
-## Verification
-1. `supabase--read_query`: confirm view definition shows `security_invoker = true`
-2. `supabase--read_query`: anon-context check that `reviews_public` returns rows (via view grants)
-3. `security--run_security_scan` + `supabase--linter` — fresh scan
-4. `security--get_scan_results` (force=true) — full list
+**Recommended order:** Wait 10 min → retry Publish (Option A). If still failing → Option B (I bump a build marker). If still failing after that → Option C (support).
 
-## Display
-Final grouped output: every finding with **Level + Title + Status**. Expected open items only: Tour plan PII via token, RLS Always True x2, Leaked Password Protection.
-
-## Publish gate
-No publish until you confirm the final list matches expectations.
+Want me to proceed with Option B now (bump a build marker in `index.html` to force a fresh artifact), or wait and retry Publish first?
 
