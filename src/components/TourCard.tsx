@@ -9,6 +9,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import type { TourListing } from "@/pages/Tours";
+import SpotlightBanner from "@/components/SpotlightBanner";
 
 const TOUR_TYPE_ICONS: Record<string, string> = {
   "Walking Tour": "🚶",
@@ -67,11 +68,12 @@ const TourCard = ({ tour, index }: TourCardProps) => {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />
-            {/* Tours badge */}
-            <div className="absolute top-3 left-3">
+            {/* Tours badge + Spotlight */}
+            <div className="absolute top-3 left-3 flex items-center gap-2">
               <Badge className="bg-background/90 text-foreground text-xs font-medium backdrop-blur-sm border-0">
                 🗺️ Tours
               </Badge>
+              {tour.isSpotlight && <SpotlightBanner size="sm" />}
             </div>
             {/* Rating or New badge */}
             <div className="absolute top-3 right-3">
