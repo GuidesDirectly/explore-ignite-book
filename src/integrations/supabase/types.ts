@@ -1121,6 +1121,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      notify_email: {
+        Args: { event_type: string; payload: Json }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "guide"
