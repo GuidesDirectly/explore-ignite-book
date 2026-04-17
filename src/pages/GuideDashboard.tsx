@@ -29,6 +29,7 @@ import AiBanner from "@/components/dashboard/AiBanner";
 import FeedbackInsights from "@/components/dashboard/FeedbackInsights";
 import ToursManager from "@/components/dashboard/ToursManager";
 import SubscriptionManager from "@/components/dashboard/SubscriptionManager";
+import ActivationGate from "@/components/dashboard/ActivationGate";
 
 interface PhotoItem {
   name: string;
@@ -342,6 +343,7 @@ const GuideDashboard = () => {
   }
 
   return (
+    <ActivationGate userId={user.id}>
     <div className="min-h-screen" style={{ backgroundColor: '#0A1628' }}>
       {/* Header */}
       <header className="px-6 py-4 flex items-center justify-between" style={{ backgroundColor: '#1A2F50', borderBottom: '1px solid rgba(201,168,76,0.15)' }}>
