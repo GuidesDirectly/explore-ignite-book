@@ -26,6 +26,7 @@ import SaveGuideButton from "@/components/SaveGuideButton";
 import FoundingGuideBadge from "@/components/FoundingGuideBadge";
 import SpotlightBanner from "@/components/SpotlightBanner";
 import { useFoundingProgram } from "@/hooks/useFoundingProgram";
+import { useSavedGuides } from "@/hooks/useSavedGuides";
 
 interface GuideData {
   id: string;
