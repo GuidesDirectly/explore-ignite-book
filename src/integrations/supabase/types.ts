@@ -735,6 +735,7 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           currency: string
+          description: string | null
           detailed_itinerary: string | null
           difficulty_level: number
           duration_unit: string
@@ -745,15 +746,19 @@ export type Database = {
           highlights: string[] | null
           id: string
           inclusions: string[] | null
+          inquiry_count: number
           languages: string[] | null
           max_group_size: number
           meeting_point: string | null
           meeting_point_lat: number | null
           meeting_point_lng: number | null
+          min_group_size: number
+          photos: string[]
           price_per_person: number
           status: string
           title: string
           updated_at: string
+          view_count: number
           what_to_bring: string[] | null
         }
         Insert: {
@@ -764,6 +769,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           currency?: string
+          description?: string | null
           detailed_itinerary?: string | null
           difficulty_level?: number
           duration_unit?: string
@@ -774,15 +780,19 @@ export type Database = {
           highlights?: string[] | null
           id?: string
           inclusions?: string[] | null
+          inquiry_count?: number
           languages?: string[] | null
           max_group_size?: number
           meeting_point?: string | null
           meeting_point_lat?: number | null
           meeting_point_lng?: number | null
+          min_group_size?: number
+          photos?: string[]
           price_per_person?: number
           status?: string
           title: string
           updated_at?: string
+          view_count?: number
           what_to_bring?: string[] | null
         }
         Update: {
@@ -793,6 +803,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           currency?: string
+          description?: string | null
           detailed_itinerary?: string | null
           difficulty_level?: number
           duration_unit?: string
@@ -803,15 +814,19 @@ export type Database = {
           highlights?: string[] | null
           id?: string
           inclusions?: string[] | null
+          inquiry_count?: number
           languages?: string[] | null
           max_group_size?: number
           meeting_point?: string | null
           meeting_point_lat?: number | null
           meeting_point_lng?: number | null
+          min_group_size?: number
+          photos?: string[]
           price_per_person?: number
           status?: string
           title?: string
           updated_at?: string
+          view_count?: number
           what_to_bring?: string[] | null
         }
         Relationships: [
@@ -1135,6 +1150,8 @@ export type Database = {
         Returns: boolean
       }
       increment_founding_count: { Args: never; Returns: number }
+      increment_tour_inquiry: { Args: { _tour_id: string }; Returns: undefined }
+      increment_tour_view: { Args: { _tour_id: string }; Returns: undefined }
       list_public_guide_profiles: {
         Args: never
         Returns: {

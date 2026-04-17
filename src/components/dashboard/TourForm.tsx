@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -20,7 +20,6 @@ import {
   X,
   MapPin,
   DollarSign,
-  Clock,
   Users,
   Tag,
   Shield,
@@ -29,7 +28,10 @@ import {
   ChevronUp,
   Save,
   Eye,
+  Camera,
+  FileText,
 } from "lucide-react";
+import TourPhotosUploader from "./TourPhotosUploader";
 
 interface TourFormProps {
   userId: string;
@@ -67,31 +69,36 @@ const BRING_SUGGESTIONS = [
   "Snacks",
 ];
 
+// Expanded to 9 tour types per spec
 const CATEGORIES = [
   { value: "walking", label: "Walking Tour" },
-  { value: "food", label: "Food & Drink" },
-  { value: "adventure", label: "Adventure" },
-  { value: "cultural", label: "Cultural" },
-  { value: "historical", label: "Historical" },
-  { value: "photography", label: "Photography" },
-  { value: "night", label: "Nightlife" },
-  { value: "nature", label: "Nature & Outdoors" },
-  { value: "family", label: "Family Friendly" },
-  { value: "luxury", label: "Luxury & VIP" },
+  { value: "driving", label: "Driving Tour" },
+  { value: "private", label: "Private Tour" },
+  { value: "group", label: "Group Tour" },
+  { value: "historical", label: "Historical Tour" },
+  { value: "food", label: "Food Tour" },
+  { value: "cultural", label: "Cultural Tour" },
+  { value: "multi-day", label: "Multi-Day Tour" },
+  { value: "custom", label: "Custom Tour" },
 ];
+
+const DEFAULT_REQUIRED_PHOTOS = 3;
 
 const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormProps) => {
   const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string>("basics");
+  const [requiredPhotos, setRequiredPhotos] = useState(DEFAULT_REQUIRED_PHOTOS);
 
   // Section A: Basics
   const [title, setTitle] = useState(existingTour?.title || "");
+  const [description, setDescription] = useState(existingTour?.description || "");
   const [durationValue, setDurationValue] = useState<number>(existingTour?.duration_value || 2);
   const [durationUnit, setDurationUnit] = useState(existingTour?.duration_unit || "hours");
   const [pricePerPerson, setPricePerPerson] = useState<number>(existingTour?.price_per_person || 0);
   const [currency, setCurrency] = useState(existingTour?.currency || "USD");
   const [meetingPoint, setMeetingPoint] = useState(existingTour?.meeting_point || "");
+  const [minGroupSize, setMinGroupSize] = useState<number>(existingTour?.min_group_size || 1);
   const [maxGroupSize, setMaxGroupSize] = useState<number>(existingTour?.max_group_size || 10);
   const [city, setCity] = useState(existingTour?.city || "");
   const [country, setCountry] = useState(existingTour?.country || "");
@@ -105,9 +112,31 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
   const [inclusions, setInclusions] = useState(existingTour?.inclusions?.join("\n") || "");
   const [exclusions, setExclusions] = useState(existingTour?.exclusions?.join("\n") || "");
 
-  // Section C: Logistics
-  const [cancellationPolicy, setCancellationPolicy] = useState(existingTour?.cancellation_policy || "flexible");
-  const [difficultyLevel, setDifficultyLevel] = useState<number>(existingTour?.difficulty_level || 1);
+  // Section C: Photos
+  const [photos, setPhotos] = useState<string[]>(existingTour?.photos || []);
+
+  // Section D: Logistics
+  const [cancellationPolicy, setCancellationPolicy] = useState(
+    existingTour?.cancellation_policy || "flexible"
+  );
+  const [difficultyLevel, setDifficultyLevel] = useState<number>(
+    existingTour?.difficulty_level || 1
+  );
+
+  // Read app_settings for required photo count
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "required_tour_photos")
+        .maybeSingle();
+      if (data?.value != null) {
+        const parsed = typeof data.value === "number" ? data.value : Number(data.value);
+        if (Number.isFinite(parsed) && parsed > 0) setRequiredPhotos(parsed);
+      }
+    })();
+  }, []);
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? "" : section);
@@ -138,26 +167,36 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
       toast.error("Tour title is required.");
       return;
     }
-    if (pricePerPerson <= 0) {
-      toast.error("Price per person must be greater than 0.");
+    if (pricePerPerson < 0) {
+      toast.error("Price per person cannot be negative.");
       return;
     }
     if (!city.trim()) {
       toast.error("City is required for searchability.");
       return;
     }
+    if (publishStatus === "published" && photos.length < requiredPhotos) {
+      toast.error(`Please add at least ${requiredPhotos} photos before publishing.`);
+      return;
+    }
+    if (minGroupSize > maxGroupSize) {
+      toast.error("Min group size cannot exceed max group size.");
+      return;
+    }
 
     setSaving(true);
 
-    const tourData = {
+    const tourData: any = {
       guide_user_id: userId,
       guide_profile_id: guideProfileId,
       title: title.trim(),
+      description: description.trim() || null,
       duration_value: durationValue,
       duration_unit: durationUnit,
       price_per_person: pricePerPerson,
       currency,
       meeting_point: meetingPoint.trim() || null,
+      min_group_size: minGroupSize,
       max_group_size: maxGroupSize,
       city: city.trim(),
       country: country.trim() || null,
@@ -170,20 +209,20 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
       cancellation_policy: cancellationPolicy,
       difficulty_level: difficultyLevel,
       status: publishStatus,
+      photos,
+      cover_image_url: photos[0] || null,
     };
 
     let error;
 
     if (existingTour?.id) {
       const res = await supabase
-        .from("tours" as any)
-        .update(tourData as any)
+        .from("tours")
+        .update(tourData)
         .eq("id", existingTour.id);
       error = res.error;
     } else {
-      const res = await supabase
-        .from("tours" as any)
-        .insert(tourData as any);
+      const res = await supabase.from("tours").insert(tourData);
       error = res.error;
     }
 
@@ -234,6 +273,8 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
       )}
     </button>
   );
+
+  const canPublish = photos.length >= requiredPhotos;
 
   return (
     <div className="space-y-4">
@@ -286,7 +327,7 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
             <div>
               <Label htmlFor="price">
                 <DollarSign className="w-3 h-3 inline mr-1" />
-                Price per Person *
+                Price per Person
               </Label>
               <div className="flex gap-2">
                 <Input
@@ -311,6 +352,9 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
                   </SelectContent>
                 </Select>
               </div>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Leave at 0 to show "Contact for pricing".
+              </p>
             </div>
           </div>
 
@@ -328,11 +372,25 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="min-group">
+                <Users className="w-3 h-3 inline mr-1" />
+                Min Size
+              </Label>
+              <Input
+                id="min-group"
+                type="number"
+                min={1}
+                max={200}
+                value={minGroupSize}
+                onChange={(e) => setMinGroupSize(parseInt(e.target.value) || 1)}
+              />
+            </div>
             <div>
               <Label htmlFor="max-group">
                 <Users className="w-3 h-3 inline mr-1" />
-                Max Group Size
+                Max Size
               </Label>
               <Input
                 id="max-group"
@@ -344,7 +402,7 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
               />
             </div>
             <div>
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">Tour Type</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
                   <SelectValue />
@@ -381,6 +439,37 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
                 maxLength={100}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Section: About Your Tour (description) */}
+      <SectionHeader
+        id="about"
+        icon={FileText}
+        label="About Your Tour"
+        sublabel="Description that travelers will read"
+      />
+      {expandedSection === "about" && (
+        <div className="space-y-3 px-2">
+          <div>
+            <Label htmlFor="description">Tour Description</Label>
+            <Textarea
+              id="description"
+              placeholder="Describe your tour in detail. What makes it special? What will travelers see, do, and experience?"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={6}
+              maxLength={2000}
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {description.length} / 2000 characters
+              {description.length > 0 && description.length < 200 && (
+                <span className="text-amber-600 ml-2">
+                  • Tip: aim for 200+ characters for richer listings
+                </span>
+              )}
+            </p>
           </div>
         </div>
       )}
@@ -501,7 +590,26 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
         </div>
       )}
 
-      {/* Section C: Logistics */}
+      {/* Section C: Photos */}
+      <SectionHeader
+        id="photos"
+        icon={Camera}
+        label={`Photos${photos.length > 0 ? ` (${photos.length})` : ""}`}
+        sublabel={`Min ${requiredPhotos} required to publish · first photo is the cover`}
+      />
+      {expandedSection === "photos" && (
+        <div className="px-2">
+          <TourPhotosUploader
+            userId={userId}
+            tourId={existingTour?.id}
+            photos={photos}
+            onChange={setPhotos}
+            required={requiredPhotos}
+          />
+        </div>
+      )}
+
+      {/* Section D: Logistics */}
       <SectionHeader
         id="logistics"
         icon={Shield}
@@ -576,7 +684,7 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
       )}
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-3 pt-4 border-t border-border">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4 border-t border-border">
         <Button
           onClick={() => handleSave("draft")}
           variant="outline"
@@ -584,17 +692,23 @@ const TourForm = ({ userId, guideProfileId, onSaved, existingTour }: TourFormPro
           className="flex-1"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
-          Save Draft
+          Save as Draft
         </Button>
         <Button
           onClick={() => handleSave("published")}
           disabled={saving}
           className="flex-1"
+          title={!canPublish ? `Add ${requiredPhotos - photos.length} more photo(s) to publish` : undefined}
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Eye className="w-4 h-4 mr-1" />}
-          Publish Tour
+          Publish Now
         </Button>
       </div>
+      {!canPublish && (
+        <p className="text-xs text-muted-foreground text-center">
+          You can save as draft any time. To publish, add at least {requiredPhotos} photos.
+        </p>
+      )}
     </div>
   );
 };

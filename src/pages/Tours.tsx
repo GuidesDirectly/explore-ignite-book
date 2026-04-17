@@ -33,7 +33,24 @@ export interface TourListing {
   currency: string;
   createdAt: string | null;
   isSpotlight?: boolean;
+  // New fields for the published-tour-aware listing model
+  tourId?: string | null;
+  tourTitle?: string | null;
+  coverImage?: string | null;
+  noToursNote?: boolean;
 }
+
+const CATEGORY_TO_LABEL: Record<string, string> = {
+  walking: "Walking Tour",
+  driving: "Driving Tour",
+  private: "Private Tour",
+  group: "Group Tour",
+  historical: "Historical Tour",
+  food: "Food Tour",
+  cultural: "Cultural Tour",
+  "multi-day": "Multi-Day Tour",
+  custom: "Custom Tour",
+};
 
 const Tours = () => {
   const [searchParams] = useSearchParams();
@@ -48,24 +65,25 @@ const Tours = () => {
 
   useEffect(() => {
     const fetchTours = async () => {
-      const { data: guideData } = await (supabase
-        .from("guide_profiles_public" as any)
-        .select("id, user_id, form_data, service_areas, translations, created_at, is_spotlight") as any);
+      const { data: guideData } = await supabase
+        .from("guide_profiles_public")
+        .select("id, user_id, form_data, service_areas, translations, created_at, is_spotlight");
 
       if (!guideData) {
         setLoading(false);
         return;
       }
 
-      // Fetch review stats
-      const { data: reviewData } = await (supabase
-        .from("reviews_public" as any)
+      // Review stats
+      const { data: reviewData } = await supabase
+        .from("reviews_public")
         .select("guide_user_id, rating")
-        .eq("hidden", false) as any);
+        .eq("hidden", false);
 
       const statsMap = new Map<string, { count: number; total: number }>();
       if (reviewData) {
         reviewData.forEach((r: any) => {
+          if (!r.guide_user_id) return;
           const existing = statsMap.get(r.guide_user_id) || { count: 0, total: 0 };
           existing.count += 1;
           existing.total += r.rating;
@@ -73,39 +91,83 @@ const Tours = () => {
         });
       }
 
-      // Fetch published tour prices — keep lowest per guide
-      const { data: tourPriceData } = await supabase
+      // All published tours
+      const { data: tourData } = await supabase
         .from("tours")
-        .select("guide_user_id, price_per_person, currency")
+        .select("id, guide_user_id, title, description, city, country, category, price_per_person, currency, photos, cover_image_url, languages, created_at")
         .eq("status", "published");
 
-      const priceMap = new Map<string, { price: number; currency: string }>();
-      if (tourPriceData) {
-        tourPriceData.forEach((t: any) => {
-          const price = Number(t.price_per_person);
-          if (!price || price <= 0) return;
-          const existing = priceMap.get(t.guide_user_id);
-          if (!existing || price < existing.price) {
-            priceMap.set(t.guide_user_id, { price, currency: t.currency || "USD" });
-          }
-        });
-      }
+      // Group by guide_user_id
+      const toursByGuide = new Map<string, any[]>();
+      (tourData || []).forEach((t: any) => {
+        const arr = toursByGuide.get(t.guide_user_id) || [];
+        arr.push(t);
+        toursByGuide.set(t.guide_user_id, arr);
+      });
 
-      // One listing per guide (using primary city)
-      const listings: TourListing[] = guideData.map((g: any) => {
+      const listings: TourListing[] = [];
+      const guideMap = new Map<string, any>();
+      guideData.forEach((g: any) => guideMap.set(g.user_id, g));
+
+      // 1. One card per published tour
+      (tourData || []).forEach((t: any) => {
+        const g = guideMap.get(t.guide_user_id);
+        if (!g) return;
         const fd = g.form_data || {};
-        const tourTypes: string[] = fd.tourTypes && fd.tourTypes.length > 0 ? fd.tourTypes : ["Walking Tour"];
-        const stats = statsMap.get(g.user_id);
-        const cities: string[] = g.service_areas && g.service_areas.length > 0 ? g.service_areas : ["Washington DC"];
-        const primaryCity = cities[0];
-        const priceInfo = priceMap.get(g.user_id);
+        const stats = statsMap.get(t.guide_user_id);
+        const cover = (t.photos && t.photos[0]) || t.cover_image_url || null;
+        const price = Number(t.price_per_person);
+        const tourLangs: string[] =
+          Array.isArray(t.languages) && t.languages.length > 0
+            ? t.languages
+            : fd.languages || ["English"];
+        const categoryLabel = CATEGORY_TO_LABEL[t.category] || "Walking Tour";
 
-        return {
-          id: g.id,
+        listings.push({
+          id: `tour-${t.id}`,
+          tourId: t.id,
+          tourTitle: t.title,
+          coverImage: cover,
+          guideUserId: t.guide_user_id,
+          guideName: `${fd.firstName || "Guide"} ${(fd.lastName || "").charAt(0)}.`,
+          tourTypes: [categoryLabel],
+          city: t.city || (g.service_areas?.[0] ?? "Washington DC"),
+          languages: tourLangs,
+          specializations: fd.specializations || [],
+          rating: stats ? Math.round((stats.total / stats.count) * 10) / 10 : 0,
+          reviewCount: stats?.count || 0,
+          photoUrl: cover,
+          description:
+            t.description?.substring(0, 140) +
+              (t.description && t.description.length > 140 ? "…" : "") ||
+            fd.biography?.substring(0, 140) ||
+            "Experience the best of the city with a licensed local guide.",
+          price: !isNaN(price) && price > 0 ? price : null,
+          currency: t.currency || "USD",
+          createdAt: t.created_at ?? null,
+          isSpotlight: !!g.is_spotlight,
+        });
+      });
+
+      // 2. Guides with no published tours → fallback guide-level card with empty-state note
+      guideData.forEach((g: any) => {
+        if (toursByGuide.has(g.user_id)) return;
+        const fd = g.form_data || {};
+        const stats = statsMap.get(g.user_id);
+        const cities: string[] =
+          g.service_areas && g.service_areas.length > 0 ? g.service_areas : ["Washington DC"];
+        const tourTypes: string[] =
+          fd.tourTypes && fd.tourTypes.length > 0 ? fd.tourTypes : ["Walking Tour"];
+
+        listings.push({
+          id: `guide-${g.id}`,
+          tourId: null,
+          tourTitle: null,
+          coverImage: null,
           guideUserId: g.user_id,
           guideName: `${fd.firstName || "Guide"} ${(fd.lastName || "").charAt(0)}.`,
           tourTypes,
-          city: primaryCity,
+          city: cities[0],
           languages: fd.languages || ["English"],
           specializations: fd.specializations || [],
           rating: stats ? Math.round((stats.total / stats.count) * 10) / 10 : 0,
@@ -114,11 +176,12 @@ const Tours = () => {
           description: fd.biography
             ? fd.biography.substring(0, 120) + (fd.biography.length > 120 ? "…" : "")
             : "Experience the best of the city with a licensed local guide.",
-          price: priceInfo?.price ?? null,
-          currency: priceInfo?.currency || "USD",
+          price: null,
+          currency: "USD",
           createdAt: g.created_at ?? null,
           isSpotlight: !!g.is_spotlight,
-        };
+          noToursNote: true,
+        });
       });
 
       setTours(listings);
@@ -140,15 +203,17 @@ const Tours = () => {
     return [...langs].sort();
   }, [tours]);
 
-  // Filter
   const filtered = useMemo(() => {
     return tours.filter((t) => {
       if (filterCity && filterCity !== "all" && t.city !== filterCity) return false;
       if (filterType && filterType !== "all" && !t.tourTypes.includes(filterType)) return false;
-      if (filterLanguage && filterLanguage !== "all" && !t.languages.includes(filterLanguage)) return false;
+      if (filterLanguage && filterLanguage !== "all" && !t.languages.includes(filterLanguage))
+        return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        const searchable = `${t.guideName} ${t.tourTypes.join(" ")} ${t.city} ${t.specializations.join(" ")} ${t.description}`.toLowerCase();
+        const searchable = `${t.guideName} ${t.tourTitle || ""} ${t.tourTypes.join(" ")} ${
+          t.city
+        } ${t.specializations.join(" ")} ${t.description}`.toLowerCase();
         if (!searchable.includes(q)) return false;
       }
       return true;
@@ -176,12 +241,19 @@ const Tours = () => {
         });
         break;
     }
-    // Spotlight guides always rendered first within current sort
-    arr.sort((a, b) => (b.isSpotlight ? 1 : 0) - (a.isSpotlight ? 1 : 0));
+    // Spotlight first; published tours next; empty-state guides last
+    arr.sort((a, b) => {
+      const spotDiff = (b.isSpotlight ? 1 : 0) - (a.isSpotlight ? 1 : 0);
+      if (spotDiff !== 0) return spotDiff;
+      const tourDiff = (a.noToursNote ? 1 : 0) - (b.noToursNote ? 1 : 0);
+      return tourDiff;
+    });
     return arr;
   }, [filtered, sortBy]);
 
-  const activeFilterCount = [filterCity, filterType, filterLanguage].filter(v => v && v !== "all").length;
+  const activeFilterCount = [filterCity, filterType, filterLanguage].filter(
+    (v) => v && v !== "all"
+  ).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -201,14 +273,12 @@ const Tours = () => {
               <span className="text-primary text-sm font-semibold">Browse All Experiences</span>
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-bold text-secondary-foreground mb-4">
-              Discover Unforgettable{" "}
-              <span className="text-gradient-gold">Tours</span>
+              Discover Unforgettable <span className="text-gradient-gold">Tours</span>
             </h1>
             <p className="text-secondary-foreground/70 text-lg mb-8">
               Browse curated experiences led by licensed local guides. No middlemen, no markups.
             </p>
 
-            {/* Search bar */}
             <div className="flex gap-2 max-w-xl mx-auto">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -227,7 +297,9 @@ const Tours = () => {
                 <Filter className="w-4 h-4 mr-2" />
                 Filters
                 {activeFilterCount > 0 && (
-                  <Badge className="ml-2 bg-primary text-primary-foreground text-xs px-1.5">{activeFilterCount}</Badge>
+                  <Badge className="ml-2 bg-primary text-primary-foreground text-xs px-1.5">
+                    {activeFilterCount}
+                  </Badge>
                 )}
               </Button>
             </div>
@@ -310,12 +382,11 @@ const Tours = () => {
         </motion.div>
       )}
 
-      {/* Results */}
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <p className="text-sm text-muted-foreground">
-              {loading ? "Loading..." : `${sorted.length} guide${sorted.length !== 1 ? "s" : ""} found`}
+              {loading ? "Loading..." : `${sorted.length} result${sorted.length !== 1 ? "s" : ""}`}
             </p>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[200px] bg-background">
