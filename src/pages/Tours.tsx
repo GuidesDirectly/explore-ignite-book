@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -14,24 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Search,
-  MapPin,
-  Star,
-  Globe,
-  Filter,
-  X,
-  Compass,
-  ShieldCheck,
-  ArrowRight,
-} from "lucide-react";
+import { Search, Filter, X, Compass } from "lucide-react";
 import TourCard from "@/components/TourCard";
 
 export interface TourListing {
   id: string;
   guideUserId: string;
   guideName: string;
-  tourType: string;
+  tourTypes: string[];
   city: string;
   languages: string[];
   specializations: string[];
@@ -82,68 +72,51 @@ const Tours = () => {
         });
       }
 
-      // Fetch published tour prices
+      // Fetch published tour prices — keep lowest per guide
       const { data: tourPriceData } = await supabase
         .from("tours")
-        .select("guide_user_id, title, price_per_person, currency")
+        .select("guide_user_id, price_per_person, currency")
         .eq("status", "published");
 
       const priceMap = new Map<string, { price: number; currency: string }>();
       if (tourPriceData) {
         tourPriceData.forEach((t: any) => {
-          const key = `${t.guide_user_id}__${t.title}`;
-          priceMap.set(key, { price: Number(t.price_per_person), currency: t.currency || "USD" });
-        });
-      }
-
-      // Fetch profile photos
-      const photoUrls = new Map<string, string>();
-      for (const g of guideData) {
-        const { data: files } = await supabase.storage
-          .from("guide-photos")
-          .list(g.user_id, { limit: 10 });
-        const profileFile = files?.find((f: any) => f.name.startsWith("profile"));
-        if (profileFile) {
-          const { data: photoData } = supabase.storage
-            .from("guide-photos")
-            .getPublicUrl(`${g.user_id}/${profileFile.name}`);
-          if (photoData?.publicUrl) {
-            photoUrls.set(g.user_id, photoData.publicUrl);
+          const price = Number(t.price_per_person);
+          if (!price || price <= 0) return;
+          const existing = priceMap.get(t.guide_user_id);
+          if (!existing || price < existing.price) {
+            priceMap.set(t.guide_user_id, { price, currency: t.currency || "USD" });
           }
-        }
+        });
       }
 
-      // Flatten: each guide × each tour type = one listing
-      const listings: TourListing[] = [];
-      guideData.forEach((g: any) => {
+      // One listing per guide (using primary city)
+      const listings: TourListing[] = guideData.map((g: any) => {
         const fd = g.form_data || {};
-        const tourTypes = fd.tourTypes || ["Walking Tour"];
+        const tourTypes: string[] = fd.tourTypes && fd.tourTypes.length > 0 ? fd.tourTypes : ["Walking Tour"];
         const stats = statsMap.get(g.user_id);
-        const cities = g.service_areas || ["Washington DC"];
+        const cities: string[] = g.service_areas && g.service_areas.length > 0 ? g.service_areas : ["Washington DC"];
+        const primaryCity = cities[0];
+        const priceInfo = priceMap.get(g.user_id);
 
-        cities.forEach((city: string) => {
-          tourTypes.forEach((tt: string) => {
-            const priceInfo = priceMap.get(`${g.user_id}__${tt}`);
-            listings.push({
-              id: `${g.id}-${city}-${tt}`,
-              guideUserId: g.user_id,
-              guideName: `${fd.firstName || "Guide"} ${(fd.lastName || "").charAt(0)}.`,
-              tourType: tt,
-              city,
-              languages: fd.languages || ["English"],
-              specializations: fd.specializations || [],
-              rating: stats ? Math.round((stats.total / stats.count) * 10) / 10 : 0,
-              reviewCount: stats?.count || 0,
-              photoUrl: photoUrls.get(g.user_id) || null,
-              description: fd.biography
-                ? fd.biography.substring(0, 120) + (fd.biography.length > 120 ? "…" : "")
-                : "Experience the best of the city with a licensed local guide.",
-              price: priceInfo?.price ?? null,
-              currency: priceInfo?.currency || "USD",
-              createdAt: g.created_at ?? null,
-            });
-          });
-        });
+        return {
+          id: g.id,
+          guideUserId: g.user_id,
+          guideName: `${fd.firstName || "Guide"} ${(fd.lastName || "").charAt(0)}.`,
+          tourTypes,
+          city: primaryCity,
+          languages: fd.languages || ["English"],
+          specializations: fd.specializations || [],
+          rating: stats ? Math.round((stats.total / stats.count) * 10) / 10 : 0,
+          reviewCount: stats?.count || 0,
+          photoUrl: null,
+          description: fd.biography
+            ? fd.biography.substring(0, 120) + (fd.biography.length > 120 ? "…" : "")
+            : "Experience the best of the city with a licensed local guide.",
+          price: priceInfo?.price ?? null,
+          currency: priceInfo?.currency || "USD",
+          createdAt: g.created_at ?? null,
+        };
       });
 
       setTours(listings);
@@ -154,7 +127,11 @@ const Tours = () => {
 
   // Derive filter options
   const allCities = useMemo(() => [...new Set(tours.map((t) => t.city))].sort(), [tours]);
-  const allTypes = useMemo(() => [...new Set(tours.map((t) => t.tourType))].sort(), [tours]);
+  const allTypes = useMemo(() => {
+    const types = new Set<string>();
+    tours.forEach((t) => t.tourTypes.forEach((tt) => types.add(tt)));
+    return [...types].sort();
+  }, [tours]);
   const allLanguages = useMemo(() => {
     const langs = new Set<string>();
     tours.forEach((t) => t.languages.forEach((l) => langs.add(l)));
@@ -165,11 +142,11 @@ const Tours = () => {
   const filtered = useMemo(() => {
     return tours.filter((t) => {
       if (filterCity && filterCity !== "all" && t.city !== filterCity) return false;
-      if (filterType && filterType !== "all" && t.tourType !== filterType) return false;
+      if (filterType && filterType !== "all" && !t.tourTypes.includes(filterType)) return false;
       if (filterLanguage && filterLanguage !== "all" && !t.languages.includes(filterLanguage)) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        const searchable = `${t.guideName} ${t.tourType} ${t.city} ${t.specializations.join(" ")} ${t.description}`.toLowerCase();
+        const searchable = `${t.guideName} ${t.tourTypes.join(" ")} ${t.city} ${t.specializations.join(" ")} ${t.description}`.toLowerCase();
         if (!searchable.includes(q)) return false;
       }
       return true;
@@ -331,7 +308,7 @@ const Tours = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <p className="text-sm text-muted-foreground">
-              {loading ? "Loading..." : `${sorted.length} tour${sorted.length !== 1 ? "s" : ""} found`}
+              {loading ? "Loading..." : `${sorted.length} guide${sorted.length !== 1 ? "s" : ""} found`}
             </p>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[200px] bg-background">
