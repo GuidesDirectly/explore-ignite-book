@@ -27,14 +27,14 @@ const corsHeaders = {
 const NOTIFY_EMAIL = "michael@iguidetours.net";
 
 interface NotificationRequest {
-  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request" | "profile_reminder" | "guide_activated" | "activation_reminder" | "subscription_expiring_soon" | "subscription_expired";
+  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request" | "profile_reminder" | "guide_activated" | "activation_reminder" | "subscription_expiring_soon" | "subscription_expired" | "founding_guide_welcome" | "founding_30day_warning" | "founding_7day_warning" | "founding_expired" | "founding_spots_filled";
   data: Record<string, unknown>;
 }
 
-const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request", "profile_reminder", "guide_activated", "activation_reminder", "subscription_expiring_soon", "subscription_expired"]);
+const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request", "profile_reminder", "guide_activated", "activation_reminder", "subscription_expiring_soon", "subscription_expired", "founding_guide_welcome", "founding_30day_warning", "founding_7day_warning", "founding_expired", "founding_spots_filled"]);
 
 // Notification types that can be sent without authentication (public forms + DB-triggered events)
-const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request", "review_request", "profile_reminder", "guide_activated", "activation_reminder", "subscription_expiring_soon", "subscription_expired"]);
+const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request", "review_request", "profile_reminder", "guide_activated", "activation_reminder", "subscription_expiring_soon", "subscription_expired", "founding_guide_welcome", "founding_30day_warning", "founding_7day_warning", "founding_expired", "founding_spots_filled"]);
 // Notification types that require authentication
 const AUTH_TYPES = new Set(["guide_status", "guide_application", "booking_status"]);
 
@@ -755,6 +755,89 @@ const handler = async (req: Request): Promise<Response> => {
         </div>
       `;
       toEmails = [guideEmail];
+    } else if (type === "founding_guide_welcome" || type === "founding_30day_warning" || type === "founding_7day_warning" || type === "founding_expired") {
+      const guideName = String(data.guideName || "there");
+      const guideEmail = data.guideEmail as string | undefined;
+      const lockedPrice = Number(data.lockedPrice || 29);
+      const dashboardUrl = "https://iguidetours.net/guide-dashboard";
+      const renewUrl = "https://iguidetours.net/guide-dashboard";
+
+      if (!guideEmail) throw new Error("guideEmail is required");
+
+      const titles: Record<string, string> = {
+        founding_guide_welcome: `Welcome, Founding Guide ${escapeHtml(guideName)} — your $${lockedPrice}/mo rate is locked forever`,
+        founding_30day_warning: `Your free Founding Guide period ends in 30 days — lock in your $${lockedPrice}/mo rate`,
+        founding_7day_warning: `Final reminder — your free Founding Guide period ends in 7 days`,
+        founding_expired: `Your Founding Guide free period has ended — your $${lockedPrice}/mo rate is still locked`,
+      };
+
+      const headlines: Record<string, string> = {
+        founding_guide_welcome: `You're one of our first 50. Your profile is live — free until December 31, 2026.`,
+        founding_30day_warning: `Your free period ends December 31, 2026 (30 days from now).`,
+        founding_7day_warning: `Final 7 days. Your free period ends December 31, 2026.`,
+        founding_expired: `Your free Founding Guide period has ended.`,
+      };
+
+      const bodies: Record<string, string> = {
+        founding_guide_welcome: `Thank you for being a Founding Guide of GuidesDirectly. As one of our first 50 guides, you have <strong>locked in $${lockedPrice}/month for life</strong> — others will pay $59. Your profile is now visible to travelers worldwide. No commission. Ever.`,
+        founding_30day_warning: `Thank you for being a Founding Guide. As a permanent thank-you, your subscription rate is <strong>locked at $${lockedPrice}/month forever</strong> — others will pay $59. To keep your profile visible without interruption, renew before December 31.`,
+        founding_7day_warning: `This is your final reminder. Your free period ends in 7 days. Your <strong>$${lockedPrice}/month locked rate</strong> is still guaranteed forever — but only if you renew before your profile goes inactive.`,
+        founding_expired: `Your free period has ended and your profile is currently hidden from travelers. Good news — your <strong>$${lockedPrice}/month Founding Guide rate is still locked forever</strong>. Reactivate now to restore visibility immediately. Others pay $59 — you pay $${lockedPrice}, always.`,
+      };
+
+      const ctaLabel: Record<string, string> = {
+        founding_guide_welcome: "Open Your Dashboard →",
+        founding_30day_warning: `Lock in $${lockedPrice}/mo Rate →`,
+        founding_7day_warning: `Renew at $${lockedPrice}/mo →`,
+        founding_expired: `Reactivate at $${lockedPrice}/mo →`,
+      };
+
+      subject = titles[type];
+      html = `
+        <div style="font-family:'Georgia','Times New Roman',serif;max-width:600px;margin:0 auto;">
+          <div style="background:#0A1628;padding:32px 40px;text-align:center;">
+            <h1 style="color:#ffffff;margin:0;font-size:26px;letter-spacing:1px;">GuidesDirectly</h1>
+            <p style="color:#C9A84C;margin:6px 0 0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;">FOUNDING GUIDE PROGRAM</p>
+          </div>
+          <div style="padding:40px;background:#ffffff;">
+            <h2 style="color:#0A1628;font-size:22px;margin:0 0 20px;">Hi ${escapeHtml(guideName)},</h2>
+            <p style="color:#333333;line-height:1.7;font-size:17px;margin:0 0 16px;"><strong>${headlines[type]}</strong></p>
+            <p style="color:#333333;line-height:1.7;font-size:16px;">${bodies[type]}</p>
+            <div style="text-align:center;margin:30px 0 10px;">
+              <a href="${renewUrl}" style="display:inline-block;background:#C9A84C;color:#0A1628;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">${ctaLabel[type]}</a>
+            </div>
+            <p style="color:#666;font-size:14px;margin-top:24px;">Questions? Reply to this email or call <strong>+1 (202) 243-8336</strong>.</p>
+            <p style="color:#333333;font-size:15px;margin-top:24px;">— The Guides Directly Team</p>
+          </div>
+          <div style="padding:20px;text-align:center;background:#F5F5F5;">
+            <p style="color:#999999;font-size:12px;margin:0;line-height:1.6;">© 2025–2026 Guides Directly, powered by iGuide Tours<br/>Bethesda, MD · +1 (202) 243-8336</p>
+          </div>
+        </div>
+      `;
+      toEmails = [guideEmail];
+    } else if (type === "founding_spots_filled") {
+      const filledAt = String(data.filledAt || new Date().toISOString());
+      subject = "🎉 All 50 Founding Guide spots are claimed!";
+      html = `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+          <div style="background:#0A1628;padding:30px;text-align:center;">
+            <h1 style="color:#C9A84C;margin:0;">Founding Guide Program — FULL</h1>
+          </div>
+          <div style="padding:30px;background:#f9f9f9;">
+            <h2 style="color:#0A1628;">All 50 Founding Guide spots have been claimed.</h2>
+            <p style="color:#333;font-size:16px;line-height:1.6;">
+              The Founding Guide cohort is now closed. New guide registrations will be routed to the standard paid flow (Pro $29/mo or Featured $59/mo).
+            </p>
+            <table style="border-collapse:collapse;margin-top:20px;">
+              <tr><td style="padding:8px;font-weight:bold;">Filled at:</td><td style="padding:8px;">${escapeHtml(filledAt)}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold;">Cohort size:</td><td style="padding:8px;">50</td></tr>
+              <tr><td style="padding:8px;font-weight:bold;">Locked rate:</td><td style="padding:8px;">$29/mo forever (when free period ends Dec 31, 2026)</td></tr>
+            </table>
+            <p style="color:#666;font-size:14px;margin-top:24px;">All Founding Guides have been notified of their welcome and locked rate. Standard pricing now applies to all new signups.</p>
+          </div>
+        </div>
+      `;
+      toEmails = ["allharmony@gmail.com"];
     } else {
       throw new Error("Invalid notification type");
     }
