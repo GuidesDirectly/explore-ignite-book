@@ -164,11 +164,15 @@ const Admin = () => {
   }, [isAdmin]);
 
   const fetchData = async () => {
-    const [inqRes, revRes, guideRes, tourRes] = await Promise.all([
+    const [inqRes, revRes, guideRes, tourRes, publishedToursRes] = await Promise.all([
       supabase.from("inquiries").select("*").order("created_at", { ascending: false }),
       supabase.from("reviews").select("*").order("created_at", { ascending: false }),
       supabase.from("guide_profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("tour_plans").select("*").order("created_at", { ascending: false }),
+      supabase
+        .from("tours")
+        .select("id, title, status, view_count, inquiry_count, created_at, guide_user_id")
+        .order("created_at", { ascending: false }),
     ]);
     if (inqRes.data) setInquiries(inqRes.data);
     if (revRes.data) setReviews(revRes.data);
@@ -187,6 +191,34 @@ const Admin = () => {
       setGuidePhotoUrls(photoMap);
     }
     if (tourRes.data) setTourPlans(tourRes.data as any);
+
+    // Hydrate published tours with guide names
+    if (publishedToursRes.data && guideRes.data) {
+      const guideNameMap: Record<string, string> = {};
+      for (const g of guideRes.data as any[]) {
+        const fd = g.form_data || {};
+        guideNameMap[g.user_id] = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "Unnamed Guide";
+      }
+      setPublishedTours(
+        (publishedToursRes.data as any[]).map((t) => ({
+          ...t,
+          guideName: guideNameMap[t.guide_user_id] || "Unknown",
+        }))
+      );
+    }
+  };
+
+  const toggleTourStatus = async (tourId: string, newStatus: "draft" | "published") => {
+    const { error } = await supabase
+      .from("tours")
+      .update({ status: newStatus } as any)
+      .eq("id", tourId);
+    if (error) {
+      toast.error("Failed to update tour status");
+      return;
+    }
+    setPublishedTours((prev) => prev.map((t) => (t.id === tourId ? { ...t, status: newStatus } : t)));
+    toast.success(`Tour set to ${newStatus}`);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
