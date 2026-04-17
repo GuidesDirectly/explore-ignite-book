@@ -771,6 +771,12 @@ const Admin = () => {
             <Map className="w-4 h-4 mr-2" /> Tour Plans ({tourPlans.length})
           </Button>
           <Button
+            variant={tab === "published_tours" ? "default" : "outline"}
+            onClick={() => setTab("published_tours")}
+          >
+            <Briefcase className="w-4 h-4 mr-2" /> Published Tours ({publishedTours.filter(t => t.status === "published").length})
+          </Button>
+          <Button
             variant={tab === "verification" ? "default" : "outline"}
             onClick={() => setTab("verification")}
           >
