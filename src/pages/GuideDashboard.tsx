@@ -589,6 +589,7 @@ const GuideDashboard = () => {
         </section>
       </div>
     </div>
+    </ActivationGate>
   );
 };
 
