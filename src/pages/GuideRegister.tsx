@@ -28,7 +28,7 @@ import PasswordStrengthMeter, { isPasswordStrong } from "@/components/PasswordSt
 import { checkPasswordBreached } from "@/lib/hibp";
 import { scanFileForViruses } from "@/lib/scanUpload";
 import { useFoundingProgram } from "@/hooks/useFoundingProgram";
-import { Crown, AlertTriangle } from "lucide-react";
+import FoundingProgramBanner from "@/components/FoundingProgramBanner";
 
 
 // Service area presets now come from the shared destinations data
@@ -495,6 +495,7 @@ const GuideRegister = () => {
     return (
       <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
         <div className="max-w-md w-full">
+          <FoundingProgramBanner program={foundingProgram} />
           {/* Bright white card */}
           <div className="bg-background rounded-2xl shadow-xl border border-border p-8">
             <div className="text-center mb-8">
@@ -620,6 +621,7 @@ const GuideRegister = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <FoundingProgramBanner program={foundingProgram} />
         {/* Step indicators */}
         <div className="flex items-center mb-10">
           {STEPS.map((step, idx) => {
