@@ -101,6 +101,7 @@ const STEPS = [
 const GuideRegister = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { data: foundingProgram } = useFoundingProgram();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [checkingBreach, setCheckingBreach] = useState(false);
