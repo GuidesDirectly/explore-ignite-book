@@ -80,6 +80,17 @@ interface TourPlan {
   updated_at: string;
 }
 
+interface PublishedTour {
+  id: string;
+  title: string;
+  status: string;
+  view_count: number;
+  inquiry_count: number;
+  created_at: string;
+  guide_user_id: string;
+  guideName?: string;
+}
+
 const Admin = () => {
   const { data: foundingProgram } = useFoundingProgram();
   const [email, setEmail] = useState("");
@@ -87,11 +98,12 @@ const Admin = () => {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours" | "verification">("inquiries");
+  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours" | "published_tours" | "verification">("inquiries");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [guides, setGuides] = useState<GuideApplication[]>([]);
   const [tourPlans, setTourPlans] = useState<TourPlan[]>([]);
+  const [publishedTours, setPublishedTours] = useState<PublishedTour[]>([]);
   const [expandedGuide, setExpandedGuide] = useState<string | null>(null);
   const [editingGuide, setEditingGuide] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<GuideApplication["form_data"] | null>(null);
@@ -152,11 +164,15 @@ const Admin = () => {
   }, [isAdmin]);
 
   const fetchData = async () => {
-    const [inqRes, revRes, guideRes, tourRes] = await Promise.all([
+    const [inqRes, revRes, guideRes, tourRes, publishedToursRes] = await Promise.all([
       supabase.from("inquiries").select("*").order("created_at", { ascending: false }),
       supabase.from("reviews").select("*").order("created_at", { ascending: false }),
       supabase.from("guide_profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("tour_plans").select("*").order("created_at", { ascending: false }),
+      supabase
+        .from("tours")
+        .select("id, title, status, view_count, inquiry_count, created_at, guide_user_id")
+        .order("created_at", { ascending: false }),
     ]);
     if (inqRes.data) setInquiries(inqRes.data);
     if (revRes.data) setReviews(revRes.data);
@@ -175,6 +191,34 @@ const Admin = () => {
       setGuidePhotoUrls(photoMap);
     }
     if (tourRes.data) setTourPlans(tourRes.data as any);
+
+    // Hydrate published tours with guide names
+    if (publishedToursRes.data && guideRes.data) {
+      const guideNameMap: Record<string, string> = {};
+      for (const g of guideRes.data as any[]) {
+        const fd = g.form_data || {};
+        guideNameMap[g.user_id] = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "Unnamed Guide";
+      }
+      setPublishedTours(
+        (publishedToursRes.data as any[]).map((t) => ({
+          ...t,
+          guideName: guideNameMap[t.guide_user_id] || "Unknown",
+        }))
+      );
+    }
+  };
+
+  const toggleTourStatus = async (tourId: string, newStatus: "draft" | "published") => {
+    const { error } = await supabase
+      .from("tours")
+      .update({ status: newStatus } as any)
+      .eq("id", tourId);
+    if (error) {
+      toast.error("Failed to update tour status");
+      return;
+    }
+    setPublishedTours((prev) => prev.map((t) => (t.id === tourId ? { ...t, status: newStatus } : t)));
+    toast.success(`Tour set to ${newStatus}`);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -727,6 +771,12 @@ const Admin = () => {
             <Map className="w-4 h-4 mr-2" /> Tour Plans ({tourPlans.length})
           </Button>
           <Button
+            variant={tab === "published_tours" ? "default" : "outline"}
+            onClick={() => setTab("published_tours")}
+          >
+            <Briefcase className="w-4 h-4 mr-2" /> Published Tours ({publishedTours.filter(t => t.status === "published").length})
+          </Button>
+          <Button
             variant={tab === "verification" ? "default" : "outline"}
             onClick={() => setTab("verification")}
           >
@@ -980,6 +1030,82 @@ const Admin = () => {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Published Tours Tab */}
+        {tab === "published_tours" && (
+          <div className="space-y-6">
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-card rounded-xl border border-border p-6">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Total Published</p>
+                <p className="text-3xl font-bold text-primary">
+                  {publishedTours.filter((t) => t.status === "published").length}
+                </p>
+              </div>
+              <div className="bg-card rounded-xl border border-border p-6">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Total Drafts</p>
+                <p className="text-3xl font-bold text-muted-foreground">
+                  {publishedTours.filter((t) => t.status === "draft").length}
+                </p>
+              </div>
+            </div>
+
+            {/* Table */}
+            {publishedTours.length === 0 ? (
+              <p className="text-center text-muted-foreground py-12">No tours yet.</p>
+            ) : (
+              <div className="bg-card rounded-xl border border-border overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/30">
+                      <tr className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        <th className="px-4 py-3">Title</th>
+                        <th className="px-4 py-3">Guide</th>
+                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3 text-right">Views</th>
+                        <th className="px-4 py-3 text-right">Inquiries</th>
+                        <th className="px-4 py-3">Created</th>
+                        <th className="px-4 py-3 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {publishedTours.map((t) => (
+                        <tr key={t.id} className="border-t border-border hover:bg-muted/20">
+                          <td className="px-4 py-3 text-foreground font-medium">{t.title}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{t.guideName}</td>
+                          <td className="px-4 py-3">
+                            <Badge
+                              variant="secondary"
+                              className={`text-xs ${t.status === "published" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
+                            >
+                              {t.status}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-right text-foreground">{t.view_count}</td>
+                          <td className="px-4 py-3 text-right text-foreground">{t.inquiry_count}</td>
+                          <td className="px-4 py-3 text-muted-foreground">
+                            {new Date(t.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                toggleTourStatus(t.id, t.status === "published" ? "draft" : "published")
+                              }
+                            >
+                              {t.status === "published" ? "Unpublish" : "Publish"}
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

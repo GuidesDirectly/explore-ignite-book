@@ -51,6 +51,7 @@ interface Props {
   tourTypes: string[];
   serviceAreas: string[];
   availableDates?: Date[];
+  tourId?: string;
 }
 
 const TIME_SLOTS = [
@@ -60,7 +61,7 @@ const TIME_SLOTS = [
   "17:00", "17:30", "18:00", "18:30", "19:00",
 ];
 
-const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas, availableDates }: Props) => {
+const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas, availableDates, tourId }: Props) => {
   const { t } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -122,6 +123,15 @@ const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas, a
     } else {
       setSubmitted(true);
       toast.success("Booking request sent!");
+
+      // Increment inquiry count when this booking is for a specific tour
+      if (tourId) {
+        try {
+          await supabase.rpc("increment_tour_inquiry", { _tour_id: tourId });
+        } catch (e) {
+          console.error("Failed to increment tour inquiry:", e);
+        }
+      }
 
       // Send confirmation email to traveler
       try {
