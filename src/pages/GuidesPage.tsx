@@ -100,6 +100,17 @@ const GuidesPage = () => {
 
       if (guidesRes.data) setGuides(guidesRes.data as GuideProfile[]);
 
+      // Founding-guide ids: query guide_profiles for matching plan + active state
+      if (foundingProgram?.foundingPlanId) {
+        const { data: founders } = await supabase
+          .from("guide_profiles")
+          .select("user_id")
+          .eq("subscription_plan_id", foundingProgram.foundingPlanId)
+          .eq("status", "approved")
+          .eq("activation_status", "active");
+        if (founders) setFoundingUserIds(new Set(founders.map((f: any) => f.user_id)));
+      }
+
       if (reviewsRes.data) {
         const stats: Record<string, ReviewStats> = {};
         for (const r of reviewsRes.data) {
@@ -118,7 +129,7 @@ const GuidesPage = () => {
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [foundingProgram?.foundingPlanId]);
 
   const filtered = useMemo(() => {
     let result = [...guides];
@@ -286,6 +297,11 @@ const GuidesPage = () => {
                         >
                           VERIFIED
                         </span>
+                      )}
+                      {foundingUserIds.has(guide.user_id) && (
+                        <div className="absolute top-3 right-3" style={{ zIndex: 1 }}>
+                          <FoundingGuideBadge size="sm" />
+                        </div>
                       )}
                     </div>
 
