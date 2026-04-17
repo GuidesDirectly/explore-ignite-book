@@ -5,7 +5,6 @@ import {
   Star,
   MapPin,
   Globe,
-  Compass,
   ShieldCheck,
   ArrowRight,
 } from "lucide-react";
@@ -20,6 +19,23 @@ const TOUR_TYPE_ICONS: Record<string, string> = {
   "Group Tour": "👥",
   "History Tour": "📜",
   "Art Tour": "🎨",
+  "Driving Tour": "🚗",
+};
+
+const UNSPLASH_PARAMS = "?w=800&q=80&auto=format&fit=crop";
+
+const getCityImage = (city: string): string => {
+  const c = city.toLowerCase();
+  if (c.includes("washington") || c.includes("dc")) {
+    return `https://images.unsplash.com/photo-1617581629397-a72507c3de9e${UNSPLASH_PARAMS}`;
+  }
+  if (c.includes("los angeles") || c.includes("hollywood") || c === "la") {
+    return `https://images.unsplash.com/photo-1503891450247-ee5f8ec46dc3${UNSPLASH_PARAMS}`;
+  }
+  if (c.includes("chicago")) {
+    return `https://images.unsplash.com/photo-1494522855154-9297ac14b55f${UNSPLASH_PARAMS}`;
+  }
+  return `https://images.unsplash.com/photo-1488646953014-85cb44e25828${UNSPLASH_PARAMS}`;
 };
 
 interface TourCardProps {
@@ -28,6 +44,10 @@ interface TourCardProps {
 }
 
 const TourCard = ({ tour, index }: TourCardProps) => {
+  const imageUrl = getCityImage(tour.city);
+  const visibleTypes = tour.tourTypes.slice(0, 4);
+  const extraTypeCount = Math.max(0, tour.tourTypes.length - visibleTypes.length);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -35,28 +55,22 @@ const TourCard = ({ tour, index }: TourCardProps) => {
       transition={{ duration: 0.4, delay: index * 0.05 }}
     >
       <Link
-        to={`/tour/${tour.guideUserId}?type=${encodeURIComponent(tour.tourType)}&city=${encodeURIComponent(tour.city)}`}
+        to={`/tour/${tour.guideUserId}?city=${encodeURIComponent(tour.city)}`}
         className="group block"
       >
         <div className="rounded-2xl border border-border/50 bg-card overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 group-hover:-translate-y-1">
-          {/* Image */}
+          {/* Image — destination, not guide face */}
           <div className="relative h-48 bg-muted overflow-hidden">
-            {tour.photoUrl ? (
-              <img
-                src={tour.photoUrl}
-                alt={`${tour.tourType} in ${tour.city}`}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                loading="lazy"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-primary/5">
-                <Compass className="w-10 h-10 text-primary/30" />
-              </div>
-            )}
-            {/* Tour type badge */}
+            <img
+              src={imageUrl}
+              alt={`${tour.city} destination`}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            {/* Tours badge */}
             <div className="absolute top-3 left-3">
               <Badge className="bg-background/90 text-foreground text-xs font-medium backdrop-blur-sm border-0">
-                {TOUR_TYPE_ICONS[tour.tourType] || "🗺️"} {tour.tourType}
+                🗺️ Tours
               </Badge>
             </div>
             {/* Rating or New badge */}
@@ -85,7 +99,7 @@ const TourCard = ({ tour, index }: TourCardProps) => {
           {/* Content */}
           <div className="p-5">
             <h3 className="font-display text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-              {tour.tourType} in {tour.city}
+              Tours with {tour.guideName}
             </h3>
             <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
               <span className="flex items-center gap-1">
@@ -95,11 +109,26 @@ const TourCard = ({ tour, index }: TourCardProps) => {
                 <Globe className="w-3.5 h-3.5" /> {tour.languages.slice(0, 2).join(", ")}
               </span>
             </div>
+
+            {/* Tour-type chips */}
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {visibleTypes.map((tt) => (
+                <Badge key={tt} variant="secondary" className="text-xs font-medium">
+                  {TOUR_TYPE_ICONS[tt] || "🗺️"} {tt}
+                </Badge>
+              ))}
+              {extraTypeCount > 0 && (
+                <Badge variant="secondary" className="text-xs font-medium">
+                  +{extraTypeCount} more
+                </Badge>
+              )}
+            </div>
+
             <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
               {tour.description}
             </p>
 
-            {/* Price — visually dominant */}
+            {/* Price */}
             <div className="mb-4">
               {tour.price != null && tour.price > 0 ? (
                 <span className="text-xl font-bold text-foreground">
@@ -111,13 +140,13 @@ const TourCard = ({ tour, index }: TourCardProps) => {
               )}
             </div>
 
-            {/* Footer: guide name + CTA */}
+            {/* Footer */}
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">
                 with {tour.guideName}
               </span>
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:gap-2 transition-all">
-                View Tour <ArrowRight className="w-4 h-4" />
+                View Tours <ArrowRight className="w-4 h-4" />
               </span>
             </div>
           </div>
