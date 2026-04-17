@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Loader2, TrendingUp, Users, Clock, AlertTriangle, Send } from "lucide-react";
+import { Loader2, TrendingUp, Users, Clock, AlertTriangle, Send, Crown, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
+import { useFoundingProgram } from "@/hooks/useFoundingProgram";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import FoundingGuideBadge from "@/components/FoundingGuideBadge";
 
 interface FunnelGuide {
   user_id: string;
@@ -15,6 +18,7 @@ interface FunnelGuide {
 }
 
 const ActivationFunnel = () => {
+  const { data: foundingProgram } = useFoundingProgram();
   const [loading, setLoading] = useState(true);
   const [inactive, setInactive] = useState<FunnelGuide[]>([]);
   const [expiringSoon, setExpiringSoon] = useState<FunnelGuide[]>([]);
@@ -22,6 +26,8 @@ const ActivationFunnel = () => {
   const [activeProCount, setActiveProCount] = useState(0);
   const [activeFeaturedCount, setActiveFeaturedCount] = useState(0);
   const [sending, setSending] = useState<string | null>(null);
+  const [foundingGuides, setFoundingGuides] = useState<FunnelGuide[]>([]);
+  const [foundingOpen, setFoundingOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -53,10 +59,21 @@ const ActivationFunnel = () => {
     setActiveFreeCount(freeRes.count || 0);
     setActiveProCount(proRes.count || 0);
     setActiveFeaturedCount(featRes.count || 0);
+
+    // Founding guides list (by plan UUID, any activation status)
+    if (foundingProgram?.foundingPlanId) {
+      const { data: founders } = await supabase
+        .from("guide_profiles")
+        .select("user_id, form_data, activation_status, subscription_tier, subscription_expires_at, payment_reminder_count, updated_at")
+        .eq("subscription_plan_id", foundingProgram.foundingPlanId)
+        .order("updated_at", { ascending: false });
+      setFoundingGuides((founders as any[]) || []);
+    }
+
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [foundingProgram?.foundingPlanId]);
 
   const triggerCron = async () => {
     setSending("cron");
