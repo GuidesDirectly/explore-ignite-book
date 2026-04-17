@@ -85,6 +85,7 @@ const TourDetail = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [notFound, setNotFound] = useState(false);
   const { data: foundingProgram } = useFoundingProgram();
+  const { savedIds, toggleSave, loading: saveLoading } = useSavedGuides();
   const isFounding =
     !!guide?.subscription_plan_id &&
     !!foundingProgram?.foundingPlanId &&
@@ -345,7 +346,11 @@ const TourDetail = () => {
                     </h1>
                   </div>
                   <div className="flex items-center gap-2">
-                    <SaveGuideButton guideProfileId={guide.id} variant="ghost" size="sm" />
+                    <SaveGuideButton
+                      isSaved={savedIds.has(guide.id)}
+                      onToggle={() => toggleSave(guide.id)}
+                      loading={saveLoading}
+                    />
                     <Button variant="outline" size="sm" onClick={handleShare}>
                       <Share2 className="w-4 h-4 mr-1" /> Share
                     </Button>
