@@ -7,26 +7,30 @@ import {
   Globe,
   ShieldCheck,
   ArrowRight,
+  Info,
 } from "lucide-react";
 import type { TourListing } from "@/pages/Tours";
 import SpotlightBanner from "@/components/SpotlightBanner";
 
 const TOUR_TYPE_ICONS: Record<string, string> = {
   "Walking Tour": "🚶",
-  "City Tour": "🏙️",
-  "Food Tour": "🍽️",
-  "Custom Tour": "✨",
+  "Driving Tour": "🚗",
   "Private Tour": "🔒",
   "Group Tour": "👥",
+  "Historical Tour": "📜",
+  "Food Tour": "🍽️",
+  "Cultural Tour": "🎭",
+  "Multi-Day Tour": "🗓️",
+  "Custom Tour": "✨",
+  "City Tour": "🏙️",
   "History Tour": "📜",
   "Art Tour": "🎨",
-  "Driving Tour": "🚗",
 };
 
 const UNSPLASH_PARAMS = "?w=800&q=80&auto=format&fit=crop";
 
 const getCityImage = (city: string): string => {
-  const c = city.toLowerCase();
+  const c = (city || "").toLowerCase();
   if (c.includes("washington") || c.includes("dc")) {
     return `https://images.unsplash.com/photo-1617581629397-a72507c3de9e${UNSPLASH_PARAMS}`;
   }
@@ -45,9 +49,18 @@ interface TourCardProps {
 }
 
 const TourCard = ({ tour, index }: TourCardProps) => {
-  const imageUrl = getCityImage(tour.city);
+  const hasOwnCover = !!tour.coverImage;
+  const imageUrl = tour.coverImage || getCityImage(tour.city);
   const visibleTypes = tour.tourTypes.slice(0, 4);
   const extraTypeCount = Math.max(0, tour.tourTypes.length - visibleTypes.length);
+
+  // When the listing represents a specific tour, link to it; otherwise the guide profile
+  const linkTo = tour.tourId
+    ? `/tour/${tour.tourId}`
+    : `/tour/${tour.guideUserId}?city=${encodeURIComponent(tour.city)}`;
+
+  // Title rule: tour title if present, else generic guide listing
+  const displayTitle = tour.tourTitle || `Tours with ${tour.guideName}`;
 
   return (
     <motion.div
@@ -55,27 +68,22 @@ const TourCard = ({ tour, index }: TourCardProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
     >
-      <Link
-        to={`/tour/${tour.guideUserId}?city=${encodeURIComponent(tour.city)}`}
-        className="group block"
-      >
+      <Link to={linkTo} className="group block">
         <div className="rounded-2xl border border-border/50 bg-card overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 group-hover:-translate-y-1">
-          {/* Image — destination, not guide face */}
+          {/* Image — tour cover when available, else city fallback */}
           <div className="relative h-48 bg-muted overflow-hidden">
             <img
               src={imageUrl}
-              alt={`${tour.city} destination`}
+              alt={hasOwnCover ? displayTitle : `${tour.city} destination`}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />
-            {/* Tours badge + Spotlight */}
             <div className="absolute top-3 left-3 flex items-center gap-2">
               <Badge className="bg-background/90 text-foreground text-xs font-medium backdrop-blur-sm border-0">
-                🗺️ Tours
+                {tour.tourId ? "🎟️ Tour" : "🗺️ Guide"}
               </Badge>
               {tour.isSpotlight && <SpotlightBanner size="sm" />}
             </div>
-            {/* Rating or New badge */}
             <div className="absolute top-3 right-3">
               {tour.rating > 0 ? (
                 <div className="flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1">
@@ -89,7 +97,6 @@ const TourCard = ({ tour, index }: TourCardProps) => {
                 </Badge>
               )}
             </div>
-            {/* Verified badge */}
             <div className="absolute bottom-3 left-3">
               <div className="flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-primary" />
@@ -100,9 +107,18 @@ const TourCard = ({ tour, index }: TourCardProps) => {
 
           {/* Content */}
           <div className="p-5">
-            <h3 className="font-display text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-              Tours with {tour.guideName}
+            <h3 className="font-display text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-2">
+              {displayTitle}
             </h3>
+
+            {/* Empty-state note: guides without published tours */}
+            {tour.noToursNote && (
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground italic mb-2">
+                <Info className="w-3 h-3" />
+                No tours listed yet — contact to inquire
+              </p>
+            )}
+
             <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
               <span className="flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5" /> {tour.city}
@@ -148,7 +164,7 @@ const TourCard = ({ tour, index }: TourCardProps) => {
                 with {tour.guideName}
               </span>
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:gap-2 transition-all">
-                View Tours <ArrowRight className="w-4 h-4" />
+                {tour.tourId ? "View Tour" : "View Guide"} <ArrowRight className="w-4 h-4" />
               </span>
             </div>
           </div>
