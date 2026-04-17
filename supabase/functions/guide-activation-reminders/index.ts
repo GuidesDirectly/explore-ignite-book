@@ -9,6 +9,11 @@ const corsHeaders = {
 const REMINDER_DAYS = [0, 3, 7, 14]; // Days after approval to send reminders
 const SUSPEND_AFTER_DAYS = 30;
 
+// Founding Guide free period end + warning windows
+const FOUNDING_FREE_UNTIL_ISO = "2026-12-31T23:59:59Z";
+const FOUNDING_30DAY_START_ISO = "2026-12-01T00:00:00Z";
+const FOUNDING_7DAY_START_ISO = "2026-12-24T00:00:00Z";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -23,6 +28,9 @@ serve(async (req) => {
     let expiringSoonSent = 0;
     let expiredCount = 0;
     let suspendedCount = 0;
+    let founding30daySent = 0;
+    let founding7daySent = 0;
+    let foundingExpiredCount = 0;
 
     // === JOB 1: Activation reminders for approved-but-inactive guides ===
     const { data: inactive } = await supabase
@@ -38,7 +46,6 @@ serve(async (req) => {
       const dueDate = new Date(baseDate.getTime() + REMINDER_DAYS[reminderIdx] * 24 * 60 * 60 * 1000);
 
       if (now < dueDate) continue;
-      // Don't double-send within 24h
       if (g.last_reminder_sent_at && now.getTime() - new Date(g.last_reminder_sent_at).getTime() < 24 * 60 * 60 * 1000) continue;
 
       const { data: authUser } = await supabase.auth.admin.getUserById(g.user_id);
@@ -91,7 +98,6 @@ serve(async (req) => {
       .gte("subscription_expires_at", now.toISOString());
 
     for (const g of expiringSoon || []) {
-      // Throttle: don't warn more than once per 48h
       if (g.last_reminder_sent_at && now.getTime() - new Date(g.last_reminder_sent_at).getTime() < 48 * 60 * 60 * 1000) continue;
 
       const { data: authUser } = await supabase.auth.admin.getUserById(g.user_id);
@@ -143,6 +149,94 @@ serve(async (req) => {
       expiredCount++;
     }
 
+    // === JOB 5: Founding Guide — 30-day warning (Dec 1 → Dec 23) ===
+    if (now >= new Date(FOUNDING_30DAY_START_ISO) && now < new Date(FOUNDING_7DAY_START_ISO)) {
+      const { data: founding } = await supabase
+        .from("guide_profiles")
+        .select("user_id, form_data, subscription_tier, last_reminder_sent_at")
+        .eq("activation_status", "active")
+        .eq("subscription_tier", "founding");
+
+      for (const g of founding || []) {
+        if (g.last_reminder_sent_at && now.getTime() - new Date(g.last_reminder_sent_at).getTime() < 7 * 24 * 60 * 60 * 1000) continue;
+        const { data: authUser } = await supabase.auth.admin.getUserById(g.user_id);
+        const email = authUser?.user?.email;
+        const fd: any = g.form_data || {};
+        const name = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "there";
+        if (email) {
+          await supabase.functions.invoke("send-notification", {
+            body: { type: "founding_30day_warning", data: { guideName: name, guideEmail: email, lockedPrice: 29 } },
+          });
+          await supabase
+            .from("guide_profiles")
+            .update({ last_reminder_sent_at: now.toISOString() })
+            .eq("user_id", g.user_id);
+          founding30daySent++;
+        }
+      }
+    }
+
+    // === JOB 6: Founding Guide — 7-day warning (Dec 24 → Dec 31) ===
+    if (now >= new Date(FOUNDING_7DAY_START_ISO) && now < new Date(FOUNDING_FREE_UNTIL_ISO)) {
+      const { data: founding } = await supabase
+        .from("guide_profiles")
+        .select("user_id, form_data, subscription_tier, last_reminder_sent_at")
+        .eq("activation_status", "active")
+        .eq("subscription_tier", "founding");
+
+      for (const g of founding || []) {
+        if (g.last_reminder_sent_at && now.getTime() - new Date(g.last_reminder_sent_at).getTime() < 2 * 24 * 60 * 60 * 1000) continue;
+        const { data: authUser } = await supabase.auth.admin.getUserById(g.user_id);
+        const email = authUser?.user?.email;
+        const fd: any = g.form_data || {};
+        const name = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "there";
+        if (email) {
+          await supabase.functions.invoke("send-notification", {
+            body: { type: "founding_7day_warning", data: { guideName: name, guideEmail: email, lockedPrice: 29 } },
+          });
+          await supabase
+            .from("guide_profiles")
+            .update({ last_reminder_sent_at: now.toISOString() })
+            .eq("user_id", g.user_id);
+          founding7daySent++;
+        }
+      }
+    }
+
+    // === JOB 7: Founding Guide expiry (Jan 1, 2027 onward) ===
+    if (now > new Date(FOUNDING_FREE_UNTIL_ISO)) {
+      const { data: foundingExpired } = await supabase
+        .from("guide_profiles")
+        .select("user_id, form_data, subscription_tier")
+        .eq("activation_status", "active")
+        .eq("subscription_tier", "founding")
+        .not("subscription_expires_at", "is", null)
+        .lt("subscription_expires_at", now.toISOString());
+
+      for (const g of foundingExpired || []) {
+        await supabase
+          .from("guide_profiles")
+          .update({
+            activation_status: "inactive",
+            subscription_status: "cancelled",
+            suspension_reason: "founding_period_expired",
+          })
+          .eq("user_id", g.user_id);
+
+        const { data: authUser } = await supabase.auth.admin.getUserById(g.user_id);
+        const email = authUser?.user?.email;
+        const fd: any = g.form_data || {};
+        const name = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "there";
+
+        if (email) {
+          await supabase.functions.invoke("send-notification", {
+            body: { type: "founding_expired", data: { guideName: name, guideEmail: email, lockedPrice: 29 } },
+          });
+        }
+        foundingExpiredCount++;
+      }
+    }
+
     return new Response(
       JSON.stringify({
         ok: true,
@@ -150,6 +244,9 @@ serve(async (req) => {
         expiringSoonSent,
         expiredCount,
         suspendedCount,
+        founding30daySent,
+        founding7daySent,
+        foundingExpiredCount,
         ranAt: now.toISOString(),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

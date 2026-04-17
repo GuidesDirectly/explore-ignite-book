@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { generateGuideSlug } from "@/lib/utils";
 import { MessageCircle, PlusCircle, Check } from "lucide-react";
 import type { BadgeType } from "@/components/GuideBadge";
+import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 
 interface GuideProfile {
   id: string;
@@ -26,28 +27,50 @@ const CREDENTIAL_MAP: Record<string, string> = {
 
 const MeetGuidesSection = () => {
   const navigate = useNavigate();
+  const { data: foundingProgram } = useFoundingProgram();
   const [guides, setGuides] = useState<GuideProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!foundingProgram) return;
+    const foundingPlanId = foundingProgram.foundingPlanId;
+    if (!foundingPlanId) {
+      setLoading(false);
+      return;
+    }
+
     const fetchGuides = async () => {
+      // 1. Get user_ids of all approved+active guides on the founding plan
+      const { data: foundingProfiles, error: fpError } = await supabase
+        .from("guide_profiles")
+        .select("user_id")
+        .eq("subscription_plan_id", foundingPlanId)
+        .eq("status", "approved")
+        .eq("activation_status", "active");
+
+      if (fpError || !foundingProfiles || foundingProfiles.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      const userIds = foundingProfiles.map((p: any) => p.user_id);
+
+      // 2. Fetch the public, sanitised projection for those users
       const { data: guideData, error } = await (supabase
         .from("guide_profiles_public" as any)
         .select("id, user_id, form_data, service_areas")
-        .in("id", [
-          "6f6e341e-b696-4c3f-80a8-ca64cc1be863",
-          "f38ded03-43a2-4238-8b9a-eecb620a2a9c"
-        ]) as any);
+        .in("user_id", userIds) as any);
 
       if (error || !guideData) {
         setLoading(false);
         return;
       }
 
-      // Fetch badges
+      // 3. Fetch badges
       const { data: badgeData } = await supabase
         .from("guide_badges" as any)
-        .select("guide_user_id, badge_type");
+        .select("guide_user_id, badge_type")
+        .in("guide_user_id", userIds);
       const badgeMap = new Map<string, BadgeType[]>();
       if (badgeData) {
         (badgeData as any[]).forEach((b: any) => {
@@ -67,7 +90,7 @@ const MeetGuidesSection = () => {
       setLoading(false);
     };
     fetchGuides();
-  }, []);
+  }, [foundingProgram]);
 
   const getInitials = (g: GuideProfile) => {
     const first = g.form_data.firstName?.[0] || "";

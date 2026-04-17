@@ -8,8 +8,10 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Free plan price ID — activates instantly without Stripe checkout
+// Founding plan price ID — activates instantly without Stripe checkout
 const FREE_PRICE_ID = "price_1TGrIRC1U7SmvwepwpRmbWkU";
+// Founding free-period end (UTC). Founding guides activate with this expiry.
+const FOUNDING_FREE_UNTIL = "2026-12-31T23:59:59Z";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -45,13 +47,31 @@ serve(async (req) => {
       );
     }
 
-    // ===== FREE PLAN BRANCH — instant activation, no Stripe =====
+    // ===== FOUNDING (FREE) PLAN BRANCH — instant activation, no Stripe =====
     if (price_id === FREE_PRICE_ID) {
+      // Look up founding plan UUID
       const { data: foundingPlan } = await supabase
         .from("subscription_plans")
         .select("id")
         .eq("slug", "founding")
         .maybeSingle();
+
+      // Atomically claim a founding spot. Throws 'founding_guide_limit_reached' if full.
+      let newCount: number | null = null;
+      try {
+        const { data: incData, error: incError } = await supabase.rpc("increment_founding_count");
+        if (incError) throw incError;
+        newCount = typeof incData === "number" ? incData : Number(incData);
+      } catch (e: any) {
+        const msg = String(e?.message || "");
+        if (msg.includes("founding_guide_limit_reached")) {
+          return new Response(
+            JSON.stringify({ error: "Founding Guide spots are full. Please choose Pro or Featured." }),
+            { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        throw e;
+      }
 
       const { error: updateError } = await supabase
         .from("guide_profiles")
@@ -61,7 +81,7 @@ serve(async (req) => {
           subscription_status: "active",
           subscription_plan_id: foundingPlan?.id ?? null,
           subscription_started_at: new Date().toISOString(),
-          subscription_expires_at: null,
+          subscription_expires_at: FOUNDING_FREE_UNTIL,
           payment_reminder_count: 0,
           suspension_reason: null,
         })
@@ -69,32 +89,53 @@ serve(async (req) => {
 
       if (updateError) {
         return new Response(
-          JSON.stringify({ error: `Failed to activate free plan: ${updateError.message}` }),
+          JSON.stringify({ error: `Failed to activate founding plan: ${updateError.message}` }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      // Look up email and fire activation notification
+      // Look up email
+      let guideEmail: string | undefined;
+      let guideName = "there";
       try {
         const { data: authUser } = await supabase.auth.admin.getUserById(guide_user_id);
-        const guideEmail = authUser?.user?.email;
+        guideEmail = authUser?.user?.email;
         const fd: any = guide.form_data || {};
-        const guideName = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "there";
+        guideName = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "there";
+      } catch (e) {
+        console.error("Failed to look up guide:", e);
+      }
 
-        if (guideEmail) {
+      // Send founding-guide welcome email
+      if (guideEmail) {
+        try {
           await supabase.functions.invoke("send-notification", {
             body: {
-              type: "guide_activated",
-              data: { guideName, guideEmail, tier: "Founding" },
+              type: "founding_guide_welcome",
+              data: { guideName, guideEmail, lockedPrice: 29 },
             },
           });
+        } catch (e) {
+          console.error("Failed to send founding welcome email:", e);
         }
-      } catch (e) {
-        console.error("Failed to send activation email:", e);
+      }
+
+      // If we just hit 50, alert the admin
+      if (newCount === 50) {
+        try {
+          await supabase.functions.invoke("send-notification", {
+            body: {
+              type: "founding_spots_filled",
+              data: { filledAt: new Date().toISOString() },
+            },
+          });
+        } catch (e) {
+          console.error("Failed to send founding-spots-filled admin alert:", e);
+        }
       }
 
       return new Response(
-        JSON.stringify({ free: true, redirect_url: success_url }),
+        JSON.stringify({ free: true, redirect_url: success_url, founding_count: newCount }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

@@ -27,6 +27,8 @@ import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import PasswordStrengthMeter, { isPasswordStrong } from "@/components/PasswordStrengthMeter";
 import { checkPasswordBreached } from "@/lib/hibp";
 import { scanFileForViruses } from "@/lib/scanUpload";
+import { useFoundingProgram } from "@/hooks/useFoundingProgram";
+import FoundingProgramBanner from "@/components/FoundingProgramBanner";
 
 
 // Service area presets now come from the shared destinations data
@@ -99,6 +101,7 @@ const STEPS = [
 const GuideRegister = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { data: foundingProgram } = useFoundingProgram();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [checkingBreach, setCheckingBreach] = useState(false);
@@ -492,6 +495,7 @@ const GuideRegister = () => {
     return (
       <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
         <div className="max-w-md w-full">
+          <FoundingProgramBanner program={foundingProgram} />
           {/* Bright white card */}
           <div className="bg-background rounded-2xl shadow-xl border border-border p-8">
             <div className="text-center mb-8">
@@ -617,6 +621,7 @@ const GuideRegister = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <FoundingProgramBanner program={foundingProgram} />
         {/* Step indicators */}
         <div className="flex items-center mb-10">
           {STEPS.map((step, idx) => {
