@@ -91,56 +91,74 @@ const GuidesPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [guidesRes, reviewsRes, toursRes] = await Promise.all([
-        supabase
+
+      // 1) Guides — must succeed independently. Failure here = empty list.
+      try {
+        const { data, error } = await supabase
           .from("guide_profiles_public")
           .select("id, user_id, form_data, service_areas, translations, status, created_at, is_spotlight")
-          .eq("status", "approved"),
-        supabase
+          .eq("status", "approved");
+        if (error) throw error;
+        if (data) setGuides(data as GuideProfile[]);
+      } catch (err) {
+        console.error("[GuidesPage] guides fetch failed:", err);
+      }
+
+      // 2) Founding ids — optional decoration
+      if (foundingProgram?.foundingPlanId) {
+        try {
+          const { data: founders } = await supabase
+            .from("guide_profiles")
+            .select("user_id")
+            .eq("subscription_plan_id", foundingProgram.foundingPlanId)
+            .eq("status", "approved")
+            .eq("activation_status", "active");
+          if (founders) setFoundingUserIds(new Set(founders.map((f: any) => f.user_id)));
+        } catch (err) {
+          console.warn("[GuidesPage] founding fetch failed (non-blocking):", err);
+        }
+      }
+
+      // 3) Reviews — optional decoration
+      try {
+        const { data: reviewsData } = await supabase
           .from("reviews_public")
-          .select("guide_user_id, rating"),
-        supabase
+          .select("guide_user_id, rating");
+        if (reviewsData) {
+          const stats: Record<string, ReviewStats> = {};
+          for (const r of reviewsData) {
+            if (!r.guide_user_id) continue;
+            if (!stats[r.guide_user_id]) {
+              stats[r.guide_user_id] = { guide_user_id: r.guide_user_id, count: 0, avg: 0 };
+            }
+            stats[r.guide_user_id].count++;
+            stats[r.guide_user_id].avg += (r.rating || 0);
+          }
+          for (const k of Object.keys(stats)) {
+            stats[k].avg = stats[k].count > 0 ? stats[k].avg / stats[k].count : 0;
+          }
+          setReviewStats(stats);
+        }
+      } catch (err) {
+        console.warn("[GuidesPage] reviews fetch failed (non-blocking):", err);
+      }
+
+      // 4) Tour counts — optional decoration
+      try {
+        const { data: toursData } = await supabase
           .from("tours")
           .select("guide_user_id")
-          .eq("status", "published"),
-      ]);
-
-      if (guidesRes.data) setGuides(guidesRes.data as GuideProfile[]);
-
-      // Founding-guide ids: query guide_profiles for matching plan + active state
-      if (foundingProgram?.foundingPlanId) {
-        const { data: founders } = await supabase
-          .from("guide_profiles")
-          .select("user_id")
-          .eq("subscription_plan_id", foundingProgram.foundingPlanId)
-          .eq("status", "approved")
-          .eq("activation_status", "active");
-        if (founders) setFoundingUserIds(new Set(founders.map((f: any) => f.user_id)));
-      }
-
-      if (reviewsRes.data) {
-        const stats: Record<string, ReviewStats> = {};
-        for (const r of reviewsRes.data) {
-          if (!r.guide_user_id) continue;
-          if (!stats[r.guide_user_id]) {
-            stats[r.guide_user_id] = { guide_user_id: r.guide_user_id, count: 0, avg: 0 };
+          .eq("status", "published");
+        if (toursData) {
+          const counts: Record<string, number> = {};
+          for (const row of toursData as any[]) {
+            if (!row.guide_user_id) continue;
+            counts[row.guide_user_id] = (counts[row.guide_user_id] || 0) + 1;
           }
-          stats[r.guide_user_id].count++;
-          stats[r.guide_user_id].avg += (r.rating || 0);
+          setTourCounts(counts);
         }
-        for (const k of Object.keys(stats)) {
-          stats[k].avg = stats[k].count > 0 ? stats[k].avg / stats[k].count : 0;
-        }
-        setReviewStats(stats);
-      }
-
-      if (toursRes.data) {
-        const counts: Record<string, number> = {};
-        for (const row of toursRes.data as any[]) {
-          if (!row.guide_user_id) continue;
-          counts[row.guide_user_id] = (counts[row.guide_user_id] || 0) + 1;
-        }
-        setTourCounts(counts);
+      } catch (err) {
+        console.warn("[GuidesPage] tours fetch failed (non-blocking):", err);
       }
 
       setLoading(false);
