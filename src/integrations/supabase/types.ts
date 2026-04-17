@@ -133,6 +133,7 @@ export type Database = {
           last_message_at: string
           traveler_email: string | null
           traveler_name: string
+          traveler_user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -141,6 +142,7 @@ export type Database = {
           last_message_at?: string
           traveler_email?: string | null
           traveler_name: string
+          traveler_user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -149,6 +151,7 @@ export type Database = {
           last_message_at?: string
           traveler_email?: string | null
           traveler_name?: string
+          traveler_user_id?: string | null
         }
         Relationships: []
       }
@@ -383,6 +386,7 @@ export type Database = {
           id: string
           is_read: boolean
           sender_type: string
+          sender_user_id: string | null
         }
         Insert: {
           content: string
@@ -391,6 +395,7 @@ export type Database = {
           id?: string
           is_read?: boolean
           sender_type?: string
+          sender_user_id?: string | null
         }
         Update: {
           content?: string
@@ -399,6 +404,7 @@ export type Database = {
           id?: string
           is_read?: boolean
           sender_type?: string
+          sender_user_id?: string | null
         }
         Relationships: [
           {
@@ -1038,7 +1044,6 @@ export type Database = {
       }
       reviews_public: {
         Row: {
-          booking_id: string | null
           comment: string | null
           created_at: string | null
           guide_user_id: string | null
@@ -1049,7 +1054,6 @@ export type Database = {
           translations: Json | null
         }
         Insert: {
-          booking_id?: string | null
           comment?: string | null
           created_at?: string | null
           guide_user_id?: string | null
@@ -1060,7 +1064,6 @@ export type Database = {
           translations?: Json | null
         }
         Update: {
-          booking_id?: string | null
           comment?: string | null
           created_at?: string | null
           guide_user_id?: string | null
@@ -1070,15 +1073,7 @@ export type Database = {
           reviewer_name?: string | null
           translations?: Json | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Functions: {
