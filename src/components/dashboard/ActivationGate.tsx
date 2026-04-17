@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loader2, Crown, Sparkles, Star, Check, AlertCircle, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 
 interface ActivationGateProps {
   userId: string;
@@ -37,6 +38,7 @@ const ActivationGate = ({ userId, children }: ActivationGateProps) => {
   const [state, setState] = useState<GateState | null>(null);
   const [plans, setPlans] = useState<PlanRow[]>([]);
   const [activating, setActivating] = useState<string | null>(null);
+  const { data: foundingProgram } = useFoundingProgram();
 
   useEffect(() => {
     const fetch = async () => {
@@ -100,9 +102,12 @@ const ActivationGate = ({ userId, children }: ActivationGateProps) => {
   }
 
   const isSuspendedNonPayment = state.activation_status === "suspended" && state.suspension_reason === "non_payment";
-  const isSuspendedOther = state.activation_status === "suspended" && state.suspension_reason !== "non_payment";
+  const isSuspendedOther = state.activation_status === "suspended" && state.suspension_reason !== "non_payment" && state.suspension_reason !== "founding_period_expired";
+  const isFoundingExpired =
+    state.subscription_tier === "founding" &&
+    foundingProgram?.isPastFreeUntil === true;
 
-  // Suspended for reasons other than non-payment → contact admin
+  // Suspended for reasons other than non-payment or founding expiry → contact admin
   if (isSuspendedOther) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#0A1628' }}>
@@ -119,6 +124,82 @@ const ActivationGate = ({ userId, children }: ActivationGateProps) => {
           >
             Contact Support
           </a>
+        </div>
+      </div>
+    );
+  }
+
+  // FOUNDING GUIDE whose free period has ended → locked $29/mo Pro upgrade
+  if (isFoundingExpired) {
+    const lockedPrice = foundingProgram?.lockedPrice ?? 29;
+    return (
+      <div className="min-h-screen py-12 px-4" style={{ backgroundColor: '#0A1628' }}>
+        <div className="max-w-lg mx-auto">
+          <div className="text-center mb-8">
+            <Crown className="w-12 h-12 mx-auto mb-4 text-[#C9A84C]" />
+            <h1 className="font-display text-3xl md:text-4xl font-bold mb-3" style={{ color: '#F5F0E8' }}>
+              Your free Founding Guide period has ended
+            </h1>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'rgba(255,255,255,0.7)' }}>
+              Thank you for being one of our first 50 guides. As a Founding Guide, your rate is{" "}
+              <strong className="text-[#C9A84C]">locked at ${lockedPrice}/mo forever</strong>{" "}
+              — that's permanent, even when others pay $59.
+            </p>
+          </div>
+
+          <div
+            className="rounded-2xl p-6"
+            style={{ backgroundColor: '#1A2F50', border: '1px solid rgba(201,168,76,0.3)' }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-5 h-5 text-[#C9A84C]" />
+              <h3 className="font-display text-xl font-bold" style={{ color: '#F5F0E8' }}>
+                Pro — Founding Guide Rate
+              </h3>
+            </div>
+            <div className="mb-5">
+              <span className="font-display text-5xl font-bold" style={{ color: '#F5F0E8' }}>
+                ${lockedPrice}
+              </span>
+              <span className="text-sm ml-1" style={{ color: 'rgba(255,255,255,0.65)' }}>/month</span>
+              <span
+                className="ml-3 inline-block rounded-full px-2 py-0.5 text-xs font-semibold"
+                style={{ backgroundColor: '#C9A84C', color: '#0A1628' }}
+              >
+                LOCKED FOREVER
+              </span>
+            </div>
+            <ul className="space-y-2 mb-6">
+              {[
+                "Visible in all traveler searches",
+                "Priority placement vs. inactive guides",
+                "Direct messaging with travelers",
+                "Zero commission on bookings",
+                "Your locked rate never increases",
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  <Check className="w-4 h-4 text-[#C9A84C] mt-0.5 flex-shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <Button
+              onClick={() => handleActivate("pro")}
+              disabled={!!activating}
+              className="w-full font-semibold border-none hover:opacity-90"
+              style={{ backgroundColor: '#C9A84C', color: '#0A1628' }}
+            >
+              {activating === "pro" ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Lock in ${lockedPrice}/mo — Continue as Pro
+            </Button>
+          </div>
+
+          <p className="text-center text-sm mt-8" style={{ color: 'rgba(255,255,255,0.55)' }}>
+            Questions? Contact{" "}
+            <a href="mailto:michael@iguidetours.net" className="text-[#C9A84C] hover:underline">
+              michael@iguidetours.net
+            </a>
+          </p>
         </div>
       </div>
     );
