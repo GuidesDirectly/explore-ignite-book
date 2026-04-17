@@ -1,40 +1,29 @@
 
 
-# Update ForGuidesSection Homepage Copy
+# Build Approved — Switching to Default Mode to Execute
 
-## What changes
-Update 12 text values in the `forGuides.section` group in `en.json` with stronger conversion-focused copy, then run the translation script for all 20 non-English locales.
+The plan is locked. I'm currently in plan mode (read-only) and cannot run migrations, deploy Edge Functions, or write files. Approving this plan switches me to default mode so I can execute Phases 1–7 in one continuous run.
 
-## Step 1 — Update `src/i18n/locales/en.json` (lines 734-746)
+## Execution order on approval
 
-Replace values only (keys unchanged):
+1. **Phase 1** — Migration: rename `subscription_plans` rows to Founding/Pro/Featured at $0/$29/$59 (name, slug, price_monthly only — no Stripe ID changes)
+2. **Phase 2** — Migration: add 7 activation columns to `guide_profiles`, index, backfill approved guides → `active` on Founding plan
+3. **🛑 PAUSE** — Run and show:
+   ```sql
+   SELECT COUNT(*), activation_status FROM guide_profiles GROUP BY activation_status;
+   ```
+   Wait for your "go" before Phase 3.
+4. **Phase 3** — Migration: drop + recreate `anon_can_view_approved_guides` and `authenticated_can_view_approved_guides` RLS policies to require `activation_status='active'`
+5. **Phase 4** — Email infra: `app_settings.notification_webhook_url`, `notify_email()` helper, 4 triggers (guide_profiles INSERT/UPDATE, bookings INSERT, inquiries INSERT); extend `send-notification` with 11 typed handlers; remove duplicate client-side invokes from 4 form components
+6. **Phase 5** — Activation system: update `guide-subscribe` (Free branch), `stripe-webhook` (set activation fields), create `guide-activation-reminders` (daily cron with reminders + expiry sweep + 30-day suspension)
+7. **Phase 6** — Frontend: `<ActivationGate />` (3 states), status badges in `GuideDashboard`, `<ActivationFunnel />` admin widget with MRR estimate
+8. **Phase 7** — Cron: `vault.create_secret('<YOUR_SERVICE_ROLE_KEY>', 'service_role_key', ...)` with replace-me comment, `app_settings` URL row, `cron.schedule('daily-activation-reminders', '0 9 * * *', ...)` reading key from `vault.decrypted_secrets`
 
-| Key | Old | New |
-|-----|-----|-----|
-| label | "For Guides" | "FOR TOUR GUIDES" |
-| title | "Work Directly With Travelers Worldwide" | "Own your clients. Keep every dollar." |
-| subtitle | "Keep your earnings..." | "The only platform where you keep 100% of what you earn — forever. No commission. No middlemen." |
-| costNote | "Joining is currently free..." | "Free forever for our first 50 founding guides." |
-| cta | "Apply to Join" | "Join as a Founding Guide — Free" |
-| feat1 | "Zero commissions — ever" | "Zero commission — ever" |
-| feat2 | "Global traveler audience" | "Your own Google profile page" |
-| feat3 | "Direct traveler relationships" | "Direct traveler relationships" (unchanged) |
-| whyEarlyTitle | "Why Join Early?" | "Why join as a Founding Guide?" |
-| early1 | "Priority visibility" | "Free forever — never changes" |
-| early2 | "Early traveler requests" | "First access to new cities" |
-| early3 | "Founding guide status" | "Founding Guide badge on profile" |
-| aiToolsNote | "Includes AI-powered business tools..." | "Includes AI Content Co-Pilot — write in 21 languages instantly." |
+## Reminders honored
+- Pause after Phase 2 with verification query — yes
+- `<YOUR_SERVICE_ROLE_KEY>` placeholder, never the real key in code — yes
+- No Header/Hero/design changes — yes
+- No Stripe price ID changes — yes
 
-## Step 2 — Run translation script
-
-Python script via `code--exec` translating only `forGuides.section.*` (13 keys) into all 20 non-English locale files using Lovable AI Gateway, merging into existing files.
-
-## Files modified
-- `src/i18n/locales/en.json` — 12 value updates in `forGuides.section`
-- 20 locale files — updated `forGuides.section` translations via script
-
-## No changes to
-- Any component files
-- Any styling or layout
-- Any other translation keys
+Approve to begin Phase 1.
 
