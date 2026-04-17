@@ -73,6 +73,7 @@ const GuidesPage = () => {
   const [guides, setGuides] = useState<GuideProfile[]>([]);
   const [foundingUserIds, setFoundingUserIds] = useState<Set<string>>(new Set());
   const [reviewStats, setReviewStats] = useState<Record<string, ReviewStats>>({});
+  const [tourCounts, setTourCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [cityFilter, setCityFilter] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
@@ -90,7 +91,7 @@ const GuidesPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [guidesRes, reviewsRes] = await Promise.all([
+      const [guidesRes, reviewsRes, toursRes] = await Promise.all([
         supabase
           .from("guide_profiles_public")
           .select("id, user_id, form_data, service_areas, translations, status, created_at, is_spotlight")
@@ -98,6 +99,10 @@ const GuidesPage = () => {
         supabase
           .from("reviews_public")
           .select("guide_user_id, rating"),
+        supabase
+          .from("tours")
+          .select("guide_user_id")
+          .eq("status", "published"),
       ]);
 
       if (guidesRes.data) setGuides(guidesRes.data as GuideProfile[]);
@@ -128,6 +133,16 @@ const GuidesPage = () => {
         }
         setReviewStats(stats);
       }
+
+      if (toursRes.data) {
+        const counts: Record<string, number> = {};
+        for (const row of toursRes.data as any[]) {
+          if (!row.guide_user_id) continue;
+          counts[row.guide_user_id] = (counts[row.guide_user_id] || 0) + 1;
+        }
+        setTourCounts(counts);
+      }
+
       setLoading(false);
     };
     fetchData();
