@@ -211,10 +211,13 @@ export type Database = {
       }
       guide_profiles: {
         Row: {
+          activation_status: string
           created_at: string
           current_step: number
           form_data: Json
           id: string
+          last_reminder_sent_at: string | null
+          payment_reminder_count: number
           service_areas: string[] | null
           status: string
           stripe_account_id: string | null
@@ -222,17 +225,24 @@ export type Database = {
           stripe_onboarding_complete: boolean | null
           stripe_subscription_id: string | null
           subscription_current_period_end: string | null
+          subscription_expires_at: string | null
+          subscription_plan_id: string | null
+          subscription_started_at: string | null
           subscription_status: string | null
           subscription_tier: string | null
+          suspension_reason: string | null
           translations: Json | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          activation_status?: string
           created_at?: string
           current_step?: number
           form_data?: Json
           id?: string
+          last_reminder_sent_at?: string | null
+          payment_reminder_count?: number
           service_areas?: string[] | null
           status?: string
           stripe_account_id?: string | null
@@ -240,17 +250,24 @@ export type Database = {
           stripe_onboarding_complete?: boolean | null
           stripe_subscription_id?: string | null
           subscription_current_period_end?: string | null
+          subscription_expires_at?: string | null
+          subscription_plan_id?: string | null
+          subscription_started_at?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
+          suspension_reason?: string | null
           translations?: Json | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          activation_status?: string
           created_at?: string
           current_step?: number
           form_data?: Json
           id?: string
+          last_reminder_sent_at?: string | null
+          payment_reminder_count?: number
           service_areas?: string[] | null
           status?: string
           stripe_account_id?: string | null
@@ -258,13 +275,25 @@ export type Database = {
           stripe_onboarding_complete?: boolean | null
           stripe_subscription_id?: string | null
           subscription_current_period_end?: string | null
+          subscription_expires_at?: string | null
+          subscription_plan_id?: string | null
+          subscription_started_at?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
+          suspension_reason?: string | null
           translations?: Json | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "guide_profiles_subscription_plan_id_fkey"
+            columns: ["subscription_plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       inquiries: {
         Row: {
