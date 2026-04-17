@@ -1085,6 +1085,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_founding_count: { Args: never; Returns: number }
       list_public_guide_profiles: {
         Args: never
         Returns: {
