@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -409,10 +409,17 @@ const Tours = () => {
               ))}
             </div>
           ) : sorted.length === 0 ? (
-            <div className="text-center py-20">
-              <Compass className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="font-display text-xl font-bold text-foreground mb-2">No tours found</h3>
-              <p className="text-muted-foreground">Try adjusting your search or filters.</p>
+            <div className="text-center py-20 max-w-md mx-auto">
+              <Compass className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="font-display text-2xl font-bold text-foreground mb-3">
+                Tours coming soon
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Our guides are setting up their tours. Browse our guides directly or check back soon.
+              </p>
+              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Link to="/guides">Browse Guides →</Link>
+              </Button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
