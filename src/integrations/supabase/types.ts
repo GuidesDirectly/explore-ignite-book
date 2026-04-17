@@ -594,13 +594,6 @@ export type Database = {
             referencedRelation: "guide_profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "saved_guides_guide_profile_id_fkey"
-            columns: ["guide_profile_id"]
-            isOneToOne: false
-            referencedRelation: "guide_profiles_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       subscription_plans: {
@@ -813,13 +806,6 @@ export type Database = {
             referencedRelation: "guide_profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "tours_guide_profile_id_fkey"
-            columns: ["guide_profile_id"]
-            isOneToOne: false
-            referencedRelation: "guide_profiles_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       traveler_profiles: {
@@ -1004,24 +990,6 @@ export type Database = {
           translations: Json | null
           user_id: string | null
         }
-        Insert: {
-          created_at?: string | null
-          form_data?: never
-          id?: string | null
-          service_areas?: string[] | null
-          status?: string | null
-          translations?: Json | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          form_data?: never
-          id?: string | null
-          service_areas?: string[] | null
-          status?: string | null
-          translations?: Json | null
-          user_id?: string | null
-        }
         Relationships: []
       }
       reviews_guide: {
@@ -1114,12 +1082,25 @@ export type Database = {
       }
     }
     Functions: {
+      get_public_guide_form_data: { Args: { _form_data: Json }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      list_public_guide_profiles: {
+        Args: never
+        Returns: {
+          created_at: string
+          form_data: Json
+          id: string
+          service_areas: string[]
+          status: string
+          translations: Json
+          user_id: string
+        }[]
       }
       notify_email: {
         Args: { event_type: string; payload: Json }
