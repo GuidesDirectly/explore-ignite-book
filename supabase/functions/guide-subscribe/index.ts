@@ -8,6 +8,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Free plan price ID — activates instantly without Stripe checkout
+const FREE_PRICE_ID = "price_1TGrIRC1U7SmvwepwpRmbWkU";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -23,7 +26,6 @@ serve(async (req) => {
       );
     }
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -32,7 +34,7 @@ serve(async (req) => {
     // Verify guide exists
     const { data: guide, error: guideError } = await supabase
       .from("guide_profiles")
-      .select("id, stripe_customer_id, user_id")
+      .select("id, stripe_customer_id, user_id, form_data")
       .eq("user_id", guide_user_id)
       .maybeSingle();
 
@@ -43,11 +45,65 @@ serve(async (req) => {
       );
     }
 
-    // Get or create Stripe customer
+    // ===== FREE PLAN BRANCH — instant activation, no Stripe =====
+    if (price_id === FREE_PRICE_ID) {
+      const { data: foundingPlan } = await supabase
+        .from("subscription_plans")
+        .select("id")
+        .eq("slug", "founding")
+        .maybeSingle();
+
+      const { error: updateError } = await supabase
+        .from("guide_profiles")
+        .update({
+          activation_status: "active",
+          subscription_tier: "founding",
+          subscription_status: "active",
+          subscription_plan_id: foundingPlan?.id ?? null,
+          subscription_started_at: new Date().toISOString(),
+          subscription_expires_at: null,
+          payment_reminder_count: 0,
+          suspension_reason: null,
+        })
+        .eq("user_id", guide_user_id);
+
+      if (updateError) {
+        return new Response(
+          JSON.stringify({ error: `Failed to activate free plan: ${updateError.message}` }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Look up email and fire activation notification
+      try {
+        const { data: authUser } = await supabase.auth.admin.getUserById(guide_user_id);
+        const guideEmail = authUser?.user?.email;
+        const fd: any = guide.form_data || {};
+        const guideName = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "there";
+
+        if (guideEmail) {
+          await supabase.functions.invoke("send-notification", {
+            body: {
+              type: "guide_activated",
+              data: { guideName, guideEmail, tier: "Founding" },
+            },
+          });
+        }
+      } catch (e) {
+        console.error("Failed to send activation email:", e);
+      }
+
+      return new Response(
+        JSON.stringify({ free: true, redirect_url: success_url }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ===== PAID PLAN BRANCH — Stripe Checkout =====
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
     let customerId = guide.stripe_customer_id;
 
     if (!customerId) {
-      // Get guide's email from auth.users
       const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(guide_user_id);
 
       if (authError || !authUser?.user?.email) {
@@ -64,14 +120,12 @@ serve(async (req) => {
 
       customerId = customer.id;
 
-      // Save customer ID to guide_profiles
       await supabase
         .from("guide_profiles")
         .update({ stripe_customer_id: customerId })
         .eq("user_id", guide_user_id);
     }
 
-    // Create Stripe Checkout Session for subscription
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,

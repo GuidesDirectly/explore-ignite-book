@@ -60,4 +60,10 @@ verify_jwt = false
 [functions.translate-i18n-keys]
 verify_jwt = true
 
+[functions.guide-subscribe]
+verify_jwt = false
+
+[functions.guide-activation-reminders]
+verify_jwt = false
+
 

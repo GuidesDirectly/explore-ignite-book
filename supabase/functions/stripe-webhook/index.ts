@@ -104,20 +104,60 @@ serve(async (req) => {
           return "founding";
         })();
 
-        const status = subscription.status === "active" || subscription.status === "trialing" ? "active" : "past_due";
+        const isActive = subscription.status === "active" || subscription.status === "trialing";
+        const status = isActive ? "active" : "past_due";
+        const periodEnd = new Date(subscription.current_period_end * 1000).toISOString();
 
-        const { error } = await supabase
+        // Look up plan UUID for activation_status linkage
+        const { data: planRow } = await supabase
+          .from("subscription_plans")
+          .select("id")
+          .eq("slug", tier)
+          .maybeSingle();
+
+        const updatePayload: Record<string, any> = {
+          subscription_status: status,
+          subscription_tier: tier,
+          stripe_subscription_id: subscription.id,
+          subscription_current_period_end: periodEnd,
+          subscription_expires_at: periodEnd,
+          subscription_plan_id: planRow?.id ?? null,
+        };
+
+        if (isActive) {
+          updatePayload.activation_status = "active";
+          updatePayload.subscription_started_at = new Date(subscription.start_date * 1000).toISOString();
+          updatePayload.payment_reminder_count = 0;
+          updatePayload.suspension_reason = null;
+        }
+
+        const { data: prevProfile, error } = await supabase
           .from("guide_profiles")
-          .update({
-            subscription_status: status,
-            subscription_tier: tier,
-            stripe_subscription_id: subscription.id,
-            subscription_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-          })
-          .eq("user_id", guideUserId);
+          .update(updatePayload)
+          .eq("user_id", guideUserId)
+          .select("activation_status, form_data")
+          .maybeSingle();
 
         if (error) console.error(`Failed to update subscription for ${guideUserId}:`, error);
-        else console.log(`Subscription ${event.type} processed for guide ${guideUserId}, tier: ${tier}`);
+        else {
+          console.log(`Subscription ${event.type} processed for guide ${guideUserId}, tier: ${tier}`);
+          // Fire guide_activated email when transitioning to active
+          if (isActive && event.type === "customer.subscription.created") {
+            try {
+              const { data: authUser } = await supabase.auth.admin.getUserById(guideUserId);
+              const email = authUser?.user?.email;
+              const fd: any = prevProfile?.form_data || {};
+              const name = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "there";
+              if (email) {
+                await supabase.functions.invoke("send-notification", {
+                  body: { type: "guide_activated", data: { guideName: name, guideEmail: email, tier } },
+                });
+              }
+            } catch (e) {
+              console.error("Failed to send guide_activated email:", e);
+            }
+          }
+        }
       }
     }
 
@@ -126,13 +166,33 @@ serve(async (req) => {
       const guideUserId = subscription.metadata?.guide_user_id;
 
       if (guideUserId) {
-        const { error } = await supabase
+        const { data: prev, error } = await supabase
           .from("guide_profiles")
-          .update({ subscription_status: "cancelled", subscription_tier: "founding" })
-          .eq("user_id", guideUserId);
+          .update({
+            subscription_status: "cancelled",
+            subscription_tier: "founding",
+            activation_status: "inactive",
+            suspension_reason: "subscription_cancelled",
+          })
+          .eq("user_id", guideUserId)
+          .select("form_data")
+          .maybeSingle();
 
         if (error) console.error(`Failed to cancel subscription for ${guideUserId}:`, error);
-        else console.log(`Subscription cancelled for guide ${guideUserId}`);
+        else {
+          console.log(`Subscription cancelled for guide ${guideUserId}`);
+          try {
+            const { data: authUser } = await supabase.auth.admin.getUserById(guideUserId);
+            const email = authUser?.user?.email;
+            const fd: any = prev?.form_data || {};
+            const name = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "there";
+            if (email) {
+              await supabase.functions.invoke("send-notification", {
+                body: { type: "subscription_expired", data: { guideName: name, guideEmail: email, tier: "Pro/Featured" } },
+              });
+            }
+          } catch (e) { console.error("Failed to send expired email:", e); }
+        }
       }
     }
 
@@ -158,7 +218,12 @@ serve(async (req) => {
       if (customerId) {
         const { error } = await supabase
           .from("guide_profiles")
-          .update({ subscription_status: "active" })
+          .update({
+            subscription_status: "active",
+            activation_status: "active",
+            payment_reminder_count: 0,
+            suspension_reason: null,
+          })
           .eq("stripe_customer_id", customerId);
 
         if (error) console.error(`Failed to set active for customer ${customerId}:`, error);
