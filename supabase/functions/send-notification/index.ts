@@ -27,14 +27,14 @@ const corsHeaders = {
 const NOTIFY_EMAIL = "michael@iguidetours.net";
 
 interface NotificationRequest {
-  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request" | "profile_reminder";
+  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request" | "profile_reminder" | "guide_activated" | "activation_reminder" | "subscription_expiring_soon" | "subscription_expired";
   data: Record<string, unknown>;
 }
 
-const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request", "profile_reminder"]);
+const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request", "profile_reminder", "guide_activated", "activation_reminder", "subscription_expiring_soon", "subscription_expired"]);
 
-// Notification types that can be sent without authentication (public forms)
-const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request", "review_request", "profile_reminder"]);
+// Notification types that can be sent without authentication (public forms + DB-triggered events)
+const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request", "review_request", "profile_reminder", "guide_activated", "activation_reminder", "subscription_expiring_soon", "subscription_expired"]);
 // Notification types that require authentication
 const AUTH_TYPES = new Set(["guide_status", "guide_application", "booking_status"]);
 
@@ -692,6 +692,65 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           <div style="padding:20px;text-align:center;background:#0A1628;">
             <p style="color:#8a8fa0;font-size:11px;margin:0;letter-spacing:1px;">Guides Directly by iGuide Tours — Premium Private Tours</p>
+          </div>
+        </div>
+      `;
+      toEmails = [guideEmail];
+    } else if (type === "guide_activated" || type === "activation_reminder" || type === "subscription_expiring_soon" || type === "subscription_expired") {
+      const guideName = String(data.guideName || "there");
+      const guideEmail = data.guideEmail as string | undefined;
+      const tier = String(data.tier || "Founding");
+      const dashboardUrl = "https://iguidetours.net/guide-dashboard";
+
+      if (!guideEmail) throw new Error("guideEmail is required");
+
+      const titles: Record<string, string> = {
+        guide_activated: `You're live on Guides Directly — welcome, ${escapeHtml(guideName)}`,
+        activation_reminder: `Activate your Guides Directly profile to be visible to travelers`,
+        subscription_expiring_soon: `Your GuidesDirectly subscription expires in 7 days`,
+        subscription_expired: `Your Guides Directly profile has been deactivated`,
+      };
+
+      const headlines: Record<string, string> = {
+        guide_activated: `Your ${escapeHtml(tier)} plan is now active.`,
+        activation_reminder: `Your profile is approved but not yet visible to travelers.`,
+        subscription_expiring_soon: `Your subscription renews — or expires — soon.`,
+        subscription_expired: `Your profile is no longer visible to travelers.`,
+      };
+
+      const bodies: Record<string, string> = {
+        guide_activated: `Travelers searching in your city can now find you, message you directly, and book your tours. No commission. Ever.`,
+        activation_reminder: `Choose a plan to make your profile live. Founding guides stay free forever — no card required.`,
+        subscription_expiring_soon: `Your profile will be hidden from travelers in 7 days. Renew now to stay visible without interruption.`,
+        subscription_expired: `Your subscription has ended and your profile is hidden from search. Reactivate anytime to restore visibility — your data is safe.`,
+      };
+
+      const ctaLabel: Record<string, string> = {
+        guide_activated: "Open Your Dashboard →",
+        activation_reminder: "Activate My Profile →",
+        subscription_expiring_soon: "Renew Subscription →",
+        subscription_expired: "Reactivate My Profile →",
+      };
+
+      subject = titles[type];
+      html = `
+        <div style="font-family:'Georgia','Times New Roman',serif;max-width:600px;margin:0 auto;">
+          <div style="background:#0A1628;padding:32px 40px;text-align:center;">
+            <h1 style="color:#ffffff;margin:0;font-size:26px;letter-spacing:1px;">GuidesDirectly</h1>
+            <p style="color:rgba(255,255,255,0.5);margin:6px 0 0;font-size:12px;">by iGuide Tours</p>
+          </div>
+          <div style="padding:40px;background:#ffffff;">
+            <h2 style="color:#0A1628;font-size:22px;margin:0 0 20px;">Hi ${escapeHtml(guideName)},</h2>
+            <p style="color:#333333;line-height:1.7;font-size:17px;margin:0 0 16px;"><strong>${headlines[type]}</strong></p>
+            <p style="color:#333333;line-height:1.7;font-size:16px;">${bodies[type]}</p>
+            <div style="text-align:center;margin:30px 0 10px;">
+              <a href="${dashboardUrl}" style="display:inline-block;background:#C9A84C;color:#0A1628;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">${ctaLabel[type]}</a>
+            </div>
+            <p style="color:#666;font-size:14px;margin-top:24px;">Questions? Reply to this email or call <strong>+1 (202) 243-8336</strong>.</p>
+            <p style="color:#333333;font-size:15px;margin-top:24px;">— The Guides Directly Team</p>
+          </div>
+          <div style="padding:20px;text-align:center;background:#F5F5F5;">
+            <p style="color:#999999;font-size:12px;margin:0;line-height:1.6;">© 2025–2026 Guides Directly, powered by iGuide Tours<br/>Bethesda, MD · +1 (202) 243-8336</p>
           </div>
         </div>
       `;
