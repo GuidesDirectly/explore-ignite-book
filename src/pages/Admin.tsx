@@ -80,6 +80,17 @@ interface TourPlan {
   updated_at: string;
 }
 
+interface PublishedTour {
+  id: string;
+  title: string;
+  status: string;
+  view_count: number;
+  inquiry_count: number;
+  created_at: string;
+  guide_user_id: string;
+  guideName?: string;
+}
+
 const Admin = () => {
   const { data: foundingProgram } = useFoundingProgram();
   const [email, setEmail] = useState("");
@@ -87,11 +98,12 @@ const Admin = () => {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours" | "verification">("inquiries");
+  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours" | "published_tours" | "verification">("inquiries");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [guides, setGuides] = useState<GuideApplication[]>([]);
   const [tourPlans, setTourPlans] = useState<TourPlan[]>([]);
+  const [publishedTours, setPublishedTours] = useState<PublishedTour[]>([]);
   const [expandedGuide, setExpandedGuide] = useState<string | null>(null);
   const [editingGuide, setEditingGuide] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<GuideApplication["form_data"] | null>(null);
