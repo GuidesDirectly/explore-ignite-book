@@ -140,7 +140,87 @@ const ActivationFunnel = () => {
         </Button>
       </div>
 
-      {/* Stats grid */}
+      {/* Founding Guide program */}
+      {foundingProgram && (() => {
+        const claimed = foundingProgram.currentCount;
+        const lim = foundingProgram.limit;
+        const remaining = foundingProgram.remaining;
+        const freeUntilDate = new Date(foundingProgram.freeUntil + "T23:59:59Z");
+        const daysLeft = Math.max(0, Math.ceil((freeUntilDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+        const freeUntilLabel = freeUntilDate.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+        const pct = Math.min(100, Math.round((claimed / Math.max(1, lim)) * 100));
+
+        return (
+          <div className="rounded-xl p-4 space-y-4" style={{ background: "linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04))", border: "1px solid rgba(201,168,76,0.3)" }}>
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <h3 className="font-display text-lg font-bold flex items-center gap-2" style={{ color: '#F5F0E8' }}>
+                <Crown className="w-5 h-5 text-[#C9A84C]" />
+                Founding Guide Program
+              </h3>
+              <span className="text-xs uppercase tracking-wide font-semibold" style={{ color: '#C9A84C' }}>
+                {remaining} spots remaining
+              </span>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs mb-1.5" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                <span>{claimed} of {lim} claimed</span>
+                <span>{pct}%</span>
+              </div>
+              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
+                <div className="h-full transition-all" style={{ width: `${pct}%`, backgroundColor: '#C9A84C' }} />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              <Clock className="w-4 h-4 text-[#C9A84C]" />
+              {daysLeft > 0 ? (
+                <span>Free period ends in <strong>{daysLeft} days</strong> ({freeUntilLabel})</span>
+              ) : (
+                <span>Free period ended on {freeUntilLabel}</span>
+              )}
+            </div>
+
+            <Collapsible open={foundingOpen} onOpenChange={setFoundingOpen}>
+              <CollapsibleTrigger asChild>
+                <button
+                  className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+                  style={{ backgroundColor: 'rgba(0,0,0,0.25)', color: '#F5F0E8' }}
+                >
+                  <span>Founding guides ({foundingGuides.length})</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${foundingOpen ? "rotate-180" : ""}`} />
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-2">
+                {foundingGuides.length === 0 ? (
+                  <p className="text-sm px-3 py-2" style={{ color: 'rgba(255,255,255,0.55)' }}>No founding guides yet.</p>
+                ) : (
+                  <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                    {foundingGuides.map((g) => {
+                      const fd = g.form_data || {};
+                      const name = `${fd.firstName || ""} ${fd.lastName || ""}`.trim() || "Unnamed";
+                      const updated = g.updated_at ? new Date(g.updated_at).toLocaleDateString() : "—";
+                      return (
+                        <div key={g.user_id} className="flex items-center justify-between gap-3 rounded-md px-3 py-2" style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{name}</span>
+                            <FoundingGuideBadge size="sm" />
+                          </div>
+                          <div className="flex items-center gap-3 text-xs flex-shrink-0" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                            <span className="capitalize">{g.activation_status}</span>
+                            <span>{updated}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+        );
+      })()}
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(201,168,76,0.05)', border: '1px solid rgba(201,168,76,0.15)' }}>
           <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>Active (free)</p>
