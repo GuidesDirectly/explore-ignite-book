@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Globe, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DestinationsModal from "@/components/DestinationsModal";
+import SEO from "@/components/seo/SEO";
 
 import nycImg from "@/assets/city-cards/nyc.jpg";
 import phillyImg from "@/assets/city-cards/philadelphia.jpg";
@@ -119,6 +120,11 @@ const ExploreCities = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Explore Cities & Destinations — Private Tour Guides Worldwide | GuidesDirectly"
+        description="Discover guides in 150+ destinations across the globe. Book directly, zero commission, zero booking fees."
+        canonical="https://iguidetours.net/explore"
+      />
       {/* Header */}
       <header className="bg-secondary border-b border-border px-6 py-4">
         <div className="container mx-auto flex items-center justify-between">

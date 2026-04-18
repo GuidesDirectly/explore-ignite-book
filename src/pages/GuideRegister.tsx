@@ -23,6 +23,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import logoImg from "@/assets/logo.jpg";
+import SEO from "@/components/seo/SEO";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import PasswordStrengthMeter, { isPasswordStrong } from "@/components/PasswordStrengthMeter";
 import { checkPasswordBreached } from "@/lib/hibp";
@@ -603,6 +604,11 @@ const GuideRegister = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Register as a Tour Guide — Founding Member Free | GuidesDirectly"
+        description="Register as a founding tour guide on GuidesDirectly. Free until 2027, keep 100% of every booking, zero commission, zero platform fees."
+        canonical="https://iguidetours.net/guide-register"
+      />
       {/* Header */}
       <header className="border-b border-border px-6 py-4 flex items-center justify-between bg-card">
         <div className="flex items-center gap-3">

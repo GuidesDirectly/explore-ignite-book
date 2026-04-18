@@ -15,6 +15,7 @@ import TrustSection from "@/components/TrustSection";
 import FinalCtaSection from "@/components/FinalCtaSection";
 import InquirySection from "@/components/InquirySection";
 import Footer from "@/components/Footer";
+import SEO from "@/components/seo/SEO";
 import { Sparkles } from "lucide-react";
 
 const Home = () => {
@@ -40,6 +41,13 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="GuidesDirectly — Book Private Tour Guides Directly | Zero Commission"
+        description="Connect directly with licensed local tour guides. No booking fees, no commission markup, no middlemen. Washington DC, Chicago, Los Angeles and more. Keep 100% of what you pay with your guide."
+        keywords="private tour guide, local tour guide, book tour guide directly, no commission tours, Washington DC tour guide, Chicago tour guide"
+        canonical="https://iguidetours.net/home"
+        ogUrl="https://iguidetours.net"
+      />
       <Navbar />
 
       {/* Section 1 — Hero */}

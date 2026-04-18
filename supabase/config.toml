@@ -66,4 +66,7 @@ verify_jwt = false
 [functions.guide-activation-reminders]
 verify_jwt = false
 
+[functions.generate-sitemap]
+verify_jwt = false
+
 
