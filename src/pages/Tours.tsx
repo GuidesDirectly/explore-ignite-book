@@ -65,9 +65,12 @@ const Tours = () => {
 
   useEffect(() => {
     const fetchTours = async () => {
-      const { data: guideData } = await supabase
+      const { data: guideData, error: guideErr } = await supabase
         .from("guide_profiles_public")
-        .select("id, user_id, form_data, service_areas, translations, created_at, is_spotlight");
+        .select("*");
+
+      if (guideErr) console.error("[Tours] Guides fetch error:", guideErr);
+      console.log("[Tours] Guides data:", guideData?.length ?? 0, "rows");
 
       if (!guideData) {
         setLoading(false);
