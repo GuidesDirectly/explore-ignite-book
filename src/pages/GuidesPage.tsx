@@ -93,12 +93,16 @@ const GuidesPage = () => {
       setLoading(true);
 
       // 1) Guides — must succeed independently. Failure here = empty list.
+      // View already filters approved+active rows, so no extra .eq() needed.
       try {
         const { data, error } = await supabase
           .from("guide_profiles_public")
-          .select("id, user_id, form_data, service_areas, translations, status, created_at, is_spotlight")
-          .eq("status", "approved");
-        if (error) throw error;
+          .select("*");
+        if (error) {
+          console.error("[GuidesPage] Guides fetch error:", error);
+          throw error;
+        }
+        console.log("[GuidesPage] Guides data:", data?.length ?? 0, "rows");
         if (data) setGuides(data as GuideProfile[]);
       } catch (err) {
         console.error("[GuidesPage] guides fetch failed:", err);
