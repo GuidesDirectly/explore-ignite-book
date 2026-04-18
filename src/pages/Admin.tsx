@@ -3,8 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye, UserCheck, CheckCircle, XCircle, Globe, Briefcase, Map, DollarSign, Clock, Pencil, Save, X, ShieldCheck } from "lucide-react";
+import { Star, Trash2, LogOut, Mail, Phone, MapPin, Calendar, Users, MessageSquare, BarChart3, EyeOff, Eye, UserCheck, CheckCircle, XCircle, Globe, Briefcase, Map, DollarSign, Clock, Pencil, Save, X, ShieldCheck, LineChart } from "lucide-react";
 import VerificationDashboard from "@/components/dashboard/VerificationDashboard";
+import AnalyticsDashboard from "@/components/admin/AnalyticsDashboard";
 import UnservedDestinationsWidget from "@/components/dashboard/UnservedDestinationsWidget";
 import ActivationFunnel from "@/components/dashboard/ActivationFunnel";
 import { Textarea } from "@/components/ui/textarea";
@@ -98,7 +99,7 @@ const Admin = () => {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours" | "published_tours" | "verification">("inquiries");
+  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours" | "published_tours" | "verification" | "analytics">("inquiries");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [guides, setGuides] = useState<GuideApplication[]>([]);
@@ -782,7 +783,16 @@ const Admin = () => {
           >
             <ShieldCheck className="w-4 h-4 mr-2" /> Verification
           </Button>
+          <Button
+            variant={tab === "analytics" ? "default" : "outline"}
+            onClick={() => setTab("analytics")}
+          >
+            <LineChart className="w-4 h-4 mr-2" /> Analytics
+          </Button>
         </div>
+
+        {/* Analytics Tab */}
+        {tab === "analytics" && <AnalyticsDashboard />}
 
         {/* Inquiries Tab */}
         {tab === "inquiries" && (
