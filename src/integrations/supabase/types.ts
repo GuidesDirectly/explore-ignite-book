@@ -848,16 +848,21 @@ export type Database = {
       }
       traveler_profiles: {
         Row: {
+          avatar_url: string | null
           budget_preference: string | null
           children_ages: string | null
+          country: string | null
           created_at: string
           dietary_restrictions: string[] | null
+          first_name: string | null
           group_type: string | null
           has_children: boolean | null
           id: string
           interests: string[] | null
+          last_name: string | null
           mobility_needs: string | null
           notes: string | null
+          onboarding_complete: boolean
           pace: string | null
           preferred_languages: string[] | null
           previous_destinations: string[] | null
@@ -866,16 +871,21 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
           budget_preference?: string | null
           children_ages?: string | null
+          country?: string | null
           created_at?: string
           dietary_restrictions?: string[] | null
+          first_name?: string | null
           group_type?: string | null
           has_children?: boolean | null
           id?: string
           interests?: string[] | null
+          last_name?: string | null
           mobility_needs?: string | null
           notes?: string | null
+          onboarding_complete?: boolean
           pace?: string | null
           preferred_languages?: string[] | null
           previous_destinations?: string[] | null
@@ -884,16 +894,21 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
           budget_preference?: string | null
           children_ages?: string | null
+          country?: string | null
           created_at?: string
           dietary_restrictions?: string[] | null
+          first_name?: string | null
           group_type?: string | null
           has_children?: boolean | null
           id?: string
           interests?: string[] | null
+          last_name?: string | null
           mobility_needs?: string | null
           notes?: string | null
+          onboarding_complete?: boolean
           pace?: string | null
           preferred_languages?: string[] | null
           previous_destinations?: string[] | null

@@ -4,6 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 export interface TravelerProfile {
   id?: string;
   user_id?: string;
+  first_name: string;
+  last_name: string;
+  country: string;
+  avatar_url: string;
+  onboarding_complete: boolean;
   travel_style: string;
   pace: string;
   budget_preference: string;
@@ -19,6 +24,11 @@ export interface TravelerProfile {
 }
 
 const DEFAULT_PROFILE: TravelerProfile = {
+  first_name: "",
+  last_name: "",
+  country: "",
+  avatar_url: "",
+  onboarding_complete: false,
   travel_style: "balanced",
   pace: "moderate",
   budget_preference: "flexible",
@@ -55,7 +65,7 @@ export function useTravelerProfile() {
         .maybeSingle();
 
       if (data) {
-        setProfile(data as unknown as TravelerProfile);
+        setProfile({ ...DEFAULT_PROFILE, ...(data as any) } as TravelerProfile);
       }
       setLoading(false);
     };
@@ -69,6 +79,11 @@ export function useTravelerProfile() {
 
     const payload = {
       user_id: userId,
+      first_name: merged.first_name,
+      last_name: merged.last_name,
+      country: merged.country,
+      avatar_url: merged.avatar_url,
+      onboarding_complete: merged.onboarding_complete,
       travel_style: merged.travel_style,
       pace: merged.pace,
       budget_preference: merged.budget_preference,
@@ -95,7 +110,7 @@ export function useTravelerProfile() {
     return false;
   }, [userId, profile]);
 
-  return { profile, setProfile, loading, saving, save, isLoggedIn: !!userId };
+  return { profile, setProfile, loading, saving, save, isLoggedIn: !!userId, userId };
 }
 
 /** Build a text summary of the profile for AI prompt injection */
