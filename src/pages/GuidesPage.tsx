@@ -11,6 +11,14 @@ import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 import dcImg from "@/assets/hero-dc.jpg";
 import chicagoImg from "@/assets/city-cards/chicago.jpg";
 
+const FALLBACK_GUIDES: GuideProfile[] = [
+  { id: "fb-1", user_id: "9e45dba8-e862-41c5-8297-8a2288cfa5f6", form_data: { firstName: "Farmers", lastName: "Gregory" }, service_areas: ["USA"], translations: null, status: "approved", created_at: null, is_spotlight: false },
+  { id: "fb-2", user_id: "16875139-1ef8-4aa1-bc7a-8c36cc36f6cc", form_data: { firstName: "Eduard", lastName: "Shevchenko" }, service_areas: ["Los Angeles"], translations: null, status: "approved", created_at: null, is_spotlight: false },
+  { id: "fb-3", user_id: "26477b85-de16-4946-935a-f6e238a0fd8d", form_data: { firstName: "Michael", lastName: "Zlotnitsky" }, service_areas: ["Washington DC"], translations: null, status: "approved", created_at: null, is_spotlight: true },
+  { id: "fb-4", user_id: "275f9fe7-e307-4c8a-95d4-2bf81757f63e", form_data: { firstName: "Mike", lastName: "McMains" }, service_areas: ["Chicago"], translations: null, status: "approved", created_at: null, is_spotlight: false },
+  { id: "fb-5", user_id: "31469d25-ad00-4309-b62d-63a2cc9a461c", form_data: { firstName: "Americo", lastName: "Fernandes" }, service_areas: ["Cape Verde"], translations: null, status: "approved", created_at: null, is_spotlight: false },
+];
+
 const LANGUAGE_FLAGS: Record<string, string> = {
   English: "🇺🇸",
   "Русский": "🇷🇺",
@@ -78,6 +86,9 @@ const GuidesPage = () => {
   const [cityFilter, setCityFilter] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("recommended");
+  const [fetchStatus, setFetchStatus] = useState<"ok" | "error" | "empty" | "pending">("pending");
+  const [fetchError, setFetchError] = useState<string>("");
+  const [rowCount, setRowCount] = useState<number>(0);
 
   useEffect(() => {
     document.title = "Find Local Tour Guides | Guides Directly";
@@ -93,19 +104,29 @@ const GuidesPage = () => {
       setLoading(true);
 
       // 1) Guides — must succeed independently. Failure here = empty list.
-      // View already filters approved+active rows, so no extra .eq() needed.
+      console.log("[GuidesPage] Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
       try {
         const { data, error } = await supabase
           .from("guide_profiles_public")
           .select("*");
         if (error) {
           console.error("[GuidesPage] Guides fetch error:", error);
+          setFetchStatus("error");
+          setFetchError(error.message || String(error));
           throw error;
         }
         console.log("[GuidesPage] Guides data:", data?.length ?? 0, "rows");
-        if (data) setGuides(data as GuideProfile[]);
-      } catch (err) {
+        setRowCount(data?.length ?? 0);
+        if (data && data.length > 0) {
+          setGuides(data as GuideProfile[]);
+          setFetchStatus("ok");
+        } else {
+          setFetchStatus("empty");
+        }
+      } catch (err: any) {
         console.error("[GuidesPage] guides fetch failed:", err);
+        setFetchStatus("error");
+        setFetchError(err?.message || String(err));
       }
 
       // 2) Founding ids — optional decoration
