@@ -104,7 +104,6 @@ const GuidesPage = () => {
       setLoading(true);
 
       // 1) Guides — must succeed independently. Failure here = empty list.
-      console.log("[GuidesPage] Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
       try {
         const { data, error } = await supabase
           .from("guide_profiles_public")
@@ -242,7 +241,6 @@ const GuidesPage = () => {
 
   const usingFallback = !loading && fetchStatus !== "ok" && guides.length === 0;
   const displayList = usingFallback ? FALLBACK_GUIDES : filtered;
-  const supabaseHost = (import.meta.env.VITE_SUPABASE_URL || "").replace(/^https?:\/\//, "").split(".")[0];
 
   return (
     <div style={{ background: "#0A1628" }} className="min-h-screen">
@@ -273,22 +271,6 @@ const GuidesPage = () => {
         </div>
       </section>
 
-      {/* Diagnostic strip */}
-      {!loading && (
-        <div
-          className="container mx-auto px-4"
-          style={{
-            padding: "8px 16px",
-            fontSize: 11,
-            fontFamily: "monospace",
-            color: fetchStatus === "ok" ? "rgba(201,168,76,0.7)" : "#ff6b6b",
-          }}
-        >
-          Supabase: {supabaseHost}… · Rows: {rowCount} · Status: {fetchStatus}
-          {fetchError && ` · Error: ${fetchError}`}
-          {usingFallback && " · Showing fallback guides"}
-        </div>
-      )}
       {/* SECTION 3 — Guide cards grid */}
       <section style={{ background: "#0A1628", padding: "48px 0" }}>
         <div className="container mx-auto px-4" style={{ maxWidth: 1200 }}>
