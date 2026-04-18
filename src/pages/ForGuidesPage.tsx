@@ -14,6 +14,7 @@ import {
 import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/seo/SEO";
 
 import dcImg from "@/assets/hero-dc.jpg";
 import chicagoImg from "@/assets/city-cards/chicago.jpg";

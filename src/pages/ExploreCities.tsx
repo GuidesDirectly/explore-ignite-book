@@ -119,6 +119,11 @@ const ExploreCities = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Explore Cities & Destinations — Private Tour Guides Worldwide | GuidesDirectly"
+        description="Discover guides in 150+ destinations across the globe. Book directly, zero commission, zero booking fees."
+        canonical="https://iguidetours.net/explore"
+      />
       {/* Header */}
       <header className="bg-secondary border-b border-border px-6 py-4">
         <div className="container mx-auto flex items-center justify-between">
