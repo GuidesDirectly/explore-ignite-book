@@ -298,7 +298,7 @@ const GuidesPage = () => {
                 <div key={i} className="animate-pulse rounded-xl" style={{ background: "#1A2F50", height: 420 }} />
               ))}
             </div>
-          ) : filtered.length === 0 ? (
+          ) : displayList.length === 0 ? (
             <div className="text-center py-20">
               <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 16 }} className="mb-6">
                 No guides found for your search. Try a different city or language.
@@ -317,7 +317,7 @@ const GuidesPage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((guide) => {
+              {displayList.map((guide) => {
                 const fd = guide.form_data || {};
                 const initials = getInitials(fd);
                 const languages: string[] = Array.isArray(fd?.languages) ? fd.languages : [];
