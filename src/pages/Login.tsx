@@ -140,9 +140,10 @@ const Login = () => {
     }
 
     if (authData.session && authData.user) {
-      // Email confirmation disabled — user is signed in immediately
-      toast({ title: "Welcome!", description: "Your account has been created." });
-      await routeAfterAuth(authData.user.id);
+      // Email confirmation disabled — user is signed in immediately.
+      // New sign-ups always go through onboarding first.
+      toast({ title: "Welcome!", description: "Let's set up your traveler profile." });
+      navigate("/traveler/onboarding");
     } else {
       // Email confirmation required
       toast({
