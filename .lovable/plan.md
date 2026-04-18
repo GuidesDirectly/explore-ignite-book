@@ -1,61 +1,53 @@
 
 
-## Plan — Bulletproof `/guides` with hardcoded fallback + diagnostics overlay
+## Plan — Remove diagnostic strip + persist view security_invoker fix
 
-### Investigation summary
-Confirmed:
-- `.env` → `VITE_SUPABASE_URL=https://oegfwomloaihzwomwypx.supabase.co` ✅ correct
-- `src/integrations/supabase/client.ts` → reads from env vars correctly ✅
-- `App.tsx` → `/guides` has NO auth guard, no middleware ✅
-- DB view → returns 5 approved rows ✅
-- `GuidesPage.tsx` query → already `.select("*")`, no broken filters ✅
-- Live site `iguidetours.net/guides` → renders "0 guides found" empty branch (proves component mounts, fetch returns nothing, and reaches the filtered-empty UI)
+### Task 1: Remove diagnostic UI from `GuidesPage.tsx`
+Remove three pieces:
+1. The diagnostic strip JSX block (lines ~239–253: the `{!loading && (...)}` block showing `Supabase: ... · Rows: ... · Status: ...`).
+2. The `console.log("[GuidesPage] Supabase URL:", ...)` line in the fetch effect.
+3. The unused diagnostic state setters' visible output — keep `fetchStatus`/`rowCount`/`fetchError` state since `usingFallback` logic depends on `fetchStatus`. Just remove the rendered strip and the URL console log. The `supabaseHost` derived var becomes unused → remove it too.
 
-The code is correct. The published bundle is either stale, or the runtime fetch is failing silently in production. We need a visible diagnostic + a guaranteed non-empty render.
+Keep: `FALLBACK_GUIDES`, `usingFallback` logic, and the silent `console.error`/`console.warn` calls (useful in DevTools, invisible to users).
 
-### Fix — single edit to `src/pages/GuidesPage.tsx`
+### Task 2: Persist `security_invoker = false` on `guide_profiles_public`
+Create a new migration that re-creates the view with `WITH (security_invoker = false)` so future redeploys don't revert the manual SQL Editor fix.
 
-**1. Visible diagnostic banner (dev only, dismissible)**
-After `setLoading(false)`, store the raw fetch result in state:
-- `fetchStatus`: `'ok' | 'error' | 'empty'`
-- `fetchError`: error message string
-- `rowCount`: number returned
+```sql
+-- Re-create guide_profiles_public with security_invoker = false
+-- so the view runs with the definer's privileges and bypasses the
+-- caller's RLS, matching the manual hotfix applied in SQL Editor.
+DROP VIEW IF EXISTS public.guide_profiles_public;
 
-Render a small diagnostic strip just under the results bar showing:
-> `Supabase URL: oegfw…supabase.co · Rows: 5 · Status: ok`
+CREATE VIEW public.guide_profiles_public
+WITH (security_invoker = false) AS
+SELECT
+  g.id,
+  g.user_id,
+  g.service_areas,
+  g.status,
+  g.created_at,
+  g.translations,
+  g.is_spotlight,
+  public.get_public_guide_form_data(g.form_data) AS form_data
+FROM public.guide_profiles g
+WHERE g.status = 'approved'
+  AND g.activation_status = 'active';
 
-…or if error:
-> `Supabase fetch error: <message>` in red.
-
-This makes the failure mode visible on the live site instead of guessing.
-
-**2. Hardcoded fallback for the 5 known approved guides**
-If `guides.length === 0` AND `fetchStatus !== 'ok'` (i.e., fetch errored or is still pending after timeout), render a static fallback list of the 5 known guide IDs as minimal cards with a "View profile" link. This guarantees the page is never visually empty when the DB has data but the network path fails.
-
-The fallback array contains only public-safe data (first name, city, slug) — no PII — sourced from what we already know is in `guide_profiles_public`:
-```ts
-const FALLBACK_GUIDES = [
-  { user_id: "9e45dba8-…", firstName: "…", city: "…" },
-  // 4 more
-];
+GRANT SELECT ON public.guide_profiles_public TO anon, authenticated;
 ```
 
-Fallback only renders when fetch demonstrably failed — it never overrides successful empty filter results.
-
-**3. Print Supabase URL to console on mount**
-```ts
-console.log("[GuidesPage] Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
-```
-So when the user opens DevTools on the live site, the actual URL the bundle is using is visible immediately.
+Note: Column list mirrors what `GuidesPage.tsx` consumes (`id, user_id, form_data, service_areas, translations, status, created_at, is_spotlight`). `form_data` goes through the existing `get_public_guide_form_data()` whitelist function for column-level security, so even with `security_invoker = false` no PII leaks.
 
 ### Files touched
 | Path | Change |
 |---|---|
-| `src/pages/GuidesPage.tsx` | Add fetch-status state, diagnostic strip, hardcoded fallback list, URL log |
+| `src/pages/GuidesPage.tsx` | Remove diagnostic strip JSX, URL console.log, unused `supabaseHost` var |
+| New migration | Re-create view `WITH (security_invoker = false)` + re-grant SELECT |
 
 ### Untouched
-Supabase client, RLS, view, all other pages, Header, Hero, Navbar.
+Fallback logic, fetch error handling, all RLS policies on base table, Header, Hero, Navbar, all other pages.
 
 ### After
-Publish. Then on live site you'll either see the 5 guides (fetch works) or the diagnostic strip will show the exact error / URL mismatch, plus the fallback cards so the page is never empty.
+Publish.
 
