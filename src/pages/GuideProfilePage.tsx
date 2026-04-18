@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import MessageGuideButton from "@/components/messaging/MessageGuideButton";
 import { useParams, Link } from "react-router-dom";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -517,18 +518,25 @@ const GuideProfilePage = () => {
 
                 {/* CTA Buttons */}
                 <div className="flex flex-col gap-3 pt-2">
-                  <button
-                    onClick={() => document.getElementById("contact-section")?.scrollIntoView({ behavior: "smooth" })}
-                    className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 font-semibold transition-opacity hover:opacity-90"
-                    style={{
-                      background: "#C9A84C",
-                      color: "#0A1628",
-                      fontSize: "15px",
-                    }}
+                  <MessageGuideButton
+                    guideUserId={guide.user_id}
+                    guideFirstName={fd.firstName || ""}
+                    guideLastName={fd.lastName || ""}
+                    guideCity={(guide.service_areas || [])[0] || ""}
                   >
-                    <MessageCircle className="w-4 h-4" />
-                    Message {fd.firstName}
-                  </button>
+                    <button
+                      className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 font-semibold transition-opacity hover:opacity-90"
+                      style={{
+                        background: "#C9A84C",
+                        color: "#0A1628",
+                        fontSize: "15px",
+                        border: "none",
+                      }}
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      Message {fd.firstName}
+                    </button>
+                  </MessageGuideButton>
                   <button
                     onClick={handleShare}
                     className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 font-semibold transition-opacity hover:opacity-90"
