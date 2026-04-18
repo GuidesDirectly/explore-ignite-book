@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown, Heart, Sparkles, LogIn, Phone } from "lucide-react";
+import { Menu, X, ChevronDown, Heart, Sparkles, LogIn, Phone, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import TravelerProfileForm from "./TravelerProfileForm";
 import NavbarUserMenu from "./NavbarUserMenu";
 import { supabase } from "@/integrations/supabase/client";
 
+type RoleKey = "admin" | "guide" | "traveler";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,17 +23,44 @@ const Navbar = () => {
   const destBtnRef = useRef<HTMLDivElement>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState<string | undefined>();
+  const [roleKey, setRoleKey] = useState<RoleKey>("traveler");
+
+  const resolveRole = async (userId: string): Promise<RoleKey> => {
+    const [{ data: roles }, { data: guideProfile }] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", userId),
+      supabase.from("guide_profiles").select("id").eq("user_id", userId).maybeSingle(),
+    ]);
+    const set = new Set((roles || []).map((r: any) => r.role));
+    if (set.has("admin")) return "admin";
+    if (set.has("guide") || guideProfile) return "guide";
+    return "traveler";
+  };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    let cancelled = false;
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (cancelled) return;
       setIsLoggedIn(!!session?.user);
       setUserEmail(session?.user?.email ?? undefined);
+      if (session?.user) {
+        const r = await resolveRole(session.user.id);
+        if (!cancelled) setRoleKey(r);
+      }
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setIsLoggedIn(!!session?.user);
       setUserEmail(session?.user?.email ?? undefined);
+      if (session?.user) {
+        const r = await resolveRole(session.user.id);
+        setRoleKey(r);
+      } else {
+        setRoleKey("traveler");
+      }
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -49,7 +77,6 @@ const Navbar = () => {
     { label: "Guides", href: "/guides", isRoute: true },
     { label: t("nav.services", "How it Works"), href: "#how-it-works" },
     { label: t("nav.contact", "About"), href: "#about" },
-    { label: "For Guides", href: "/for-guides", isRoute: true },
   ];
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, href: string) => {
@@ -58,6 +85,12 @@ const Navbar = () => {
       navigate(`/home${href}`);
     }
   };
+
+  const dashboardConfig = (() => {
+    if (roleKey === "admin") return { label: "Admin Panel", path: "/admin" };
+    if (roleKey === "guide") return { label: "My Dashboard", path: "/guide-dashboard" };
+    return { label: "My Dashboard", path: "/traveler/dashboard" };
+  })();
 
   const headerBg = scrolled
     ? "bg-[hsla(220,30%,8%,0.95)] shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
@@ -74,7 +107,6 @@ const Navbar = () => {
           onClick={(e) => handleNavClick(e, "#home")}
           className="flex items-center gap-2 shrink-0"
         >
-          
           <span className="flex items-baseline gap-1.5">
             <span className="font-display text-xl sm:text-2xl font-bold tracking-tight whitespace-nowrap">
               <span className="text-white">Guides</span>
@@ -129,7 +161,7 @@ const Navbar = () => {
           })}
         </div>
 
-        {/* RIGHT: Actions + Phone (desktop) */}
+        {/* RIGHT: Actions (desktop) */}
         <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
           {isLoggedIn && (
             <>
@@ -151,9 +183,10 @@ const Navbar = () => {
             </>
           )}
 
+          {/* 1. Phone — text only */}
           <a
             href="tel:+12022438336"
-            className="hidden lg:inline-flex items-center gap-1.5 text-[13px] text-white/80 hover:text-cta-book transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 text-[13px] text-white/80 hover:text-cta-book transition-colors whitespace-nowrap"
           >
             <Phone className="w-4 h-4" />
             +1 (202) 243-8336
@@ -161,40 +194,65 @@ const Navbar = () => {
 
           <div className="w-px h-6 bg-white/20 mx-1" />
 
+          {/* 2 & 3. Auth buttons OR contextual dashboard link */}
           {!isLoggedIn ? (
-            <button
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-white/80 hover:text-cta-book transition-colors"
-              onClick={() => navigate("/login")}
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              Login
-            </button>
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold whitespace-nowrap"
+                onClick={() => navigate("/login")}
+              >
+                <LogIn className="w-3.5 h-3.5 mr-1.5" />
+                Sign In
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold whitespace-nowrap"
+                onClick={() => navigate("/login?tab=signup")}
+              >
+                Join Free as Traveler
+              </Button>
+            </>
           ) : (
-            <NavbarUserMenu email={userEmail} />
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold whitespace-nowrap"
+              onClick={() => navigate(dashboardConfig.path)}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5 mr-1.5" />
+              {dashboardConfig.label}
+            </Button>
           )}
 
+          {/* 4. Find a Guide — primary gold CTA */}
           <Button
             size="sm"
             variant="outline"
             className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold whitespace-nowrap"
-            onClick={() => navigate("/tours")}
+            onClick={() => navigate("/guides")}
           >
             Find a Guide
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="border-[1.5px] border-[#C9A84C] text-[#C9A84C] bg-transparent hover:bg-[rgba(201,168,76,0.12)] hover:text-[#C9A84C] font-semibold whitespace-nowrap rounded-lg px-5 py-2.5 transition-[background] duration-150 ease-in"
-            onClick={() => navigate("/guide-register")}
+
+          {/* 5. For Guides — subtle text link */}
+          <a
+            href="/for-guides"
+            onClick={(e) => { e.preventDefault(); navigate("/for-guides"); }}
+            className="text-xs text-white/55 hover:text-white/80 transition-colors whitespace-nowrap"
           >
-            Join as Guide
-          </Button>
+            For Guides
+          </a>
+
+          {isLoggedIn && <NavbarUserMenu email={userEmail} />}
 
           <div className="w-px h-6 bg-white/20 mx-1" />
           <LanguageSwitcher />
         </div>
 
-        {/* Mobile: Phone + Language + Menu */}
+        {/* Mobile: Language + Menu */}
         <div className="lg:hidden flex items-center gap-2 shrink-0">
           <LanguageSwitcher />
           <button
@@ -266,35 +324,63 @@ const Navbar = () => {
                 </a>
               )}
 
-              {!isLoggedIn ? (
+              <div className="flex flex-col gap-2 pt-3">
+                {!isLoggedIn ? (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold w-full justify-start gap-2"
+                      onClick={() => { setIsOpen(false); navigate("/login"); }}
+                    >
+                      <LogIn className="w-4 h-4" />
+                      Sign In
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold w-full"
+                      onClick={() => { setIsOpen(false); navigate("/login?tab=signup"); }}
+                    >
+                      Join Free as Traveler
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold w-full justify-start gap-2"
+                    onClick={() => { setIsOpen(false); navigate(dashboardConfig.path); }}
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    {dashboardConfig.label}
+                  </Button>
+                )}
+
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-white/30 text-white/90 hover:text-white hover:bg-white/10 font-medium w-full justify-start gap-2"
-                  onClick={() => { setIsOpen(false); navigate("/login"); }}
+                  className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold w-full"
+                  onClick={() => { setIsOpen(false); navigate("/guides"); }}
                 >
-                  <LogIn className="w-4 h-4" />
-                  Login
+                  Find a Guide
                 </Button>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-white/80 hover:text-white hover:bg-white/10 font-medium w-full justify-start gap-2"
-                  onClick={() => { setIsOpen(false); navigate("/guide-dashboard"); }}
-                >
-                  Dashboard
-                </Button>
-              )}
 
-              <div className="flex flex-col gap-2 pt-3">
-                <Button
-                  size="sm"
-                  className="bg-cta-join text-white hover:bg-cta-join/90 font-semibold w-full"
-                  onClick={() => { setIsOpen(false); navigate("/guide-register"); }}
+                <a
+                  href="/for-guides"
+                  onClick={(e) => { e.preventDefault(); navigate("/for-guides"); setIsOpen(false); }}
+                  className="text-xs text-white/55 hover:text-white/80 transition-colors py-2 text-center"
                 >
-                  Join as Guide
-                </Button>
+                  For Guides
+                </a>
+
+                <a
+                  href="tel:+12022438336"
+                  className="inline-flex items-center justify-center gap-1.5 text-[13px] text-white/80 hover:text-cta-book transition-colors whitespace-nowrap py-2"
+                >
+                  <Phone className="w-4 h-4" />
+                  +1 (202) 243-8336
+                </a>
               </div>
             </div>
           </motion.div>
