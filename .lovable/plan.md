@@ -1,56 +1,42 @@
 
 
-## Plan — Minimal header rebuild
+## Plan — In-app messaging system (FINAL, approved)
 
-### Change to `src/components/Navbar.tsx`
+### Database migration
+- Enable Realtime publication on `messages` and `conversations`
+- Set `replica identity full` on both tables
+- Add indexes: `messages(conversation_id, created_at)`, `conversations(traveler_user_id, last_message_at desc)`, `conversations(guide_user_id, last_message_at desc)`
 
-**Logo (left):** Remove the `"by iGuide Tours"` tagline span. Keep `GuidesDirectly` text logo only.
+### New files
 
-**Center nav (unchanged):** Destinations | Guides | How It Works | About
+**`src/lib/messaging.ts`** — `getOrCreateConversation`, `sendMessage`, `markConversationRead`
 
-**Desktop right group — strip down to:**
+**`src/components/messaging/ConversationPanel.tsx`** — `Sheet`-based slide-in (right, `w-full sm:max-w-md`):
+- Props: `open`, `onClose`, `conversationId`, `peerName`, `peerAvatarUrl`, `peerInitials`, `viewerRole`, `peerFirstName?`, `peerCity?`
+- Loads messages, subscribes to `postgres_changes` INSERT for real-time
+- Auto-scroll to bottom; mark-read on open
+- Bottom: textarea + Send. **Placeholder when thread is empty:** `Hi {peerFirstName}, I'm interested in a tour in {peerCity}. Can you tell me more about your availability and pricing?` (placeholder only — not pre-filled value)
+- Fire-and-forget `send-notification` with `type: 'new_message'` after send
 
-Logged out:
-1. **Sign In** — white solid bg, dark navy text (current styling kept)
-2. **LanguageSwitcher**
+**`src/components/messaging/MessageGuideButton.tsx`** — wraps existing message button visual:
+- Auth gate: not logged in → `navigate('/login?tab=signup&returnTo=' + path + '&context=message')`
+- Logged in → `getOrCreateConversation` then open `ConversationPanel`
+- Accepts `guideUserId`, `guideFirstName`, `guideLastName`, `guideAvatarUrl?`, `guideCity?`, `children`
 
-Logged in (traveler/guide):
-1. **My Dashboard** — white solid bg, dark navy text → `/traveler/dashboard` or `/guide-dashboard`
-2. **Avatar** (`NavbarUserMenu`)
-3. **LanguageSwitcher**
+**`src/components/dashboard/GuideMessagesInbox.tsx`** — guide-side inbox (mirror of traveler)
 
-Logged in (admin):
-1. **Admin Panel** — white solid bg, dark navy text → `/admin`
-2. **Avatar** (`NavbarUserMenu`)
-3. **LanguageSwitcher**
+### Modified files
 
-**Remove entirely from desktop:**
-- Phone link (`+1 (202) 243-8336`)
-- Join Free as Traveler button
-- Find a Guide gold CTA
-- For Guides text link
-- Sparkles (Travel Preferences) icon button
-- Heart (Saved Guides) icon button
-- `TravelerProfileForm` import + state + render (no longer triggered from header)
-
-(Saved Guides and Travel Preferences remain accessible from `/traveler/dashboard` and `NavbarUserMenu`.)
-
-**Mobile menu — mirror the simplification:**
-- Keep nav links (Destinations, Guides, How It Works, About)
-- Logged out: Sign In button only
-- Logged in: My Dashboard / Admin Panel button only
-- Remove: phone link, Join Free as Traveler, Find a Guide, For Guides, Saved Guides shortcut
-
-**Spacing:** keep `gap-3 xl:gap-4` on right group — fewer items will naturally breathe.
-
-### Files touched
-
-| Path | Change |
-|---|---|
-| `src/components/Navbar.tsx` | Strip logo tagline; remove phone, Join Free, Find a Guide, For Guides, Sparkles, Heart, TravelerProfileForm; simplify mobile menu to match |
+- `src/components/MeetGuidesSection.tsx` — wire Message button via `MessageGuideButton` (pass `service_areas[0]` as `guideCity`)
+- `src/pages/GuidesPage.tsx` — same wiring
+- `src/pages/GuideProfilePage.tsx` — same wiring
+- `src/pages/Login.tsx` — honor `?returnTo=` in `routeAfterAuth`; show "Create a free account to message this guide" banner when `?context=message`
+- `src/components/traveler/MessagesInbox.tsx` — rewrite: previews, unread (bold + dot), realtime, click → `ConversationPanel`
+- `src/pages/GuideDashboard.tsx` — mount `GuideMessagesInbox`; unread-count badge on Conversations stat
+- `supabase/functions/send-notification/index.ts` — add `'new_message'` to `VALID_TYPES`/`PUBLIC_TYPES`; new handler resolves recipient email via service-role `auth.admin.getUserById`; subject `New message from {senderName} — GuidesDirectly`; body has sender, 100-char preview, CTA to dashboard; also inserts row into `notifications` table for the recipient
 
 ### Untouched
-Hero, Footer, all routes, color tokens, all other pages, NavbarUserMenu, LanguageSwitcher, role detection logic, all logged-in dashboards.
+Header/Navbar, Hero, Footer, color tokens, table schemas, RLS policies, Stripe/founding logic, all other dashboards.
 
 ### After
 Publish.
