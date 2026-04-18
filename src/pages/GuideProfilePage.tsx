@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import FoundingGuideBadge from "@/components/FoundingGuideBadge";
 import SpotlightBanner from "@/components/SpotlightBanner";
 import { useFoundingProgram } from "@/hooks/useFoundingProgram";
+import SEO from "@/components/seo/SEO";
 
 interface GuideData {
   id: string;
@@ -368,8 +369,24 @@ const GuideProfilePage = () => {
       ? "President, Chicago Tour-Guide Professionals Association (CTPA)"
       : null;
 
+  const fullName = `${fd.firstName || ""} ${fd.lastName || ""}`.trim();
+  const cityName = guide.service_areas?.[0] || "your destination";
+  const bioSnippet = (translatedBio || fd.biography || "").slice(0, 155).trim();
+  const seoDescription = bioSnippet
+    ? `${bioSnippet}${bioSnippet.endsWith(".") ? "" : "."} Book directly on GuidesDirectly — zero commission.`
+    : `Meet ${fullName}, a private tour guide in ${cityName}. Book directly on GuidesDirectly — zero commission.`;
+  const profileUrl = `https://iguidetours.net/guide/${guide.user_id}`;
+
   return (
     <div className="min-h-screen" style={{ background: "#0A1628" }}>
+      <SEO
+        title={`${fullName} — Private Tour Guide in ${cityName} | GuidesDirectly`}
+        description={seoDescription}
+        ogImage={photoUrl || undefined}
+        ogUrl={profileUrl}
+        ogType="profile"
+        canonical={profileUrl}
+      />
       <Navbar />
 
       <div className="container mx-auto px-4 pt-24 pb-16">
