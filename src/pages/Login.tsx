@@ -189,6 +189,17 @@ const Login = () => {
               </p>
             </div>
 
+            {context === "message" && (
+              <div className="mb-5 p-3 rounded-lg bg-primary/10 border border-primary/30 text-center">
+                <p className="text-sm text-foreground font-medium">
+                  Create a free account to message this guide
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Takes less than 30 seconds. We'll bring you right back.
+                </p>
+              </div>
+            )}
+
             <Tabs value={tab} onValueChange={(v) => setTab(v as "signin" | "signup")} className="w-full">
               <TabsList className="grid grid-cols-2 w-full mb-6">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
