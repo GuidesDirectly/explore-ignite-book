@@ -29,6 +29,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Support from "./pages/Support";
 import Login from "./pages/Login";
 import ForGuidesPage from "./pages/ForGuidesPage";
+import TravelerOnboarding from "./pages/TravelerOnboarding";
+import TravelerDashboard from "./pages/TravelerDashboard";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -72,6 +74,8 @@ const App = () => (
           <Route path="/support" element={<Support />} />
               <Route path="/login" element={<Login />} />
               <Route path="/for-guides" element={<ForGuidesPage />} />
+              <Route path="/traveler/onboarding" element={<TravelerOnboarding />} />
+              <Route path="/traveler/dashboard" element={<TravelerDashboard />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

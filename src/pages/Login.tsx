@@ -20,17 +20,37 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (error) {
+    if (error || !authData.user) {
       toast({
         title: "Sign-in failed",
-        description: error.message,
+        description: error?.message ?? "Unknown error",
         variant: "destructive",
       });
+      setLoading(false);
+      return;
+    }
+
+    toast({ title: "Welcome back!", description: "You've signed in successfully." });
+
+    // Determine redirect based on role + onboarding status
+    const userId = authData.user.id;
+    const [{ data: roles }, { data: guideProfile }, { data: travelerProfile }] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", userId),
+      supabase.from("guide_profiles").select("id").eq("user_id", userId).maybeSingle(),
+      supabase.from("traveler_profiles").select("onboarding_complete").eq("user_id", userId).maybeSingle(),
+    ]);
+
+    const roleSet = new Set((roles || []).map((r: any) => r.role));
+    if (roleSet.has("admin")) {
+      navigate("/admin");
+    } else if (roleSet.has("guide") || guideProfile) {
+      navigate("/guide-dashboard");
+    } else if (!travelerProfile?.onboarding_complete) {
+      navigate("/traveler/onboarding");
     } else {
-      toast({ title: "Welcome back!", description: "You've signed in successfully." });
-      navigate("/home");
+      navigate("/traveler/dashboard");
     }
 
     setLoading(false);

@@ -40,14 +40,19 @@ const NavbarUserMenu = ({ email }: NavbarUserMenuProps) => {
           </Avatar>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuItem onClick={() => navigate("/traveler/dashboard")}>
+          <LayoutDashboard className="w-4 h-4 mr-2" />
+          My Dashboard
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/traveler/onboarding")}>
+          <User className="w-4 h-4 mr-2" />
+          Edit Profile
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/guide-dashboard")}>
           <LayoutDashboard className="w-4 h-4 mr-2" />
-          Dashboard
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/guide-dashboard")}>
-          <User className="w-4 h-4 mr-2" />
-          My Profile
+          Guide Dashboard
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
