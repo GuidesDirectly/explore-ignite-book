@@ -1,62 +1,55 @@
 
 
-## Plan — Restore anon access to `guide_profiles_public`
+## Plan — Diagnose & fix silent fetch failure on `/guides`
 
-### Context
-The user reports `/guides` is empty again. They've supplied SQL to:
-1. Re-`GRANT SELECT` on the view to `anon`/`authenticated`.
-2. Add a base-table policy allowing public to see approved + active rows.
-3. Verify with a SELECT.
+### Investigation
+Looking at the current `GuidesPage.tsx` (already shown in context):
+- Query: `.from("guide_profiles_public").select("id, user_id, form_data, service_areas, translations, status, created_at, is_spotlight").eq("status", "approved")`
+- Already has `console.error("[GuidesPage] guides fetch failed:", err)` — so failures aren't fully silent, but they may not surface clearly.
+- Does NOT filter by `activation_status` (good).
+- Does filter `.eq("status", "approved")` — the view already filters this, so it's redundant but not harmful.
 
-Reviewing current DB state from the schema dump:
-- View `guide_profiles_public` exists (created in migration `20260417234640`) with `security_invoker = on`.
-- Base table `guide_profiles` already has TWO relevant SELECT policies for `anon, authenticated`:
-  - `public_can_view_approved_active_rows` → `status='approved' AND activation_status='active'`
-  - `public_can_view_approved_profiles_via_view` → `status='approved'`
-- Prior migration already issued `GRANT SELECT ON public.guide_profiles_public TO anon, authenticated`.
+Need to verify the view actually returns `status` and `is_spotlight` columns. Let me check via `supabase--read_query` and also inspect `Tours.tsx`.
 
-So the policy the user wants to add is **functionally a duplicate** of the existing `public_can_view_approved_active_rows` (just a different name). The GRANT is also already in place. However, re-asserting both is harmless and gives us a clean verification step. Note: Postgres does not support `CREATE POLICY IF NOT EXISTS` — must wrap in a `DO` block.
+### Likely root cause
+Two strong candidates:
+1. **Column mismatch**: the recreated view may not include `is_spotlight` or `status`, so `.select(...)` with those fields throws a 400. The current catch logs a warning but state stays empty.
+2. **Stale browser state**: prior 401 cached → React Query/Supabase client retains failure. (Less likely — there's no React Query here, plain `useState`.)
 
-### Migration (single file)
+### Fix plan
+
+**Step A — Verify view columns** (`supabase--read_query`):
 ```sql
--- Re-assert SELECT grants on the public view (idempotent)
-GRANT SELECT ON public.guide_profiles_public TO anon, authenticated;
-
--- Add named policy (guarded — Postgres has no CREATE POLICY IF NOT EXISTS)
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname = 'public'
-      AND tablename = 'guide_profiles'
-      AND policyname = 'Public can view approved active guides'
-  ) THEN
-    CREATE POLICY "Public can view approved active guides"
-      ON public.guide_profiles
-      FOR SELECT
-      TO anon, authenticated
-      USING (status = 'approved' AND activation_status = 'active');
-  END IF;
-END $$;
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'guide_profiles_public';
+```
+And confirm row count:
+```sql
+SELECT id, user_id, status FROM public.guide_profiles_public;
 ```
 
-### Verification (after migration)
-Run via `supabase--read_query`:
-```sql
-SELECT id, user_id, status FROM public.guide_profiles_public LIMIT 10;
-```
-Expected: 5 rows (Michael, Mike, Eduard, Farmers, Americo).
+**Step B — Inspect `Tours.tsx`** to see if it also queries `guide_profiles_public` and needs the same treatment.
 
-If the view returns rows under the service role but the page still shows empty, the issue is client-side (React Query stale cache, or a runtime error blocking the fetch) — we'd then re-inspect `GuidesPage.tsx` console output rather than the DB.
+**Step C — Harden `GuidesPage.tsx`**:
+- Change `.select(...)` to `.select("*")` to be resilient to view column changes (matches what user requested).
+- Remove the redundant `.eq("status", "approved")` filter — view already enforces this.
+- Add explicit `console.error("Guides fetch error:", error)` and `console.log("Guides data:", data)` as user requested (in addition to the existing try/catch).
+- If `is_spotlight` is missing from the view, the spotlight sort fallback `(b.is_spotlight ? 1 : 0)` already handles `undefined` gracefully.
+
+**Step D — Apply same hardening to `Tours.tsx`** if it queries `guide_profiles_public`.
+
+**Step E — Migration (only if Step A reveals view is missing required columns)**: re-create view including `is_spotlight` and `status`.
 
 ### Files touched
-| Type | Path |
-|---|---|
-| Migration | new — re-grant + guarded policy |
+| Type | Path | Change |
+|---|---|---|
+| Edit | `src/pages/GuidesPage.tsx` | `.select("*")`, remove `.eq("status","approved")`, add explicit console.error/log |
+| Edit | `src/pages/Tours.tsx` | Same treatment if it queries the view |
+| Migration (conditional) | new SQL | Re-create view with all needed columns if missing |
 
 ### Untouched
-View definition, all other policies, application code, Header, Hero, Navbar.
+Header, Hero, Navbar, all RLS policies, Stripe, founding logic, all other pages.
 
 ### After
-Verify via SELECT, reload `/guides`, confirm 5 guides visible. Then publish.
+Publish.
 
