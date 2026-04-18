@@ -275,20 +275,28 @@ const GuidesPage = () => {
             </div>
           ) : displayList.length === 0 ? (
             <div className="text-center py-20">
-              <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 16 }} className="mb-6">
-                No guides found for your search. Try a different city or language.
-              </p>
-              <button
-                onClick={() => { setCityFilter(""); setLanguageFilter(""); }}
-                className="px-6 py-3 rounded-full text-sm font-semibold"
-                style={{
-                  color: "#C9A84C",
-                  border: "1px solid rgba(201,168,76,0.4)",
-                  background: "transparent",
-                }}
-              >
-                Clear filters
-              </button>
+              {showLoadError ? (
+                <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 16 }}>
+                  Unable to load guides at this time. Please try again shortly.
+                </p>
+              ) : (
+                <>
+                  <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 16 }} className="mb-6">
+                    No guides found for your search. Try a different city or language.
+                  </p>
+                  <button
+                    onClick={() => { setCityFilter(""); setLanguageFilter(""); }}
+                    className="px-6 py-3 rounded-full text-sm font-semibold"
+                    style={{
+                      color: "#C9A84C",
+                      border: "1px solid rgba(201,168,76,0.4)",
+                      background: "transparent",
+                    }}
+                  >
+                    Clear filters
+                  </button>
+                </>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
