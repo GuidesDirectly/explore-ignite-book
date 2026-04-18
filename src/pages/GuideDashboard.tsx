@@ -30,6 +30,7 @@ import FeedbackInsights from "@/components/dashboard/FeedbackInsights";
 import ToursManager from "@/components/dashboard/ToursManager";
 import SubscriptionManager from "@/components/dashboard/SubscriptionManager";
 import ActivationGate from "@/components/dashboard/ActivationGate";
+import GuideMessagesInbox from "@/components/dashboard/GuideMessagesInbox";
 
 interface PhotoItem {
   name: string;
@@ -488,6 +489,19 @@ const GuideDashboard = () => {
 
         {/* Credential Verification */}
         {user && <GuideVerificationUpload userId={user.id} />}
+
+        {/* Messages Inbox */}
+        {user && (
+          <section className="rounded-2xl p-6" style={{ backgroundColor: '#1A2F50', border: '1px solid rgba(201,168,76,0.15)' }}>
+            <h2 className="font-display text-xl font-bold flex items-center gap-2 mb-4" style={{ color: '#F5F0E8' }}>
+              <MessageSquare className="w-5 h-5 text-[#C9A84C]" />
+              {t("guideDashboard.messages", "Messages")}
+            </h2>
+            <div className="bg-background rounded-xl p-4">
+              <GuideMessagesInbox userId={user.id} guideName={guideName} />
+            </div>
+          </section>
+        )}
 
         {/* Bookings Management */}
         {user && <BookingsManager userId={user.id} guideName={guideName} />}
