@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/seo/SEO";
 import PasswordStrengthMeter, { isPasswordStrong } from "@/components/PasswordStrengthMeter";
 import { checkPasswordBreached } from "@/lib/hibp";
 import { LogIn, UserPlus, Mail, Lock } from "lucide-react";

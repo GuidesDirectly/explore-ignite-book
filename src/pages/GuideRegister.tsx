@@ -23,6 +23,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import logoImg from "@/assets/logo.jpg";
+import SEO from "@/components/seo/SEO";
 import { translateOption, translateOptions } from "@/lib/translationHelpers";
 import PasswordStrengthMeter, { isPasswordStrong } from "@/components/PasswordStrengthMeter";
 import { checkPasswordBreached } from "@/lib/hibp";

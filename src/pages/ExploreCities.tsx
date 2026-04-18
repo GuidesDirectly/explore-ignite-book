@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Globe, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DestinationsModal from "@/components/DestinationsModal";
+import SEO from "@/components/seo/SEO";
 
 import nycImg from "@/assets/city-cards/nyc.jpg";
 import phillyImg from "@/assets/city-cards/philadelphia.jpg";
