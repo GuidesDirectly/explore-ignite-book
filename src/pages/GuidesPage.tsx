@@ -411,7 +411,7 @@ const GuidesPage = () => {
                     {/* City */}
                     {city && (
                       <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", padding: "0 16px 8px" }}>
-                        📍 {city}
+                        📍 {toTitleCase(city)}
                       </p>
                     )}
 
@@ -447,7 +447,7 @@ const GuidesPage = () => {
                             padding: "0 16px 8px",
                           }}
                         >
-                          No tours listed yet — contact to inquire
+                          Available for custom tours — send a message
                         </p>
                       );
                     })()}
