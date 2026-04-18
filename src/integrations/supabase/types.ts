@@ -1020,7 +1020,6 @@ export type Database = {
     Views: {
       guide_profiles_public: {
         Row: {
-          activation_status: string | null
           created_at: string | null
           form_data: Json | null
           id: string | null
@@ -1031,7 +1030,6 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
-          activation_status?: string | null
           created_at?: string | null
           form_data?: never
           id?: string | null
@@ -1042,7 +1040,6 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
-          activation_status?: string | null
           created_at?: string | null
           form_data?: never
           id?: string | null
