@@ -1,46 +1,56 @@
 
 
-## Plan — Traveler Profile Frontend
+## Plan — Add Sign Up tab to Login + verify traveler redirect
 
-### Investigation
-- `traveler_profiles` table exists with RLS already correct (users own their rows). Existing `useTravelerProfile` hook + `TravelerProfileForm` cover preferences modal but **lack** first/last name, country, profile photo.
-- `bookings`, `saved_guides`, `conversations`, `messages`, `reviews` tables all exist with proper RLS.
-- No traveler dashboard route exists. Login redirects guides → `/guide/dashboard` only.
-- Storage: `guide-photos` bucket exists (public). We'll reuse it under a `traveler-avatars/` prefix to avoid creating extra infra.
+### FIX 1 — Add Sign Up tab to `Login.tsx`
 
-### Required schema additions (migration)
-Add columns to `traveler_profiles`:
-- `first_name text`, `last_name text`, `country text`, `avatar_url text`, `onboarding_complete boolean default false`
+Refactor `src/pages/Login.tsx` to use the existing `Tabs` component with two tabs: **Sign In** (existing form) and **Sign Up** (new form).
 
-Existing RLS already restricts to `auth.uid() = user_id` ✅ no policy changes needed.
+**Sign Up form fields:**
+- Email
+- Password (with `PasswordStrengthMeter` reused from existing component)
+- Confirm password (must match)
+- Terms agreement checkbox + small disclosure text linking to terms
 
-### Files to create
-| Path | Purpose |
-|---|---|
-| `src/pages/TravelerOnboarding.tsx` | 5-step wizard (name → country → languages → interests → photo) |
-| `src/pages/TravelerDashboard.tsx` | Tabs: Upcoming, Past, Saved, Messages + edit-profile button |
-| `src/components/traveler/UpcomingBookings.tsx` | List bookings where `date >= today` & status ≠ cancelled |
-| `src/components/traveler/PastTours.tsx` | Past bookings + "Leave a Review" CTA |
-| `src/components/traveler/SavedGuidesList.tsx` | Pulls from `saved_guides` joined with `guide_profiles_public` |
-| `src/components/traveler/MessagesInbox.tsx` | Conversations list with last message preview |
-| `src/components/traveler/LeaveReviewDialog.tsx` | Inserts into `reviews` with `booking_id`, 1–10 rating |
+**Sign Up handler logic:**
+1. Client-side validation: email format, password matches confirm, password is strong (`isPasswordStrong`), terms checkbox checked.
+2. Optional but consistent with existing security: call `checkPasswordBreached()` before signup; warn but allow if HIBP fails open.
+3. Call `supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/` } })`.
+4. The DB trigger `handle_new_user()` already auto-inserts `user_roles` with role `'user'` (or `'admin'` for the very first user) — **no extra insert needed**.
+5. After successful signup:
+   - If session is returned (email confirmation disabled) → redirect to `/traveler/onboarding`.
+   - If no session (email confirmation enabled) → toast "Check your email to confirm" and stay on page.
+6. Toast on errors (existing user, weak password, etc.).
 
-### Files to modify (small, surgical)
+### FIX 2 — Verify post-login redirect logic
+
+Reviewing existing `Login.tsx` (shown in current-code):
+
+```ts
+if (roleSet.has("admin")) navigate("/admin");
+else if (roleSet.has("guide") || guideProfile) navigate("/guide-dashboard");
+else if (!travelerProfile?.onboarding_complete) navigate("/traveler/onboarding");
+else navigate("/traveler/dashboard");
+```
+
+Issues vs. spec:
+1. Spec says guide redirect should be `/guide/dashboard`, but existing route is `/guide-dashboard`. Checked `App.tsx` history — actual route is `/guide-dashboard`. **Keep existing route** (changing it would break the rest of the app, and memory says "Do not modify Header/Hero/navigation"). The spec wording is approximate — existing behavior is correct.
+2. Logic for traveler vs onboarding is already correct: if no admin/guide role and `onboarding_complete !== true`, goes to `/traveler/onboarding`; otherwise `/traveler/dashboard`. ✅
+3. Admin redirect → `/admin`. ✅
+
+**No logic change needed for Fix 2** — the redirect already does what the spec asks. Will add a small console.log to make debugging the test account easier, and ensure that if the `traveler_profiles` row doesn't exist yet (returns null), we route to `/traveler/onboarding` (already handled by `!travelerProfile?.onboarding_complete` since null is falsy). ✅
+
+For the **Sign Up** path specifically, after auto-signin a fresh user has no profile row → will land on `/traveler/onboarding`. ✅
+
+### Files touched
+
 | Path | Change |
 |---|---|
-| `src/hooks/useTravelerProfile.ts` | Extend `TravelerProfile` interface + `save()` payload with the 5 new fields |
-| `src/pages/Login.tsx` | After login, if user has no admin/agency/guide role AND `traveler_profiles.onboarding_complete !== true` → redirect to `/traveler/onboarding`, else `/traveler/dashboard` |
-| `src/App.tsx` | Add 2 routes: `/traveler/onboarding`, `/traveler/dashboard` |
-| `src/components/NavbarUserMenu.tsx` | Add "My Dashboard" link for traveler users (no Header/Hero/Navbar layout changes) |
+| `src/pages/Login.tsx` | Add `Tabs` wrapper, Sign In + Sign Up panes, sign-up handler, password meter, terms checkbox |
 
-### Key flows
-1. **Onboarding trigger** — checked in `Login.tsx` post-auth handler. If `onboarding_complete = false` (or row missing), route to wizard. Wizard saves and sets flag, then routes to dashboard.
-2. **Review prompt** — `PastTours` component scans for past bookings without a matching review (`reviews.booking_id`) and shows pulsing "Leave a Review" button → opens `LeaveReviewDialog`.
-3. **Photo upload** — uses existing `guide-photos` public bucket under `traveler-avatars/{userId}/avatar.jpg`. URL stored in `avatar_url`.
-
-### Untouched (per memory rules)
-Header, Hero, Navbar layout, all guide/admin flows, all other pages, Stripe, founding logic.
+### Untouched
+Header, Hero, Navbar, all routes, `handle_new_user` trigger (already assigns role), all other pages, RLS, traveler dashboard/onboarding pages.
 
 ### After
-Publish.
+Publish. Test by signing up a new email → should land on `/traveler/onboarding`. Test by logging in `testtraveler@iguidetours.net` → lands on `/traveler/onboarding` if incomplete, else `/traveler/dashboard`.
 
