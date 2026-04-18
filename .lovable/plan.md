@@ -1,54 +1,31 @@
 
 
-## Plan — Fix unreadable buttons + declutter header
+## Plan — Restore phone in header + final right-side order
 
-### Issue 1: Button contrast (`src/components/Navbar.tsx`)
+### Change to `src/components/Navbar.tsx`
 
-Header bg is dark navy (`hsla(220,30%,8%,0.8–0.95)`), but the two outline buttons use `border-white/40 text-white/90` with no fill — low contrast and visually weak. Fix:
+**Desktop right-side group, in this exact order:**
+1. `+1 (202) 243-8336` — text-only with Phone icon, white/muted (`text-white/80 hover:text-cta-book`), `text-[13px]`. Re-add as `<a href="tel:+12022438336">`.
+2. **Sign In** — white solid bg, dark navy text (current styling kept).
+3. **Join Free as Traveler** — transparent bg, gold border + gold text (change text from `text-white` → `text-cta-book`), `size="sm"`.
+4. **Find a Guide** — solid gold primary CTA (current styling kept), made visually largest by using `size="default"` instead of `sm`.
+5. **For Guides** — small muted text link (current styling kept).
+6. **LanguageSwitcher** (current).
 
-- **Sign In** → solid white background, dark navy text:
-  ```
-  bg-white text-[#0A1628] border border-white hover:bg-white/90
-  ```
-- **Join Free as Traveler** → transparent bg, gold border, white text (defers to gold "Find a Guide"):
-  ```
-  bg-transparent border border-cta-book/70 text-white hover:bg-cta-book/10 hover:border-cta-book
-  ```
-- **Find a Guide** (gold primary) — upgrade from outline to solid gold fill so it reads as the dominant CTA:
-  ```
-  bg-cta-book text-cta-book-foreground border border-cta-book hover:bg-cta-book/90
-  ```
-- **My Dashboard** (logged-in state) → keep solid white treatment same as Sign In for readability.
+**Spacing:** keep `gap-3 xl:gap-4`. Phone goes first in the right group with no divider.
 
-### Issue 2: Header crowding
+**Mobile menu:** unchanged (phone already at bottom, button styles already match).
 
-- **Remove phone number from desktop header** (lines 186–195, including the divider that follows). Footer already shows it (`Footer.tsx` line ~92).
-- **Keep phone in mobile menu** (it's not crowded there).
-- **Increase right-group spacing**: change `gap-2 xl:gap-3` → `gap-3 xl:gap-4` for breathing room between buttons.
-- **Language switcher**: keep at far right but remove the `w-px` divider before it; rely on gap spacing. (Moving it next to the logo would unbalance the 3-column layout — keeping it right is safer and matches existing pattern.)
-
-### Final desktop header (logged-out)
-
-```
-LEFT:   Logo
-CENTER: Destinations | Guides | How It Works | About
-RIGHT:  [Sign In white] [Join Free as Traveler outlined] [Find a Guide gold solid] For Guides · 🌐
-```
-
-### Mobile menu
-
-- Keep current order; update Sign In + Join Free as Traveler classes to match new desktop styling (white solid + gold-outline).
-- Find a Guide → solid gold.
-- Phone link stays at the bottom (mobile only).
+**Logged-in state:** phone still appears first; My Dashboard / Admin Panel replaces Sign In + Join Free as Traveler (current logic preserved).
 
 ### Files touched
 
 | Path | Change |
 |---|---|
-| `src/components/Navbar.tsx` | Remove desktop phone block + divider, restyle Sign In (white solid), Join Free as Traveler (gold-outline), Find a Guide (solid gold), update mobile menu button styles to match, increase right-group gap |
+| `src/components/Navbar.tsx` | Re-insert desktop phone link as first item in right group; update Join Free as Traveler text color to gold; bump Find a Guide to default size for visual emphasis |
 
 ### Untouched
-Logo, Hero, Footer, all routes, all other pages, mobile phone link, language switcher position, all logged-in user menu elements.
+Logo, center nav links, mobile menu, logged-in user menu, language switcher, Hero, Footer, all routes, all other pages.
 
 ### After
 Publish.
