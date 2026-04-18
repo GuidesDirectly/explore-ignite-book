@@ -1,12 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown, Heart, Sparkles, LogIn, Phone, LayoutDashboard } from "lucide-react";
+import { Menu, X, ChevronDown, LogIn, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 import DestinationsModal from "./DestinationsModal";
-import TravelerProfileForm from "./TravelerProfileForm";
 import NavbarUserMenu from "./NavbarUserMenu";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,12 +14,10 @@ type RoleKey = "admin" | "guide" | "traveler";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [destOpen, setDestOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const destBtnRef = useRef<HTMLDivElement>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState<string | undefined>();
   const [roleKey, setRoleKey] = useState<RoleKey>("traveler");
@@ -107,31 +104,25 @@ const Navbar = () => {
           onClick={(e) => handleNavClick(e, "#home")}
           className="flex items-center gap-2 shrink-0"
         >
-          <span className="flex items-baseline gap-1.5">
-            <span className="font-display text-xl sm:text-2xl font-bold tracking-tight whitespace-nowrap">
-              <span className="text-white">Guides</span>
-              <span className="text-cta-book">Directly</span>
-            </span>
-            <span className="text-[10px] text-white/50 font-medium hidden sm:inline whitespace-nowrap">
-              by iGuide Tours
-            </span>
+          <span className="font-display text-xl sm:text-2xl font-bold tracking-tight whitespace-nowrap">
+            <span className="text-white">Guides</span>
+            <span className="text-cta-book">Directly</span>
           </span>
         </a>
 
         {/* CENTER: Nav links (desktop) */}
-        <div className="hidden lg:flex items-center gap-3 xl:gap-4">
+        <div className="hidden lg:flex items-center gap-4 xl:gap-6">
           {navLinks.map((link) => {
             if ((link as any).isDestinations) {
               return (
-                <div key={link.href} ref={destBtnRef} className="relative">
-                  <button
-                    onClick={() => setDestOpen(true)}
-                    className="text-xs xl:text-sm font-medium text-white/80 hover:text-white transition-colors inline-flex items-center gap-1 whitespace-nowrap"
-                  >
-                    {link.label}
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                <button
+                  key={link.href}
+                  onClick={() => setDestOpen(true)}
+                  className="text-sm font-medium text-white/80 hover:text-white transition-colors inline-flex items-center gap-1 whitespace-nowrap"
+                >
+                  {link.label}
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
               );
             }
 
@@ -141,7 +132,7 @@ const Navbar = () => {
                   key={link.href}
                   href={link.href}
                   onClick={(e) => { e.preventDefault(); navigate(link.href); }}
-                  className="text-xs xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
+                  className="text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
                 >
                   {link.label}
                 </a>
@@ -153,7 +144,7 @@ const Navbar = () => {
                 key={link.href}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="text-xs xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
+                className="text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
               >
                 {link.label}
               </a>
@@ -163,82 +154,28 @@ const Navbar = () => {
 
         {/* RIGHT: Actions (desktop) */}
         <div className="hidden lg:flex items-center gap-3 xl:gap-4 shrink-0">
-          <a
-            href="tel:+12022438336"
-            className="inline-flex items-center gap-1.5 text-[13px] text-white/80 hover:text-cta-book transition-colors whitespace-nowrap"
-          >
-            <Phone className="w-3.5 h-3.5" />
-            +1 (202) 243-8336
-          </a>
-
-          {isLoggedIn && (
-            <>
-              <button
-                onClick={() => setProfileOpen(true)}
-                className="relative p-2 rounded-full text-white/60 hover:text-cta-book hover:bg-white/10 transition-colors"
-                aria-label="Travel Preferences"
-                title="My Travel Preferences"
-              >
-                <Sparkles className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => navigate("/saved-guides")}
-                className="relative p-2 rounded-full text-white/60 hover:text-red-400 hover:bg-white/10 transition-colors"
-                aria-label="Saved Guides"
-              >
-                <Heart className="w-4 h-4" />
-              </button>
-            </>
-          )}
-
-          {/* Auth buttons OR contextual dashboard link */}
           {!isLoggedIn ? (
+            <Button
+              size="sm"
+              className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold whitespace-nowrap"
+              onClick={() => navigate("/login")}
+            >
+              <LogIn className="w-3.5 h-3.5 mr-1.5" />
+              Sign In
+            </Button>
+          ) : (
             <>
               <Button
                 size="sm"
                 className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold whitespace-nowrap"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate(dashboardConfig.path)}
               >
-                <LogIn className="w-3.5 h-3.5 mr-1.5" />
-                Sign In
+                <LayoutDashboard className="w-3.5 h-3.5 mr-1.5" />
+                {dashboardConfig.label}
               </Button>
-              <Button
-                size="sm"
-                className="bg-transparent border border-cta-book/70 text-cta-book hover:bg-cta-book/10 hover:border-cta-book font-semibold whitespace-nowrap"
-                onClick={() => navigate("/login?tab=signup")}
-              >
-                Join Free as Traveler
-              </Button>
+              <NavbarUserMenu email={userEmail} />
             </>
-          ) : (
-            <Button
-              size="sm"
-              className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold whitespace-nowrap"
-              onClick={() => navigate(dashboardConfig.path)}
-            >
-              <LayoutDashboard className="w-3.5 h-3.5 mr-1.5" />
-              {dashboardConfig.label}
-            </Button>
           )}
-
-          {/* Find a Guide — primary gold CTA (solid, largest) */}
-          <Button
-            className="bg-cta-book text-cta-book-foreground border border-cta-book hover:bg-cta-book/90 font-semibold whitespace-nowrap"
-            onClick={() => navigate("/guides")}
-          >
-            Find a Guide
-          </Button>
-
-          {/* For Guides — subtle text link */}
-          <a
-            href="/for-guides"
-            onClick={(e) => { e.preventDefault(); navigate("/for-guides"); }}
-            className="text-xs text-white/55 hover:text-white/80 transition-colors whitespace-nowrap"
-          >
-            For Guides
-          </a>
-
-          {isLoggedIn && <NavbarUserMenu email={userEmail} />}
 
           <LanguageSwitcher />
         </div>
@@ -304,36 +241,16 @@ const Navbar = () => {
                 );
               })}
 
-              {isLoggedIn && (
-                <a
-                  href="/saved-guides"
-                  onClick={() => setIsOpen(false)}
-                  className="text-sm font-medium text-white/80 hover:text-red-400 transition-colors py-2.5 border-b border-white/10 flex items-center gap-2"
-                >
-                  <Heart className="w-4 h-4" />
-                  Saved Guides
-                </a>
-              )}
-
               <div className="flex flex-col gap-2 pt-3">
                 {!isLoggedIn ? (
-                  <>
-                    <Button
-                      size="sm"
-                      className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold w-full justify-start gap-2"
-                      onClick={() => { setIsOpen(false); navigate("/login"); }}
-                    >
-                      <LogIn className="w-4 h-4" />
-                      Sign In
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="bg-transparent border border-cta-book/70 text-white hover:bg-cta-book/10 hover:border-cta-book font-semibold w-full"
-                      onClick={() => { setIsOpen(false); navigate("/login?tab=signup"); }}
-                    >
-                      Join Free as Traveler
-                    </Button>
-                  </>
+                  <Button
+                    size="sm"
+                    className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold w-full justify-start gap-2"
+                    onClick={() => { setIsOpen(false); navigate("/login"); }}
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Sign In
+                  </Button>
                 ) : (
                   <Button
                     size="sm"
@@ -344,30 +261,6 @@ const Navbar = () => {
                     {dashboardConfig.label}
                   </Button>
                 )}
-
-                <Button
-                  size="sm"
-                  className="bg-cta-book text-cta-book-foreground border border-cta-book hover:bg-cta-book/90 font-semibold w-full"
-                  onClick={() => { setIsOpen(false); navigate("/guides"); }}
-                >
-                  Find a Guide
-                </Button>
-
-                <a
-                  href="/for-guides"
-                  onClick={(e) => { e.preventDefault(); navigate("/for-guides"); setIsOpen(false); }}
-                  className="text-xs text-white/55 hover:text-white/80 transition-colors py-2 text-center"
-                >
-                  For Guides
-                </a>
-
-                <a
-                  href="tel:+12022438336"
-                  className="inline-flex items-center justify-center gap-1.5 text-[13px] text-white/80 hover:text-cta-book transition-colors whitespace-nowrap py-2"
-                >
-                  <Phone className="w-4 h-4" />
-                  +1 (202) 243-8336
-                </a>
               </div>
             </div>
           </motion.div>
@@ -385,7 +278,6 @@ const Navbar = () => {
           navigate(`/home#meet-guides?cities=${encodeURIComponent(cities.join(","))}`);
         }}
       />
-      <TravelerProfileForm open={profileOpen} onClose={() => setProfileOpen(false)} />
     </nav>
   );
 };
