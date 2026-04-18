@@ -751,6 +751,13 @@ const Admin = () => {
             <MessageSquare className="w-4 h-4 mr-2" /> Inquiries ({inquiries.length})
           </Button>
           <Button
+            variant={tab === "analytics" ? "default" : "outline"}
+            onClick={() => setTab("analytics")}
+            className={tab === "analytics" ? "" : "border-primary text-primary hover:bg-primary/10"}
+          >
+            <LineChart className="w-4 h-4 mr-2" /> Analytics
+          </Button>
+          <Button
             variant={tab === "reviews" ? "default" : "outline"}
             onClick={() => setTab("reviews")}
           >
@@ -782,12 +789,6 @@ const Admin = () => {
             onClick={() => setTab("verification")}
           >
             <ShieldCheck className="w-4 h-4 mr-2" /> Verification
-          </Button>
-          <Button
-            variant={tab === "analytics" ? "default" : "outline"}
-            onClick={() => setTab("analytics")}
-          >
-            <LineChart className="w-4 h-4 mr-2" /> Analytics
           </Button>
         </div>
 
