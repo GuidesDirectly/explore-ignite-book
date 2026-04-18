@@ -313,8 +313,7 @@ const Navbar = () => {
                   <>
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold w-full justify-start gap-2"
+                      className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold w-full justify-start gap-2"
                       onClick={() => { setIsOpen(false); navigate("/login"); }}
                     >
                       <LogIn className="w-4 h-4" />
@@ -322,8 +321,7 @@ const Navbar = () => {
                     </Button>
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold w-full"
+                      className="bg-transparent border border-cta-book/70 text-white hover:bg-cta-book/10 hover:border-cta-book font-semibold w-full"
                       onClick={() => { setIsOpen(false); navigate("/login?tab=signup"); }}
                     >
                       Join Free as Traveler
@@ -332,8 +330,7 @@ const Navbar = () => {
                 ) : (
                   <Button
                     size="sm"
-                    variant="outline"
-                    className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold w-full justify-start gap-2"
+                    className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold w-full justify-start gap-2"
                     onClick={() => { setIsOpen(false); navigate(dashboardConfig.path); }}
                   >
                     <LayoutDashboard className="w-4 h-4" />
@@ -343,8 +340,7 @@ const Navbar = () => {
 
                 <Button
                   size="sm"
-                  variant="outline"
-                  className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold w-full"
+                  className="bg-cta-book text-cta-book-foreground border border-cta-book hover:bg-cta-book/90 font-semibold w-full"
                   onClick={() => { setIsOpen(false); navigate("/guides"); }}
                 >
                   Find a Guide
