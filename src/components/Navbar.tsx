@@ -162,7 +162,7 @@ const Navbar = () => {
         </div>
 
         {/* RIGHT: Actions (desktop) */}
-        <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
+        <div className="hidden lg:flex items-center gap-3 xl:gap-4 shrink-0">
           {isLoggedIn && (
             <>
               <button
@@ -183,24 +183,12 @@ const Navbar = () => {
             </>
           )}
 
-          {/* 1. Phone — text only */}
-          <a
-            href="tel:+12022438336"
-            className="inline-flex items-center gap-1.5 text-[13px] text-white/80 hover:text-cta-book transition-colors whitespace-nowrap"
-          >
-            <Phone className="w-4 h-4" />
-            +1 (202) 243-8336
-          </a>
-
-          <div className="w-px h-6 bg-white/20 mx-1" />
-
-          {/* 2 & 3. Auth buttons OR contextual dashboard link */}
+          {/* Auth buttons OR contextual dashboard link */}
           {!isLoggedIn ? (
             <>
               <Button
                 size="sm"
-                variant="outline"
-                className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold whitespace-nowrap"
+                className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold whitespace-nowrap"
                 onClick={() => navigate("/login")}
               >
                 <LogIn className="w-3.5 h-3.5 mr-1.5" />
@@ -208,8 +196,7 @@ const Navbar = () => {
               </Button>
               <Button
                 size="sm"
-                variant="outline"
-                className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold whitespace-nowrap"
+                className="bg-transparent border border-cta-book/70 text-white hover:bg-cta-book/10 hover:border-cta-book font-semibold whitespace-nowrap"
                 onClick={() => navigate("/login?tab=signup")}
               >
                 Join Free as Traveler
@@ -218,8 +205,7 @@ const Navbar = () => {
           ) : (
             <Button
               size="sm"
-              variant="outline"
-              className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold whitespace-nowrap"
+              className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold whitespace-nowrap"
               onClick={() => navigate(dashboardConfig.path)}
             >
               <LayoutDashboard className="w-3.5 h-3.5 mr-1.5" />
@@ -227,17 +213,16 @@ const Navbar = () => {
             </Button>
           )}
 
-          {/* 4. Find a Guide — primary gold CTA */}
+          {/* Find a Guide — primary gold CTA (solid) */}
           <Button
             size="sm"
-            variant="outline"
-            className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold whitespace-nowrap"
+            className="bg-cta-book text-cta-book-foreground border border-cta-book hover:bg-cta-book/90 font-semibold whitespace-nowrap"
             onClick={() => navigate("/guides")}
           >
             Find a Guide
           </Button>
 
-          {/* 5. For Guides — subtle text link */}
+          {/* For Guides — subtle text link */}
           <a
             href="/for-guides"
             onClick={(e) => { e.preventDefault(); navigate("/for-guides"); }}
@@ -248,7 +233,6 @@ const Navbar = () => {
 
           {isLoggedIn && <NavbarUserMenu email={userEmail} />}
 
-          <div className="w-px h-6 bg-white/20 mx-1" />
           <LanguageSwitcher />
         </div>
 
@@ -329,8 +313,7 @@ const Navbar = () => {
                   <>
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold w-full justify-start gap-2"
+                      className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold w-full justify-start gap-2"
                       onClick={() => { setIsOpen(false); navigate("/login"); }}
                     >
                       <LogIn className="w-4 h-4" />
@@ -338,8 +321,7 @@ const Navbar = () => {
                     </Button>
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold w-full"
+                      className="bg-transparent border border-cta-book/70 text-white hover:bg-cta-book/10 hover:border-cta-book font-semibold w-full"
                       onClick={() => { setIsOpen(false); navigate("/login?tab=signup"); }}
                     >
                       Join Free as Traveler
@@ -348,8 +330,7 @@ const Navbar = () => {
                 ) : (
                   <Button
                     size="sm"
-                    variant="outline"
-                    className="border-white/40 text-white/90 hover:bg-white/10 hover:text-white font-semibold w-full justify-start gap-2"
+                    className="bg-white text-[#0A1628] border border-white hover:bg-white/90 font-semibold w-full justify-start gap-2"
                     onClick={() => { setIsOpen(false); navigate(dashboardConfig.path); }}
                   >
                     <LayoutDashboard className="w-4 h-4" />
@@ -359,8 +340,7 @@ const Navbar = () => {
 
                 <Button
                   size="sm"
-                  variant="outline"
-                  className="border-cta-book text-cta-book hover:bg-cta-book hover:text-cta-book-foreground font-semibold w-full"
+                  className="bg-cta-book text-cta-book-foreground border border-cta-book hover:bg-cta-book/90 font-semibold w-full"
                   onClick={() => { setIsOpen(false); navigate("/guides"); }}
                 >
                   Find a Guide
