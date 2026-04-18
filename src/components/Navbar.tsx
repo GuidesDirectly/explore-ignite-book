@@ -163,6 +163,14 @@ const Navbar = () => {
 
         {/* RIGHT: Actions (desktop) */}
         <div className="hidden lg:flex items-center gap-3 xl:gap-4 shrink-0">
+          <a
+            href="tel:+12022438336"
+            className="inline-flex items-center gap-1.5 text-[13px] text-white/80 hover:text-cta-book transition-colors whitespace-nowrap"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            +1 (202) 243-8336
+          </a>
+
           {isLoggedIn && (
             <>
               <button
@@ -196,7 +204,7 @@ const Navbar = () => {
               </Button>
               <Button
                 size="sm"
-                className="bg-transparent border border-cta-book/70 text-white hover:bg-cta-book/10 hover:border-cta-book font-semibold whitespace-nowrap"
+                className="bg-transparent border border-cta-book/70 text-cta-book hover:bg-cta-book/10 hover:border-cta-book font-semibold whitespace-nowrap"
                 onClick={() => navigate("/login?tab=signup")}
               >
                 Join Free as Traveler
@@ -213,9 +221,8 @@ const Navbar = () => {
             </Button>
           )}
 
-          {/* Find a Guide — primary gold CTA (solid) */}
+          {/* Find a Guide — primary gold CTA (solid, largest) */}
           <Button
-            size="sm"
             className="bg-cta-book text-cta-book-foreground border border-cta-book hover:bg-cta-book/90 font-semibold whitespace-nowrap"
             onClick={() => navigate("/guides")}
           >
