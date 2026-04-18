@@ -1,56 +1,44 @@
 
 
-## Plan — Add Sign Up tab to Login + verify traveler redirect
+## Plan — Two traveler dashboard fixes
 
-### FIX 1 — Add Sign Up tab to `Login.tsx`
+### Fix 1: Sign-up redirect skips onboarding
 
-Refactor `src/pages/Login.tsx` to use the existing `Tabs` component with two tabs: **Sign In** (existing form) and **Sign Up** (new form).
+**Root cause** — `Login.tsx` `routeAfterAuth()` runs immediately after `signUp` returns (line 145). At that exact moment the DB trigger `handle_new_user` has fired, but the new `traveler_profiles` row has **not** been created yet (no trigger creates it). So the query `traveler_profiles.select(onboarding_complete).maybeSingle()` returns `null`. 
 
-**Sign Up form fields:**
-- Email
-- Password (with `PasswordStrengthMeter` reused from existing component)
-- Confirm password (must match)
-- Terms agreement checkbox + small disclosure text linking to terms
+Re-reading the existing logic:
+```ts
+else if (!travelerProfile?.onboarding_complete) navigate("/traveler/onboarding");
+```
+`null?.onboarding_complete` is `undefined`, `!undefined` is `true` → should route to onboarding. So this already works on paper.
 
-**Sign Up handler logic:**
-1. Client-side validation: email format, password matches confirm, password is strong (`isPasswordStrong`), terms checkbox checked.
-2. Optional but consistent with existing security: call `checkPasswordBreached()` before signup; warn but allow if HIBP fails open.
-3. Call `supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/` } })`.
-4. The DB trigger `handle_new_user()` already auto-inserts `user_roles` with role `'user'` (or `'admin'` for the very first user) — **no extra insert needed**.
-5. After successful signup:
-   - If session is returned (email confirmation disabled) → redirect to `/traveler/onboarding`.
-   - If no session (email confirmation enabled) → toast "Check your email to confirm" and stay on page.
-6. Toast on errors (existing user, weak password, etc.).
+**Likely real bug**: a race/caching issue, OR the user already has a profile row with `onboarding_complete = true` from a prior test. Defensive fix:
 
-### FIX 2 — Verify post-login redirect logic
-
-Reviewing existing `Login.tsx` (shown in current-code):
+In `Login.tsx`, change the **sign-up** branch to skip the role/profile lookup entirely and route directly to `/traveler/onboarding` — a brand-new sign-up is by definition a traveler with no completed onboarding. Sign-in keeps the existing `routeAfterAuth` logic.
 
 ```ts
-if (roleSet.has("admin")) navigate("/admin");
-else if (roleSet.has("guide") || guideProfile) navigate("/guide-dashboard");
-else if (!travelerProfile?.onboarding_complete) navigate("/traveler/onboarding");
-else navigate("/traveler/dashboard");
+// In handleSignup, replace `await routeAfterAuth(authData.user.id)` with:
+navigate("/traveler/onboarding");
 ```
 
-Issues vs. spec:
-1. Spec says guide redirect should be `/guide/dashboard`, but existing route is `/guide-dashboard`. Checked `App.tsx` history — actual route is `/guide-dashboard`. **Keep existing route** (changing it would break the rest of the app, and memory says "Do not modify Header/Hero/navigation"). The spec wording is approximate — existing behavior is correct.
-2. Logic for traveler vs onboarding is already correct: if no admin/guide role and `onboarding_complete !== true`, goes to `/traveler/onboarding`; otherwise `/traveler/dashboard`. ✅
-3. Admin redirect → `/admin`. ✅
+### Fix 2: Red notification dot on tabs
 
-**No logic change needed for Fix 2** — the redirect already does what the spec asks. Will add a small console.log to make debugging the test account easier, and ensure that if the `traveler_profiles` row doesn't exist yet (returns null), we route to `/traveler/onboarding` (already handled by `!travelerProfile?.onboarding_complete` since null is falsy). ✅
+**Investigation result** — searched all components; no notification-dot, unread badge, or `bg-red-*` indicator is rendered on the dashboard tabs or by `MessagesInbox` / `UpcomingBookings` / etc. The codebase contains no `unread`, `is_read`, `notification` state.
 
-For the **Sign Up** path specifically, after auto-signin a fresh user has no profile row → will land on `/traveler/onboarding`. ✅
+The only red element on screen is the **Heart icon in the Navbar** (`hover:text-red-400`, line 146 of `Navbar.tsx`) which only colors red on hover.
+
+**Defensive action**: confirm by re-reading the rendered components once more in default mode; if a stray indicator is found (e.g. a leftover `<span className="bg-red-500 ...">` introduced somewhere I haven't grep'd), remove it. If nothing is found, add a one-line note in the implementation message explaining the dashboard renders zero notification indicators and asking the user to share a screenshot if the dot persists.
 
 ### Files touched
 
 | Path | Change |
 |---|---|
-| `src/pages/Login.tsx` | Add `Tabs` wrapper, Sign In + Sign Up panes, sign-up handler, password meter, terms checkbox |
+| `src/pages/Login.tsx` | In `handleSignup` success branch, route directly to `/traveler/onboarding` instead of calling `routeAfterAuth` |
+| (read-only verification) | Re-confirm no notification-dot JSX exists in `TravelerDashboard.tsx`, `MessagesInbox.tsx`, `UpcomingBookings.tsx`, `PastTours.tsx`, `SavedGuidesList.tsx` |
 
 ### Untouched
-Header, Hero, Navbar, all routes, `handle_new_user` trigger (already assigns role), all other pages, RLS, traveler dashboard/onboarding pages.
+Header, Hero, Navbar, all routes, all RLS, all other pages, sign-in flow.
 
 ### After
-Publish. Test by signing up a new email → should land on `/traveler/onboarding`. Test by logging in `testtraveler@iguidetours.net` → lands on `/traveler/onboarding` if incomplete, else `/traveler/dashboard`.
+Publish.
 
