@@ -99,7 +99,7 @@ const Admin = () => {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours" | "published_tours" | "verification">("inquiries");
+  const [tab, setTab] = useState<"inquiries" | "reviews" | "guides" | "tours" | "published_tours" | "verification" | "analytics">("inquiries");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [guides, setGuides] = useState<GuideApplication[]>([]);
