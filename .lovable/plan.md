@@ -1,81 +1,63 @@
 
 
-## Plan — SEO metadata + sitemap + robots (FINAL, approved)
+## Plan — Admin Analytics dashboard
 
-### Setup
-- Add `react-helmet-async` to `package.json`
-- Wrap `<App />` in `<HelmetProvider>` in `src/main.tsx`
-- New `src/components/seo/SEO.tsx` — reusable: `title`, `description`, `keywords?`, `ogImage?`, `ogUrl?`, `ogType?`, `canonical?`. Defaults: og:site_name "GuidesDirectly", twitter:card "summary_large_image", og:image "/og-image.jpg"
+### File: `src/pages/Admin.tsx` only
 
-### `index.html`
-- Update `author` to `GuidesDirectly`
-- Update canonical to `https://iguidetours.net` (non-www)
-- Keep existing JSON-LD TravelAgency schema
+Add new "Analytics" tab to existing tab structure. All queries gated by `has_role(admin)` check already in place on the page.
 
-### Per-page `<SEO />` mounts
+### New component: `src/components/admin/AnalyticsDashboard.tsx`
 
-| Page | Title | Description |
-|---|---|---|
-| `Home.tsx` + `Index.tsx` | `GuidesDirectly — Book Private Tour Guides Directly \| Zero Commission` | "Connect directly with licensed local tour guides. No booking fees, no commission markup, no middlemen. Washington DC, Chicago, Los Angeles and more. Keep 100% of what you pay with your guide." |
-| `GuidesPage.tsx` | `Find a Local Tour Guide — Browse by City & Language \| GuidesDirectly` | "Browse verified local tour guides across Washington DC, Chicago, Los Angeles and more. Direct booking, zero platform fees. Your guide keeps 100% of what you pay." |
-| `GuideProfilePage.tsx` | `{fullName} — Private Tour Guide in {city} \| GuidesDirectly` | First 155 chars of `form_data.bio` + " Book directly on GuidesDirectly — zero commission." og:image = guide photo (fallback `/og-image.jpg`), og:type "profile" |
-| `ForGuidesPage.tsx` | `Become a Tour Guide on GuidesDirectly — Keep 100% of Your Earnings` | "Join GuidesDirectly as a founding guide. Free until 2027, zero commission, keep 100% of every booking." |
-| `ExploreCities.tsx` | `Explore Cities & Destinations — Private Tour Guides Worldwide \| GuidesDirectly` | "Discover guides in 150+ destinations. Book directly, zero commission." |
-| `AiPlannerPage.tsx` | `AI Trip Planner — Custom Itineraries with Local Guides \| GuidesDirectly` | "Plan your perfect trip with AI. Personalized itineraries, direct guide connections." |
-| `Login.tsx` | `Sign In or Create Account \| GuidesDirectly` | (auth) |
-| `GuideRegister.tsx` | `Register as a Tour Guide — Founding Member Free \| GuidesDirectly` | (register) |
-| `TrustPage.tsx`, `PrivacyPolicy.tsx`, `Support.tsx` | standard |
+Single self-contained component mounted inside the new tab. Five sections rendered in order using existing `Card` + `lucide-react` icons + Tailwind tokens (navy/gold).
 
-### robots.txt (`public/robots.txt` — overwrite)
-```
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /guide-dashboard
-Disallow: /traveler/dashboard
+**1. Key metrics cards (6-card grid, `grid-cols-2 md:grid-cols-3 lg:grid-cols-6`)**
+- Total users → `supabase.from('user_roles').select('user_id', { count: 'exact', head: true })` (distinct via Set on client if needed — small dataset)
+- Approved guides → `guide_profiles` count where `status='approved'`
+- Total bookings → `bookings` count
+- Total inquiries → `inquiries` count
+- Founding spots claimed → `app_settings` key `founding_guide_current_count` / `founding_guide_limit` shown as "X / Y"
+- Days until founding ends → computed from `2026-12-31` minus today
 
-Sitemap: https://iguidetours.net/sitemap.xml
-```
+**2. Guide pipeline funnel (horizontal bars, widths proportional to top-of-funnel)**
+- Total applications → `guide_profiles` count (all)
+- Approved → count where `status='approved'`
+- Active → count where `activation_status='active'`
+- With tours published → distinct `guide_user_id` from `tours` where `status='published'`
 
-### Sitemap (`/sitemap.xml`)
-SPA constraint: cannot serve dynamic XML from a static SPA route. Implement as a Supabase Edge Function `generate-sitemap` that:
-- Queries `guide_profiles_public` for all active guide `user_id`s
-- Returns XML with static URLs + per-guide URLs
+Rendered as 4 stacked rows, each: label · number · gold bar with width `(count / max) * 100%`.
 
-Then expose at `https://iguidetours.net/sitemap.xml` via:
-- Add a rewrite in `public/_headers` is insufficient — instead add a `public/_redirects` rule:  
-  `/sitemap.xml  https://oegfwomloaihzwomwypx.supabase.co/functions/v1/generate-sitemap  200`
+**3. Recent activity feed**
+- `analytics_events` ordered by `created_at desc` limit 10
+- Icon mapping per `event_type` (swap_request → Shuffle, cta_click → MousePointer, ai_demo_submit → Sparkles, tour_plan_generated → Map, guide_matched → Users, fallback → Activity)
+- Show event type (humanized), relative time (`date-fns formatDistanceToNow`), small JSON preview of `event_data`
 
-This is a server-side rewrite (200 = transparent proxy), so crawlers see XML at the canonical URL.
+**4. Geographic coverage**
+- Query `guide_profiles` where `status='approved' AND activation_status='active'`, select `service_areas`
+- Flatten arrays client-side, count occurrences per city, sort desc, render as list with city name + badge count
 
-Static URLs included:
-- `/` priority 1.0
-- `/guides` priority 0.9
-- `/for-guides` priority 0.8
-- `/#how-it-works` priority 0.7
-- `/#about` priority 0.6
-- `/guide/{user_id}` priority 0.8 for each public guide
+**5. MRR estimate (prominent card, gold accent)**
+- Query `guide_profiles` grouped by `subscription_tier` where `subscription_status='active'`
+- Pro (`pro`) × $29 + Featured (`featured`) × $59 + Spotlight (computed via `is_spotlight=true`) × $49
+- Show component breakdown + total in large gold typography
 
-### og:image (`public/og-image.jpg`)
-Cannot generate/manipulate binary images in read-only inspection, but `index.html` already references `/og-image.jpg`. Will check if it exists; if not, ask the user to upload a 1200×630 DC skyline image (cannot fabricate one). The SEO component will reference `/og-image.jpg` regardless — image upload is a one-time asset task by the user.
+### Data fetching pattern
+- Single `useEffect` on mount, `Promise.all` of ~7 queries via existing `supabase` client
+- Local loading state, skeleton cards while loading
+- Errors logged to console, sections degrade gracefully
+
+### Admin gate
+`Admin.tsx` already checks `has_role(admin)` before rendering content — Analytics tab inherits that gate. No additional auth code.
 
 ### Files touched
 
 | Path | Change |
 |---|---|
-| `package.json` | Add `react-helmet-async` |
-| `src/main.tsx` | Wrap in `HelmetProvider` |
-| `src/components/seo/SEO.tsx` | NEW |
-| `index.html` | Author + canonical update |
-| 11 page files above | Mount `<SEO />` |
-| `public/robots.txt` | Overwrite with disallow rules + sitemap line |
-| `public/_redirects` | NEW — proxy `/sitemap.xml` to edge function |
-| `supabase/functions/generate-sitemap/index.ts` | NEW — XML generator |
-| `supabase/config.toml` | Register `generate-sitemap` as public (verify_jwt = false) |
+| `src/components/admin/AnalyticsDashboard.tsx` | NEW — full dashboard |
+| `src/pages/Admin.tsx` | Add Analytics tab + trigger; mount `<AnalyticsDashboard />` |
 
 ### Untouched
-Header/Navbar, Hero, Footer, color tokens, messaging system, Stripe, RLS, table schemas.
+Header/Navbar, Hero, Footer, all other pages, table schemas, RLS, Stripe, messaging, SEO.
 
 ### After
-Publish. Note for user: upload `og-image.jpg` (1200×630) to `/public` if not already present.
+Publish.
 
