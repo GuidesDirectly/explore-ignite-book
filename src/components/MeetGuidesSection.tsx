@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { generateGuideSlug } from "@/lib/utils";
+import { generateGuideSlug, toTitleCase } from "@/lib/utils";
 import { MessageCircle, PlusCircle, Check } from "lucide-react";
 import type { BadgeType } from "@/components/GuideBadge";
-import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 
 interface GuideProfile {
   id: string;
@@ -27,34 +26,23 @@ const CREDENTIAL_MAP: Record<string, string> = {
 
 const MeetGuidesSection = () => {
   const navigate = useNavigate();
-  const { data: foundingProgram } = useFoundingProgram();
   const [guides, setGuides] = useState<GuideProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!foundingProgram) return;
-    const foundingPlanId = foundingProgram.foundingPlanId;
-    if (!foundingPlanId) {
-      setLoading(false);
-      return;
-    }
-
     const fetchGuides = async () => {
-      // 1. Fetch all approved+active founding guides directly from the public view
-      // (now exposes subscription_plan_id, so single-query is sufficient).
+      // The public view already enforces status='approved' AND activation_status='active'.
+      // Today, all 4 active guides are founding guides — query directly, no plan filter.
       const { data: guideData, error } = await (supabase
         .from("guide_profiles_public" as any)
-        .select("id, user_id, form_data, service_areas, subscription_plan_id")
-        .eq("subscription_plan_id", foundingPlanId)
+        .select("id, user_id, form_data, service_areas")
         .order("created_at", { ascending: true }) as any);
 
       if (error) {
-        console.warn("MeetGuidesSection: founding fetch failed", error);
+        console.warn("MeetGuidesSection: fetch failed", error);
       }
 
       if (!guideData || guideData.length === 0) {
-        // Defensive fallback: no founding guides found via plan_id — leave grid empty.
-        console.warn("MeetGuidesSection: no founding guides matched plan id", foundingPlanId);
         setLoading(false);
         return;
       }
@@ -85,7 +73,7 @@ const MeetGuidesSection = () => {
       setLoading(false);
     };
     fetchGuides();
-  }, [foundingProgram]);
+  }, []);
 
   const getInitials = (g: GuideProfile) => {
     const first = g.form_data.firstName?.[0] || "";
@@ -228,7 +216,7 @@ const MeetGuidesSection = () => {
 
                 {/* City & Languages */}
                 <p className="px-5 pb-3" style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>
-                  📍 {guide.service_areas?.[0] || "—"} · {getLanguagesString(guide)}
+                  📍 {toTitleCase(guide.service_areas?.[0]) || "—"} · {getLanguagesString(guide)}
                 </p>
 
                 {/* Bio excerpt */}

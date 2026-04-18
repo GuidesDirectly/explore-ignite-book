@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { generateGuideSlug } from "@/lib/utils";
+import { generateGuideSlug, toTitleCase } from "@/lib/utils";
 import { MapPin, Globe, Search, MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -411,7 +411,7 @@ const GuidesPage = () => {
                     {/* City */}
                     {city && (
                       <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", padding: "0 16px 8px" }}>
-                        📍 {city}
+                        📍 {toTitleCase(city)}
                       </p>
                     )}
 
@@ -447,7 +447,7 @@ const GuidesPage = () => {
                             padding: "0 16px 8px",
                           }}
                         >
-                          No tours listed yet — contact to inquire
+                          Available for custom tours — send a message
                         </p>
                       );
                     })()}
