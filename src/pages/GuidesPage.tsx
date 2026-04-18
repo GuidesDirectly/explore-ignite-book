@@ -231,8 +231,9 @@ const GuidesPage = () => {
     return languages.map(l => codeMap[l] || l.slice(0, 2).toUpperCase()).slice(0, 4);
   };
 
-  const usingFallback = !loading && fetchStatus !== "ok" && guides.length === 0;
-  const displayList = usingFallback ? FALLBACK_GUIDES : filtered;
+  const displayList = filtered;
+  const hasFilters = !!cityFilter.trim() || (!!languageFilter && languageFilter !== "Any Language");
+  const showLoadError = !loading && fetchStatus !== "ok" && guides.length === 0 && !hasFilters;
 
   return (
     <div style={{ background: "#0A1628" }} className="min-h-screen">
