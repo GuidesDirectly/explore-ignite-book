@@ -1,19 +1,17 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { MessageSquare } from "lucide-react";
 import ConversationPanel from "@/components/messaging/ConversationPanel";
 
 interface ConvoRow {
   id: string;
-  guide_user_id: string;
+  traveler_user_id: string | null;
+  traveler_name: string;
   last_message_at: string;
   lastMessage?: string;
   unreadCount?: number;
-  guideName?: string;
-  guideAvatar?: string | null;
-  guideFirstName?: string;
-  guideCity?: string;
 }
 
 const initials = (name: string) =>
@@ -23,31 +21,24 @@ const initials = (name: string) =>
     .filter(Boolean)
     .slice(0, 2)
     .join("")
-    .toUpperCase() || "G";
+    .toUpperCase() || "T";
 
-const MessagesInbox = ({ userId }: { userId: string }) => {
+const GuideMessagesInbox = ({
+  userId,
+  guideName,
+}: {
+  userId: string;
+  guideName: string;
+}) => {
   const [convos, setConvos] = useState<ConvoRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<ConvoRow | null>(null);
-  const [viewerName, setViewerName] = useState("Traveler");
-
-  useEffect(() => {
-    supabase
-      .from("traveler_profiles")
-      .select("first_name, last_name")
-      .eq("user_id", userId)
-      .maybeSingle()
-      .then(({ data }) => {
-        const n = [data?.first_name, data?.last_name].filter(Boolean).join(" ").trim();
-        if (n) setViewerName(n);
-      });
-  }, [userId]);
 
   const load = useCallback(async () => {
     const { data: convosData } = await supabase
       .from("conversations")
-      .select("id, guide_user_id, last_message_at")
-      .eq("traveler_user_id", userId)
+      .select("id, traveler_user_id, traveler_name, last_message_at")
+      .eq("guide_user_id", userId)
       .order("last_message_at", { ascending: false })
       .limit(100);
 
@@ -70,44 +61,12 @@ const MessagesInbox = ({ userId }: { userId: string }) => {
       });
     }
 
-    // Resolve guide names via public view
-    const guideIds = Array.from(new Set((convosData || []).map((c) => c.guide_user_id)));
-    const guideInfo: Record<
-      string,
-      { name: string; firstName: string; city: string; avatar: string | null }
-    > = {};
-    if (guideIds.length) {
-      const { data: guides } = await supabase
-        .from("guide_profiles_public")
-        .select("user_id, form_data, service_areas")
-        .in("user_id", guideIds);
-      (guides || []).forEach((g: any) => {
-        const fd = g.form_data || {};
-        const fn = fd.firstName || "";
-        const ln = fd.lastName || "";
-        const city = (g.service_areas && g.service_areas[0]) || "";
-        guideInfo[g.user_id] = {
-          name: `${fn} ${ln}`.trim() || "Guide",
-          firstName: fn,
-          city,
-          avatar: fd.profilePhotoUrl || fd.photoUrl || null,
-        };
-      });
-    }
-
     setConvos(
-      (convosData || []).map((c: any) => {
-        const info = guideInfo[c.guide_user_id];
-        return {
-          ...c,
-          lastMessage: previews[c.id],
-          unreadCount: unread[c.id] || 0,
-          guideName: info?.name || "Guide",
-          guideAvatar: info?.avatar || null,
-          guideFirstName: info?.firstName,
-          guideCity: info?.city,
-        };
-      })
+      (convosData || []).map((c: any) => ({
+        ...c,
+        lastMessage: previews[c.id],
+        unreadCount: unread[c.id] || 0,
+      }))
     );
     setLoading(false);
   }, [userId]);
@@ -115,7 +74,7 @@ const MessagesInbox = ({ userId }: { userId: string }) => {
   useEffect(() => {
     load();
     const channel = supabase
-      .channel(`traveler-inbox-${userId}`)
+      .channel(`guide-inbox-${userId}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "messages" },
@@ -123,12 +82,7 @@ const MessagesInbox = ({ userId }: { userId: string }) => {
       )
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "conversations",
-          filter: `traveler_user_id=eq.${userId}`,
-        },
+        { event: "*", schema: "public", table: "conversations", filter: `guide_user_id=eq.${userId}` },
         () => load()
       )
       .subscribe();
@@ -141,7 +95,7 @@ const MessagesInbox = ({ userId }: { userId: string }) => {
   if (!convos.length)
     return (
       <p className="text-muted-foreground text-sm">
-        No conversations yet. Browse guides and tap "Message" to start one.
+        No conversations yet. Travelers who message you will appear here.
       </p>
     );
 
@@ -160,9 +114,8 @@ const MessagesInbox = ({ userId }: { userId: string }) => {
             >
               <div className="flex items-start gap-3">
                 <Avatar className="h-9 w-9">
-                  {c.guideAvatar && <AvatarImage src={c.guideAvatar} alt={c.guideName} />}
                   <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                    {initials(c.guideName || "G")}
+                    {initials(c.traveler_name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
@@ -172,7 +125,7 @@ const MessagesInbox = ({ userId }: { userId: string }) => {
                         unread ? "font-bold text-foreground" : "font-medium text-foreground"
                       }`}
                     >
-                      {c.guideName}
+                      {c.traveler_name}
                     </p>
                     {unread && (
                       <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
@@ -202,19 +155,16 @@ const MessagesInbox = ({ userId }: { userId: string }) => {
           open={!!active}
           onClose={() => setActive(null)}
           conversationId={active.id}
-          peerUserId={active.guide_user_id}
-          peerName={active.guideName || "Guide"}
-          peerInitials={initials(active.guideName || "G")}
-          peerAvatarUrl={active.guideAvatar}
-          peerFirstName={active.guideFirstName}
-          peerCity={active.guideCity}
-          viewerRole="traveler"
+          peerUserId={active.traveler_user_id || ""}
+          peerName={active.traveler_name}
+          peerInitials={initials(active.traveler_name)}
+          viewerRole="guide"
           viewerUserId={userId}
-          viewerName={viewerName}
+          viewerName={guideName || "Guide"}
         />
       )}
     </>
   );
 };
 
-export default MessagesInbox;
+export default GuideMessagesInbox;

@@ -16,6 +16,8 @@ import { LogIn, UserPlus, Mail, Lock } from "lucide-react";
 const Login = () => {
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") === "signup" ? "signup" : "signin";
+  const returnTo = searchParams.get("returnTo");
+  const context = searchParams.get("context");
   const [tab, setTab] = useState<"signin" | "signup">(initialTab);
 
   // Sign in state
@@ -48,7 +50,9 @@ const Login = () => {
       onboardingComplete: travelerProfile?.onboarding_complete ?? null,
     });
 
-    if (roleSet.has("admin")) {
+    if (returnTo) {
+      navigate(decodeURIComponent(returnTo));
+    } else if (roleSet.has("admin")) {
       navigate("/admin");
     } else if (roleSet.has("guide") || guideProfile) {
       navigate("/guide-dashboard");
@@ -143,9 +147,12 @@ const Login = () => {
 
     if (authData.session && authData.user) {
       // Email confirmation disabled — user is signed in immediately.
-      // New sign-ups always go through onboarding first.
-      toast({ title: "Welcome!", description: "Let's set up your traveler profile." });
-      navigate("/traveler/onboarding");
+      toast({ title: "Welcome!", description: returnTo ? "You can now message the guide." : "Let's set up your traveler profile." });
+      if (returnTo) {
+        navigate(decodeURIComponent(returnTo));
+      } else {
+        navigate("/traveler/onboarding");
+      }
     } else {
       // Email confirmation required
       toast({
@@ -181,6 +188,17 @@ const Login = () => {
                   : "Join to discover guides and plan your tours."}
               </p>
             </div>
+
+            {context === "message" && (
+              <div className="mb-5 p-3 rounded-lg bg-primary/10 border border-primary/30 text-center">
+                <p className="text-sm text-foreground font-medium">
+                  Create a free account to message this guide
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Takes less than 30 seconds. We'll bring you right back.
+                </p>
+              </div>
+            )}
 
             <Tabs value={tab} onValueChange={(v) => setTab(v as "signin" | "signup")} className="w-full">
               <TabsList className="grid grid-cols-2 w-full mb-6">

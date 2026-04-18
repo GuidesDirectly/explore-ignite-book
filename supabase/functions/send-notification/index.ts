@@ -27,14 +27,14 @@ const corsHeaders = {
 const NOTIFY_EMAIL = "michael@iguidetours.net";
 
 interface NotificationRequest {
-  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request" | "profile_reminder" | "guide_activated" | "activation_reminder" | "subscription_expiring_soon" | "subscription_expired" | "founding_guide_welcome" | "founding_30day_warning" | "founding_7day_warning" | "founding_expired" | "founding_spots_filled";
+  type: "inquiry" | "review" | "tour_plan" | "guide_status" | "guide_application" | "booking_status" | "booking_request" | "review_request" | "profile_reminder" | "guide_activated" | "activation_reminder" | "subscription_expiring_soon" | "subscription_expired" | "founding_guide_welcome" | "founding_30day_warning" | "founding_7day_warning" | "founding_expired" | "founding_spots_filled" | "new_message";
   data: Record<string, unknown>;
 }
 
-const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request", "profile_reminder", "guide_activated", "activation_reminder", "subscription_expiring_soon", "subscription_expired", "founding_guide_welcome", "founding_30day_warning", "founding_7day_warning", "founding_expired", "founding_spots_filled"]);
+const VALID_TYPES = new Set(["inquiry", "review", "tour_plan", "guide_status", "guide_application", "booking_status", "booking_request", "review_request", "profile_reminder", "guide_activated", "activation_reminder", "subscription_expiring_soon", "subscription_expired", "founding_guide_welcome", "founding_30day_warning", "founding_7day_warning", "founding_expired", "founding_spots_filled", "new_message"]);
 
 // Notification types that can be sent without authentication (public forms + DB-triggered events)
-const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request", "review_request", "profile_reminder", "guide_activated", "activation_reminder", "subscription_expiring_soon", "subscription_expired", "founding_guide_welcome", "founding_30day_warning", "founding_7day_warning", "founding_expired", "founding_spots_filled"]);
+const PUBLIC_TYPES = new Set(["inquiry", "review", "tour_plan", "booking_request", "review_request", "profile_reminder", "guide_activated", "activation_reminder", "subscription_expiring_soon", "subscription_expired", "founding_guide_welcome", "founding_30day_warning", "founding_7day_warning", "founding_expired", "founding_spots_filled", "new_message"]);
 // Notification types that require authentication
 const AUTH_TYPES = new Set(["guide_status", "guide_application", "booking_status"]);
 
@@ -838,6 +838,80 @@ const handler = async (req: Request): Promise<Response> => {
         </div>
       `;
       toEmails = ["allharmony@gmail.com"];
+    } else if (type === "new_message") {
+      const recipientUserId = data.recipientUserId as string;
+      const senderName = (data.senderName as string) || "Someone";
+      const preview = ((data.preview as string) || "").slice(0, 100);
+      const recipientRole = (data.recipientRole as string) || "traveler";
+      const conversationId = data.conversationId as string | undefined;
+
+      if (!recipientUserId) {
+        throw new Error("recipientUserId is required for new_message");
+      }
+
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+
+      // Insert in-app notification (service role bypasses RLS)
+      try {
+        await supabaseAdmin.from("notifications").insert({
+          user_id: recipientUserId,
+          type: "new_message",
+          title: `New message from ${senderName}`,
+          message: preview,
+          metadata: { conversationId, senderName, recipientRole },
+        });
+      } catch (e) {
+        console.error("Failed to insert in-app notification:", e);
+      }
+
+      // Resolve recipient email
+      let recipientEmail: string | undefined;
+      try {
+        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(recipientUserId);
+        recipientEmail = userData?.user?.email;
+      } catch (e) {
+        console.error("Failed to look up recipient email:", e);
+      }
+
+      if (!recipientEmail) {
+        // Notification row was created; just return success without email
+        return new Response(JSON.stringify({ success: true, emailed: false }), {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+
+      const dashboardUrl =
+        recipientRole === "guide"
+          ? "https://iguidetours.net/guide-dashboard"
+          : "https://iguidetours.net/traveler/dashboard";
+
+      subject = `New message from ${escapeHtml(senderName)} — GuidesDirectly`;
+      html = `
+        <div style="font-family:'Georgia','Times New Roman',serif;max-width:600px;margin:0 auto;">
+          <div style="background:#0A1628;padding:32px 40px;text-align:center;">
+            <h1 style="color:#ffffff;margin:0;font-size:26px;letter-spacing:1px;">GuidesDirectly</h1>
+          </div>
+          <div style="padding:40px;background:#ffffff;">
+            <h2 style="color:#0A1628;font-size:22px;margin:0 0 16px;">New message from ${escapeHtml(senderName)}</h2>
+            <div style="background:#F5F0E8;border-left:3px solid #C9A84C;padding:16px 20px;margin:20px 0;border-radius:4px;">
+              <p style="color:#333;line-height:1.6;font-size:15px;margin:0;font-style:italic;">"${escapeHtml(preview)}${preview.length >= 100 ? "…" : ""}"</p>
+            </div>
+            <p style="color:#333;line-height:1.7;font-size:16px;">Open your dashboard to read and reply.</p>
+            <div style="text-align:center;margin:30px 0 10px;">
+              <a href="${dashboardUrl}" style="display:inline-block;background:#C9A84C;color:#0A1628;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">Open Messages →</a>
+            </div>
+            <p style="color:#888;font-size:13px;margin-top:24px;">— The Guides Directly Team</p>
+          </div>
+          <div style="padding:20px;text-align:center;background:#F5F5F5;">
+            <p style="color:#999;font-size:12px;margin:0;">© 2025–2026 Guides Directly, powered by iGuide Tours</p>
+          </div>
+        </div>
+      `;
+      toEmails = [recipientEmail];
     } else {
       throw new Error("Invalid notification type");
     }

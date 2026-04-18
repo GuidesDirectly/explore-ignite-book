@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { generateGuideSlug, toTitleCase } from "@/lib/utils";
 import { MessageCircle, PlusCircle, Check } from "lucide-react";
 import type { BadgeType } from "@/components/GuideBadge";
+import MessageGuideButton from "@/components/messaging/MessageGuideButton";
 
 interface GuideProfile {
   id: string;
@@ -266,27 +267,35 @@ const MeetGuidesSection = () => {
                 <div className="flex-1" />
 
                 {/* Message button */}
-                <button
-                  onClick={() => navigate(`/guide/${generateGuideSlug(guide.form_data.firstName, guide.form_data.lastName, guide.service_areas?.[0] || "")}`)}
-                  className="w-full flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer"
-                  style={{
-                    backgroundColor: "#C9A84C",
-                    color: "#0A1628",
-                    fontWeight: 600,
-                    fontSize: 15,
-                    padding: 16,
-                    borderRadius: "0 0 12px 12px",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#B8924A")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#C9A84C")
-                  }
+                <MessageGuideButton
+                  guideUserId={guide.user_id}
+                  guideFirstName={guide.form_data.firstName}
+                  guideLastName={guide.form_data.lastName}
+                  guideCity={guide.service_areas?.[0] || ""}
                 >
-                  <MessageCircle className="w-4 h-4" />
-                  Message {guide.form_data.firstName}
-                </button>
+                  <button
+                    className="w-full flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer"
+                    style={{
+                      backgroundColor: "#C9A84C",
+                      color: "#0A1628",
+                      fontWeight: 600,
+                      fontSize: 15,
+                      padding: 16,
+                      borderRadius: "0 0 12px 12px",
+                      border: "none",
+                      width: "100%",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#B8924A")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#C9A84C")
+                    }
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Message {guide.form_data.firstName}
+                  </button>
+                </MessageGuideButton>
               </div>
             </div>
           ))}
