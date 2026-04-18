@@ -783,7 +783,16 @@ const Admin = () => {
           >
             <ShieldCheck className="w-4 h-4 mr-2" /> Verification
           </Button>
+          <Button
+            variant={tab === "analytics" ? "default" : "outline"}
+            onClick={() => setTab("analytics")}
+          >
+            <LineChart className="w-4 h-4 mr-2" /> Analytics
+          </Button>
         </div>
+
+        {/* Analytics Tab */}
+        {tab === "analytics" && <AnalyticsDashboard />}
 
         {/* Inquiries Tab */}
         {tab === "inquiries" && (
