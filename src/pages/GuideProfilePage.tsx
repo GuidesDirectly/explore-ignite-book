@@ -28,6 +28,7 @@ import FoundingGuideBadge from "@/components/FoundingGuideBadge";
 import SpotlightBanner from "@/components/SpotlightBanner";
 import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 import SEO from "@/components/seo/SEO";
+import NotFoundMeta from "@/components/seo/NotFoundMeta";
 
 interface GuideData {
   id: string;
