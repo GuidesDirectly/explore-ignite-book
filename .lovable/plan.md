@@ -1,43 +1,67 @@
 
-## Plan — Force PWA cache busting + iframe guard
+
+## Plan — Fix Soft 404s for empty dynamic pages
 
 ### Problem
-The PWA service worker (`vite-plugin-pwa`) caches the old build's `index.html` and JS bundles. Even with `registerType: "autoUpdate"` already set, users keep seeing the stale tab bar without Analytics until they hard-reload or unregister the SW manually.
+Google flags `/guide/:id` and `/tour/:guideId` pages as Soft 404 when the ID doesn't resolve. The pages currently render a brief "not found" panel but still emit a `200 OK` and don't tell crawlers the page is missing.
 
-### Root causes
-1. `cleanupOutdatedCaches` is not set — old precache entries linger.
-2. `skipWaiting` / `clientsClaim` are not set — a new SW waits for all tabs to close before activating.
-3. No client-side update prompt or auto-reload, so even when a new SW downloads, the user must close every tab to see new code.
-4. No iframe/preview guard — SW pollutes the Lovable preview iframe (per Lovable PWA guidance).
+### Constraint
+This is a SPA on Lovable hosting — we cannot send a real HTTP 404 status. The accepted SEO fix is to inject `<meta name="robots" content="noindex, nofollow">` plus `<meta name="prerender-status-code" content="404">` on the not-found view, set a clear `<title>`, and render a real "Not found" UI with navigation back into the site. Google honors `noindex` and treats the page as removed from the index, eliminating the Soft 404 warning.
 
 ### Changes
 
-**1. `vite.config.ts` — VitePWA workbox block**
+**1. `src/components/seo/NotFoundMeta.tsx` (NEW)**
+Tiny component that, on mount, injects:
+- `<meta name="robots" content="noindex, nofollow">`
+- `<meta name="googlebot" content="noindex, nofollow">`
+- `<meta name="prerender-status-code" content="404">`
+- Sets `document.title` to the passed title
+- Cleans up tags on unmount so they don't leak into other routes
 
-Add to the existing `workbox: { ... }`:
-- `cleanupOutdatedCaches: true` — purges stale precache on activation
-- `skipWaiting: true` — new SW takes over immediately
-- `clientsClaim: true` — new SW controls open tabs without reload
+**2. `src/pages/NotFound.tsx` (REPLACE)**
+Replace the bare placeholder with a branded 404 page:
+- Mounts `<Navbar />` and `<Footer />` for site continuity
+- Uses `<NotFoundMeta title="Page Not Found | Guides Directly" />`
+- Heading: "Page Not Found" + subtitle
+- Two CTAs: `Link to "/"` (Home) and `Link to "/guides"` (Browse Guides)
+- Logs the bad path to console (existing behavior kept)
+- Uses existing deep-navy palette for visual consistency
 
-Keep `registerType: "autoUpdate"` (already present).
+**3. `src/pages/GuideProfilePage.tsx` (PATCH lines 339–356)**
+Enhance the existing `notFound` branch:
+- Add `<NotFoundMeta title="Guide Not Found | Guides Directly" />` so crawlers see `noindex`
+- Keep the existing "Guide not found" message + "Back to Guides" button
+- Add a second CTA link to `/` (Home)
+- Add `<Footer />` for completeness
 
-**2. `src/main.tsx` — auto-reload on new SW + iframe unregister guard**
+**4. `src/pages/TourDetail.tsx` (PATCH lines 223–237)**
+Enhance the existing `notFound` branch:
+- Add `<NotFoundMeta title="Tour Not Found | Guides Directly" />`
+- Keep "Tour Not Found" message + "Browse All Guides" button
+- Add second CTA to `/`
+- Footer already present — keep
 
-Add a small block before app render:
-- If running inside an iframe or on a Lovable preview host (`id-preview--`, `lovableproject.com`), unregister all existing service workers (prevents preview pollution).
-- Otherwise, listen for `controllerchange` from `navigator.serviceWorker` and call `window.location.reload()` once, so the moment a new SW activates the page refreshes to the new build.
+**5. `src/App.tsx` — no change needed**
+Verified: catch-all `<Route path="*" element={<NotFound />} />` already exists (line 81). All unmatched routes already render `NotFound`.
 
-This gives users the new Analytics tab on the very next normal refresh — no manual cache clear required.
+### Why this fixes Soft 404 in Search Console
+- `noindex` removes the URL from the index → Search Console reclassifies from "Soft 404" to "Excluded by 'noindex' tag" (a clean, intentional state).
+- `prerender-status-code: 404` is read by Google's rendering pipeline and many prerender services as the effective HTTP status.
+- A real "Not Found" UI with internal links eliminates the "thin/empty content" signal that triggers Soft 404 in the first place.
+- Crawlers that hit `/guide/<deleted-id>` or `/tour/<bad-id>` now get an unambiguous "this page does not exist" signal.
 
 ### Files touched
 
 | Path | Change |
 |---|---|
-| `vite.config.ts` | Add `cleanupOutdatedCaches: true`, `skipWaiting: true`, `clientsClaim: true` to workbox |
-| `src/main.tsx` | Add iframe/preview SW unregister guard + `controllerchange` auto-reload |
+| `src/components/seo/NotFoundMeta.tsx` | NEW — injects noindex + prerender 404 meta |
+| `src/pages/NotFound.tsx` | REPLACE — branded 404 with Navbar/Footer + meta |
+| `src/pages/GuideProfilePage.tsx` | PATCH — mount NotFoundMeta in notFound branch + Home CTA + Footer |
+| `src/pages/TourDetail.tsx` | PATCH — mount NotFoundMeta in notFound branch + Home CTA |
 
 ### Untouched
-`Admin.tsx`, `AnalyticsDashboard.tsx`, manifest, runtimeCaching rules, all routes/components.
+Navbar, Hero, App.tsx routes, all other pages, RLS, Supabase queries, data-fetching logic, founding/spotlight badges, SEO on valid pages.
 
 ### After
-Publish. On the user's next normal refresh of `iguidetours.net/admin`, the new SW activates, the page auto-reloads once, and the Analytics tab appears.
+Publish. Re-submit affected URLs in Search Console → "Validate Fix"; Google will re-crawl, see `noindex`, and clear the Soft 404 reports within a few days.
+
