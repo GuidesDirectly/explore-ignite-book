@@ -27,6 +27,7 @@ import FoundingGuideBadge from "@/components/FoundingGuideBadge";
 import SpotlightBanner from "@/components/SpotlightBanner";
 import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 import { useSavedGuides } from "@/hooks/useSavedGuides";
+import NotFoundMeta from "@/components/seo/NotFoundMeta";
 
 interface GuideData {
   id: string;
@@ -222,14 +223,20 @@ const TourDetail = () => {
 
   if (notFound || !guide) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
+        <NotFoundMeta title="Tour Not Found | Guides Directly" />
         <Navbar />
-        <div className="pt-24 container mx-auto px-4 text-center py-20">
+        <div className="flex-1 pt-24 container mx-auto px-4 text-center py-20">
           <h1 className="font-display text-2xl font-bold text-foreground mb-4">Tour Not Found</h1>
           <p className="text-muted-foreground mb-6">This tour may no longer be available.</p>
-          <Button asChild>
-            <Link to="/guides">Browse All Guides</Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button asChild>
+              <Link to="/guides">Browse All Guides</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/">Back to Home</Link>
+            </Button>
+          </div>
         </div>
         <Footer />
       </div>

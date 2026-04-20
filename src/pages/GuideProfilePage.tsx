@@ -28,6 +28,7 @@ import FoundingGuideBadge from "@/components/FoundingGuideBadge";
 import SpotlightBanner from "@/components/SpotlightBanner";
 import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 import SEO from "@/components/seo/SEO";
+import NotFoundMeta from "@/components/seo/NotFoundMeta";
 
 interface GuideData {
   id: string;
@@ -338,19 +339,29 @@ const GuideProfilePage = () => {
 
   if (notFound || !guide) {
     return (
-      <div className="min-h-screen" style={{ background: "#0A1628" }}>
+      <div className="min-h-screen flex flex-col" style={{ background: "#0A1628" }}>
+        <NotFoundMeta title="Guide Not Found | Guides Directly" />
         <Navbar />
-        <div className="container mx-auto px-4 pt-24 pb-16 text-center">
+        <div className="flex-1 container mx-auto px-4 pt-24 pb-16 text-center">
           <h1 className="text-3xl font-display font-bold mb-4" style={{ color: "#F5F0E8" }}>
             {t("guideProfile.notFound", "Guide not found")}
           </h1>
-          <Button variant="outline" asChild>
-            <Link to="/guides">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t("guideProfile.backToGuides", "Back to Guides")}
-            </Link>
-          </Button>
+          <p className="mb-6" style={{ color: "rgba(245,240,232,0.7)" }}>
+            {t("guideProfile.notFoundDesc", "This guide profile may no longer be available.")}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button asChild className="bg-[#C9A84C] text-[#0A1628] hover:bg-[#C9A84C]/90 font-semibold">
+              <Link to="/guides">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {t("guideProfile.backToGuides", "Back to Guides")}
+              </Link>
+            </Button>
+            <Button variant="outline" asChild className="border-white/20 text-white hover:bg-white/10">
+              <Link to="/">{t("common.home", "Home")}</Link>
+            </Button>
+          </div>
         </div>
+        <Footer />
       </div>
     );
   }
