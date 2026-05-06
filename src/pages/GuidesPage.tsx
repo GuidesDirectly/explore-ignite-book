@@ -118,22 +118,24 @@ const GuidesPage = () => {
         setFetchError(err?.message || String(err));
       }
 
-      // 2) Founding ids — optional decoration
-      if (foundingProgram?.foundingPlanId) {
-        try {
-          const { data: founders } = await supabase
-            .from("guide_profiles")
-            .select("user_id")
-            .eq("subscription_plan_id", foundingProgram.foundingPlanId)
-            .eq("status", "approved")
-            .eq("activation_status", "active");
-          if (founders) setFoundingUserIds(new Set(founders.map((f: any) => f.user_id)));
-        } catch (err) {
-          console.warn("[GuidesPage] founding fetch failed (non-blocking):", err);
+      // Build user_id -> profile id map (used to key reviews/tours by guide.id)
+      let userIdToProfileId = new Map<string, string>();
+      try {
+        const { data: idMap } = await supabase
+          .from("guide_profiles")
+          .select("id, user_id")
+          .eq("status", "approved")
+          .eq("activation_status", "active");
+        if (idMap) {
+          userIdToProfileId = new Map(
+            (idMap as any[]).map((r) => [r.user_id, r.id])
+          );
         }
+      } catch (err) {
+        console.warn("[GuidesPage] id map fetch failed (non-blocking):", err);
       }
 
-      // 3) Reviews — optional decoration
+      // Reviews — optional decoration, keyed by profile id
       try {
         const { data: reviewsData } = await supabase
           .from("reviews_public")
@@ -142,11 +144,13 @@ const GuidesPage = () => {
           const stats: Record<string, ReviewStats> = {};
           for (const r of reviewsData) {
             if (!r.guide_user_id) continue;
-            if (!stats[r.guide_user_id]) {
-              stats[r.guide_user_id] = { guide_user_id: r.guide_user_id, count: 0, avg: 0 };
+            const profileId = userIdToProfileId.get(r.guide_user_id);
+            if (!profileId) continue;
+            if (!stats[profileId]) {
+              stats[profileId] = { guide_id: profileId, count: 0, avg: 0 };
             }
-            stats[r.guide_user_id].count++;
-            stats[r.guide_user_id].avg += (r.rating || 0);
+            stats[profileId].count++;
+            stats[profileId].avg += (r.rating || 0);
           }
           for (const k of Object.keys(stats)) {
             stats[k].avg = stats[k].count > 0 ? stats[k].avg / stats[k].count : 0;
@@ -157,7 +161,7 @@ const GuidesPage = () => {
         console.warn("[GuidesPage] reviews fetch failed (non-blocking):", err);
       }
 
-      // 4) Tour counts — optional decoration
+      // Tour counts — optional decoration, keyed by profile id
       try {
         const { data: toursData } = await supabase
           .from("tours")
@@ -167,7 +171,9 @@ const GuidesPage = () => {
           const counts: Record<string, number> = {};
           for (const row of toursData as any[]) {
             if (!row.guide_user_id) continue;
-            counts[row.guide_user_id] = (counts[row.guide_user_id] || 0) + 1;
+            const profileId = userIdToProfileId.get(row.guide_user_id);
+            if (!profileId) continue;
+            counts[profileId] = (counts[profileId] || 0) + 1;
           }
           setTourCounts(counts);
         }
@@ -178,7 +184,7 @@ const GuidesPage = () => {
       setLoading(false);
     };
     fetchData();
-  }, [foundingProgram?.foundingPlanId]);
+  }, []);
 
   const filtered = useMemo(() => {
     let result = [...guides];
