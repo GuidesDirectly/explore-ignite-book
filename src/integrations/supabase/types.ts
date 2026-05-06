@@ -1038,7 +1038,6 @@ export type Database = {
           created_at: string | null
           form_data: Json | null
           id: string | null
-          is_spotlight: boolean | null
           service_areas: string[] | null
           status: string | null
           translations: Json | null
@@ -1048,7 +1047,6 @@ export type Database = {
           created_at?: string | null
           form_data?: never
           id?: string | null
-          is_spotlight?: boolean | null
           service_areas?: string[] | null
           status?: string | null
           translations?: Json | null
@@ -1058,7 +1056,6 @@ export type Database = {
           created_at?: string | null
           form_data?: never
           id?: string | null
-          is_spotlight?: boolean | null
           service_areas?: string[] | null
           status?: string | null
           translations?: Json | null
