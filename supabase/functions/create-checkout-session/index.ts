@@ -74,7 +74,7 @@ serve(async (req) => {
 
     const { data: booking, error: bookingError } = await supabase
       .from("bookings")
-      .select("price, status, guide_user_id")
+      .select("price, status, guide_user_id, traveler_email")
       .eq("id", booking_id)
       .maybeSingle();
 
