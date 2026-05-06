@@ -1042,6 +1042,7 @@ export type Database = {
           is_spotlight: boolean | null
           service_areas: string[] | null
           translations: Json | null
+          user_id: string | null
         }
         Insert: {
           activation_status?: string | null
@@ -1051,6 +1052,7 @@ export type Database = {
           is_spotlight?: boolean | null
           service_areas?: string[] | null
           translations?: Json | null
+          user_id?: string | null
         }
         Update: {
           activation_status?: string | null
@@ -1060,6 +1062,7 @@ export type Database = {
           is_spotlight?: boolean | null
           service_areas?: string[] | null
           translations?: Json | null
+          user_id?: string | null
         }
         Relationships: []
       }
