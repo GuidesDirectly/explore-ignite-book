@@ -7,9 +7,7 @@ import { MapPin, Globe, Search, MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/seo/SEO";
-import FoundingGuideBadge from "@/components/FoundingGuideBadge";
 import SpotlightBanner from "@/components/SpotlightBanner";
-import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 import dcImg from "@/assets/hero-dc.jpg";
 import chicagoImg from "@/assets/city-cards/chicago.jpg";
 
@@ -58,22 +56,20 @@ interface GuideProfile {
   form_data: any;
   service_areas: string[] | null;
   translations: any;
-  status: string | null;
+  activation_status: string | null;
   created_at: string | null;
   is_spotlight?: boolean | null;
 }
 
 interface ReviewStats {
-  guide_user_id: string;
+  guide_id: string;
   count: number;
   avg: number;
 }
 
 const GuidesPage = () => {
   const navigate = useNavigate();
-  const { data: foundingProgram } = useFoundingProgram();
   const [guides, setGuides] = useState<GuideProfile[]>([]);
-  const [foundingUserIds, setFoundingUserIds] = useState<Set<string>>(new Set());
   const [reviewStats, setReviewStats] = useState<Record<string, ReviewStats>>({});
   const [tourCounts, setTourCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
@@ -122,22 +118,24 @@ const GuidesPage = () => {
         setFetchError(err?.message || String(err));
       }
 
-      // 2) Founding ids — optional decoration
-      if (foundingProgram?.foundingPlanId) {
-        try {
-          const { data: founders } = await supabase
-            .from("guide_profiles")
-            .select("user_id")
-            .eq("subscription_plan_id", foundingProgram.foundingPlanId)
-            .eq("status", "approved")
-            .eq("activation_status", "active");
-          if (founders) setFoundingUserIds(new Set(founders.map((f: any) => f.user_id)));
-        } catch (err) {
-          console.warn("[GuidesPage] founding fetch failed (non-blocking):", err);
+      // Build user_id -> profile id map (used to key reviews/tours by guide.id)
+      let userIdToProfileId = new Map<string, string>();
+      try {
+        const { data: idMap } = await supabase
+          .from("guide_profiles")
+          .select("id, user_id")
+          .eq("status", "approved")
+          .eq("activation_status", "active");
+        if (idMap) {
+          userIdToProfileId = new Map(
+            (idMap as any[]).map((r) => [r.user_id, r.id])
+          );
         }
+      } catch (err) {
+        console.warn("[GuidesPage] id map fetch failed (non-blocking):", err);
       }
 
-      // 3) Reviews — optional decoration
+      // Reviews — optional decoration, keyed by profile id
       try {
         const { data: reviewsData } = await supabase
           .from("reviews_public")
@@ -146,11 +144,13 @@ const GuidesPage = () => {
           const stats: Record<string, ReviewStats> = {};
           for (const r of reviewsData) {
             if (!r.guide_user_id) continue;
-            if (!stats[r.guide_user_id]) {
-              stats[r.guide_user_id] = { guide_user_id: r.guide_user_id, count: 0, avg: 0 };
+            const profileId = userIdToProfileId.get(r.guide_user_id);
+            if (!profileId) continue;
+            if (!stats[profileId]) {
+              stats[profileId] = { guide_id: profileId, count: 0, avg: 0 };
             }
-            stats[r.guide_user_id].count++;
-            stats[r.guide_user_id].avg += (r.rating || 0);
+            stats[profileId].count++;
+            stats[profileId].avg += (r.rating || 0);
           }
           for (const k of Object.keys(stats)) {
             stats[k].avg = stats[k].count > 0 ? stats[k].avg / stats[k].count : 0;
@@ -161,7 +161,7 @@ const GuidesPage = () => {
         console.warn("[GuidesPage] reviews fetch failed (non-blocking):", err);
       }
 
-      // 4) Tour counts — optional decoration
+      // Tour counts — optional decoration, keyed by profile id
       try {
         const { data: toursData } = await supabase
           .from("tours")
@@ -171,7 +171,9 @@ const GuidesPage = () => {
           const counts: Record<string, number> = {};
           for (const row of toursData as any[]) {
             if (!row.guide_user_id) continue;
-            counts[row.guide_user_id] = (counts[row.guide_user_id] || 0) + 1;
+            const profileId = userIdToProfileId.get(row.guide_user_id);
+            if (!profileId) continue;
+            counts[profileId] = (counts[profileId] || 0) + 1;
           }
           setTourCounts(counts);
         }
@@ -182,7 +184,7 @@ const GuidesPage = () => {
       setLoading(false);
     };
     fetchData();
-  }, [foundingProgram?.foundingPlanId]);
+  }, []);
 
   const filtered = useMemo(() => {
     let result = [...guides];
@@ -204,7 +206,7 @@ const GuidesPage = () => {
     }
 
     if (sortBy === "most_reviews") {
-      result.sort((a, b) => (reviewStats[b.user_id!]?.count || 0) - (reviewStats[a.user_id!]?.count || 0));
+      result.sort((a, b) => (reviewStats[b.id]?.count || 0) - (reviewStats[a.id]?.count || 0));
     } else if (sortBy === "newest") {
       result.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     }
@@ -351,7 +353,7 @@ const GuidesPage = () => {
                       <span className="font-serif" style={{ fontSize: 52, color: "#C9A84C", position: "relative", zIndex: 1 }}>
                         {initials}
                       </span>
-                      {guide.status === "approved" && (
+                      {guide.activation_status === "active" && (
                         <span
                           className="absolute bottom-3 left-3 text-white font-semibold"
                           style={{
@@ -366,10 +368,9 @@ const GuidesPage = () => {
                           VERIFIED
                         </span>
                       )}
-                      {(foundingUserIds.has(guide.user_id) || guide.is_spotlight) && (
+                      {guide.is_spotlight && (
                         <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5" style={{ zIndex: 1 }}>
-                          {guide.is_spotlight && <SpotlightBanner size="sm" />}
-                          {foundingUserIds.has(guide.user_id) && <FoundingGuideBadge size="sm" />}
+                          <SpotlightBanner size="sm" />
                         </div>
                       )}
                     </div>
@@ -419,7 +420,7 @@ const GuidesPage = () => {
 
                     {/* Tour count pill or empty-state note */}
                     {(() => {
-                      const count = tourCounts[guide.user_id] || 0;
+                      const count = tourCounts[guide.id] || 0;
                       if (count > 0) {
                         return (
                           <div style={{ padding: "0 16px 8px" }}>
