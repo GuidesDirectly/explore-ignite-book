@@ -353,7 +353,7 @@ const GuidesPage = () => {
                       <span className="font-serif" style={{ fontSize: 52, color: "#C9A84C", position: "relative", zIndex: 1 }}>
                         {initials}
                       </span>
-                      {guide.status === "approved" && (
+                      {guide.activation_status === "active" && (
                         <span
                           className="absolute bottom-3 left-3 text-white font-semibold"
                           style={{
@@ -368,10 +368,9 @@ const GuidesPage = () => {
                           VERIFIED
                         </span>
                       )}
-                      {(foundingUserIds.has(guide.user_id) || guide.is_spotlight) && (
+                      {guide.is_spotlight && (
                         <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5" style={{ zIndex: 1 }}>
-                          {guide.is_spotlight && <SpotlightBanner size="sm" />}
-                          {foundingUserIds.has(guide.user_id) && <FoundingGuideBadge size="sm" />}
+                          <SpotlightBanner size="sm" />
                         </div>
                       )}
                     </div>
