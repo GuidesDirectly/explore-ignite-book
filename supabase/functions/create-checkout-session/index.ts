@@ -95,6 +95,16 @@ serve(async (req) => {
 
     const validatedAmountCents = Math.round(priceNum * 100);
 
+    // Verify caller is the traveler on this booking
+    const { data: authUser } = await userSupabase.auth.getUser();
+    const callerEmail = authUser?.user?.email;
+    if (!callerEmail || callerEmail.toLowerCase() !== booking.traveler_email?.toLowerCase()) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized: you can only pay for your own booking" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Calculate 85/15 split
     const totalAmount = validatedAmountCents;
     const platformFee = Math.round(totalAmount * 0.15);
