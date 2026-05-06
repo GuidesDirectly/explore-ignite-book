@@ -33,15 +33,46 @@ serve(async (req) => {
       cancel_url,
     } = await req.json();
 
-    if (!guide_user_id || !tour_type || !amount_cents || !traveler_email) {
+    if (!guide_user_id || !tour_type || !traveler_email) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    // Server-side price validation — never trust client-supplied amount_cents
+    if (!booking_id) {
+      return new Response(
+        JSON.stringify({ error: "booking_id is required for payment" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { data: booking, error: bookingError } = await supabase
+      .from("bookings")
+      .select("price, status, guide_user_id")
+      .eq("id", booking_id)
+      .maybeSingle();
+
+    if (bookingError || !booking) {
+      return new Response(
+        JSON.stringify({ error: "Booking not found" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const priceNum = Number(booking.price);
+    if (!priceNum || priceNum <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Booking has no valid price" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const validatedAmountCents = Math.round(priceNum * 100);
+
     // Calculate 85/15 split
-    const totalAmount = Math.round(Number(amount_cents));
+    const totalAmount = validatedAmountCents;
     const platformFee = Math.round(totalAmount * 0.15);
 
     // Check if guide has a Stripe Connect account
