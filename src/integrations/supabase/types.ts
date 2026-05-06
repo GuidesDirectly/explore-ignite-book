@@ -1035,31 +1035,31 @@ export type Database = {
     Views: {
       guide_profiles_public: {
         Row: {
+          activation_status: string | null
           created_at: string | null
           form_data: Json | null
           id: string | null
+          is_spotlight: boolean | null
           service_areas: string[] | null
-          status: string | null
           translations: Json | null
-          user_id: string | null
         }
         Insert: {
+          activation_status?: string | null
           created_at?: string | null
           form_data?: never
           id?: string | null
+          is_spotlight?: boolean | null
           service_areas?: string[] | null
-          status?: string | null
           translations?: Json | null
-          user_id?: string | null
         }
         Update: {
+          activation_status?: string | null
           created_at?: string | null
           form_data?: never
           id?: string | null
+          is_spotlight?: boolean | null
           service_areas?: string[] | null
-          status?: string | null
           translations?: Json | null
-          user_id?: string | null
         }
         Relationships: []
       }
@@ -1109,6 +1109,7 @@ export type Database = {
       }
       reviews_public: {
         Row: {
+          booking_id: string | null
           comment: string | null
           created_at: string | null
           guide_user_id: string | null
@@ -1119,6 +1120,7 @@ export type Database = {
           translations: Json | null
         }
         Insert: {
+          booking_id?: string | null
           comment?: string | null
           created_at?: string | null
           guide_user_id?: string | null
@@ -1129,6 +1131,7 @@ export type Database = {
           translations?: Json | null
         }
         Update: {
+          booking_id?: string | null
           comment?: string | null
           created_at?: string | null
           guide_user_id?: string | null
@@ -1138,7 +1141,15 @@ export type Database = {
           reviewer_name?: string | null
           translations?: Json | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
