@@ -11,6 +11,30 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  // Require authentication
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return new Response(
+      JSON.stringify({ error: "Authentication required" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  const token = authHeader.replace("Bearer ", "");
+  const userSupabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: `Bearer ${token}` } } }
+  );
+
+  const { data: { user }, error: authError } = await userSupabase.auth.getUser();
+  if (authError || !user) {
+    return new Response(
+      JSON.stringify({ error: "Invalid or expired token" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
     const supabase = createClient(
@@ -50,7 +74,7 @@ serve(async (req) => {
 
     const { data: booking, error: bookingError } = await supabase
       .from("bookings")
-      .select("price, status, guide_user_id")
+      .select("price, status, guide_user_id, traveler_email")
       .eq("id", booking_id)
       .maybeSingle();
 
@@ -70,6 +94,16 @@ serve(async (req) => {
     }
 
     const validatedAmountCents = Math.round(priceNum * 100);
+
+    // Verify caller is the traveler on this booking
+    const { data: authUser } = await userSupabase.auth.getUser();
+    const callerEmail = authUser?.user?.email;
+    if (!callerEmail || callerEmail.toLowerCase() !== booking.traveler_email?.toLowerCase()) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized: you can only pay for your own booking" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Calculate 85/15 split
     const totalAmount = validatedAmountCents;
