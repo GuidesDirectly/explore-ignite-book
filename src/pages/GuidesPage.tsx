@@ -420,7 +420,7 @@ const GuidesPage = () => {
 
                     {/* Tour count pill or empty-state note */}
                     {(() => {
-                      const count = tourCounts[guide.user_id] || 0;
+                      const count = tourCounts[guide.id] || 0;
                       if (count > 0) {
                         return (
                           <div style={{ padding: "0 16px 8px" }}>
