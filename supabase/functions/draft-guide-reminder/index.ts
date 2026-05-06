@@ -12,6 +12,22 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Reject unauthorized callers — cron/admin only
+  const authHeader = req.headers.get("authorization");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const cronSecret = Deno.env.get("CRON_SECRET");
+
+  const isAuthorized =
+    (authHeader && authHeader === `Bearer ${serviceRoleKey}`) ||
+    (cronSecret && authHeader === `Bearer ${cronSecret}`);
+
+  if (!isAuthorized) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;

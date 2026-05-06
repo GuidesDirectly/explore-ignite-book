@@ -1,33 +1,43 @@
-## Plan — Secure create-checkout-session edge function
+## Goal
+Add a shared cron/admin auth gate to four scheduled edge functions so they reject anonymous public callers but still work for pg_cron, manual admin runs, and external schedulers.
 
-Add two guards to `supabase/functions/create-checkout-session/index.ts`, plus expand one `select` clause.
+## Files to change
+1. `supabase/functions/guide-activation-reminders/index.ts`
+2. `supabase/functions/badge-expiration/index.ts`
+3. `supabase/functions/draft-guide-reminder/index.ts`
+4. `supabase/functions/expansion-digest/index.ts`
 
-### 1. JWT authentication (after the OPTIONS check, before `req.json()`)
-Insert ~22 lines that:
-- Require `Authorization: Bearer <token>` header → 401 if missing.
-- Build a user-scoped Supabase client with the token.
-- Call `userSupabase.auth.getUser()` → 401 if invalid/expired.
+## Change
+In each file, immediately after the `if (req.method === "OPTIONS")` early return and before any other logic (Supabase client creation, body parsing, queries), insert:
 
-### 2. Expand booking select
-Change:
 ```ts
-.select("price, status, guide_user_id")
+// Reject unauthorized callers — cron/admin only
+const authHeader = req.headers.get("authorization");
+const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+const cronSecret = Deno.env.get("CRON_SECRET");
+
+const isAuthorized =
+  (authHeader && authHeader === `Bearer ${serviceRoleKey}`) ||
+  (cronSecret && authHeader === `Bearer ${cronSecret}`);
+
+if (!isAuthorized) {
+  return new Response(
+    JSON.stringify({ error: "Unauthorized" }),
+    { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
+}
 ```
-to:
-```ts
-.select("price, status, guide_user_id, traveler_email")
-```
 
-### 3. Ownership check (after price validation, before Stripe session creation)
-Insert ~9 lines that compare the authenticated user's email (case-insensitive) to `booking.traveler_email` → 403 if mismatched.
+Insertion points (approx):
+- `guide-activation-reminders/index.ts` — after line 18, inside the `try` (or just before it; will place inside try to ensure error handling catches nothing here — but no awaits, so place right after OPTIONS check, before `try`).
+- `badge-expiration/index.ts` — after the OPTIONS check (~line 23), before the `try` block.
+- `draft-guide-reminder/index.ts` — after OPTIONS check (~line 13), before `try`.
+- `expansion-digest/index.ts` — after OPTIONS check (~line 25), before `try`.
 
-### Files
-| File | Change |
-|------|--------|
-| `supabase/functions/create-checkout-session/index.ts` | PATCH only — exact snippets from the user's request |
+No other logic, frontend, DB, or config changes. `CRON_SECRET` is optional — if not set, only service-role calls are accepted, which is safe.
 
-### Untouched
-Stripe session params, payment record insert, all other edge functions, frontend, DB.
+## Post-deploy notes (informational, not code)
+- Existing pg_cron jobs that call these functions using the anon key will start returning 401. After deploy, those cron schedules must be updated to send `Authorization: Bearer <SUPABASE_SERVICE_ROLE_KEY>` (or a `CRON_SECRET`). I will flag this in the completion message but will not modify cron SQL as part of this change per your instructions.
 
-### After
-Function auto-deploys. Frontend already calls via `supabase.functions.invoke()` which forwards the user's JWT, so no client change is needed.
+## Verification
+After applying, I will report the exact line numbers added in each of the four files.
