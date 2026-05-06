@@ -7,9 +7,7 @@ import { MapPin, Globe, Search, MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/seo/SEO";
-import FoundingGuideBadge from "@/components/FoundingGuideBadge";
 import SpotlightBanner from "@/components/SpotlightBanner";
-import { useFoundingProgram } from "@/hooks/useFoundingProgram";
 import dcImg from "@/assets/hero-dc.jpg";
 import chicagoImg from "@/assets/city-cards/chicago.jpg";
 
