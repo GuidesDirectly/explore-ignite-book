@@ -206,7 +206,7 @@ const GuidesPage = () => {
     }
 
     if (sortBy === "most_reviews") {
-      result.sort((a, b) => (reviewStats[b.user_id!]?.count || 0) - (reviewStats[a.user_id!]?.count || 0));
+      result.sort((a, b) => (reviewStats[b.id]?.count || 0) - (reviewStats[a.id]?.count || 0));
     } else if (sortBy === "newest") {
       result.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     }
