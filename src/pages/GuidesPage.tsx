@@ -56,22 +56,20 @@ interface GuideProfile {
   form_data: any;
   service_areas: string[] | null;
   translations: any;
-  status: string | null;
+  activation_status: string | null;
   created_at: string | null;
   is_spotlight?: boolean | null;
 }
 
 interface ReviewStats {
-  guide_user_id: string;
+  guide_id: string;
   count: number;
   avg: number;
 }
 
 const GuidesPage = () => {
   const navigate = useNavigate();
-  const { data: foundingProgram } = useFoundingProgram();
   const [guides, setGuides] = useState<GuideProfile[]>([]);
-  const [foundingUserIds, setFoundingUserIds] = useState<Set<string>>(new Set());
   const [reviewStats, setReviewStats] = useState<Record<string, ReviewStats>>({});
   const [tourCounts, setTourCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
