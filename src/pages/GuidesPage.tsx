@@ -327,7 +327,9 @@ const GuidesPage = () => {
                     style={{
                       background: "#1A2F50",
                       border: "0.5px solid rgba(201,168,76,0.15)",
+                      cursor: "pointer",
                     }}
+                    onClick={() => navigate(`/guide/${generateGuideSlug(fd.firstName || "", fd.lastName || "", city)}`)}
                     onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)")}
                     onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.15)")}
                   >
