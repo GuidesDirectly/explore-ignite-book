@@ -116,8 +116,7 @@ const GuideProfilePage = () => {
         // Slug-based lookup: fetch all approved guides and match by generated slug
         const res = await (supabase
           .from("guide_profiles_public" as any)
-          .select("id, user_id, form_data, service_areas, translations")
-          .eq("status", "approved") as any);
+          .select("id, user_id, form_data, service_areas, translations") as any);
         if (res.data && !res.error) {
           data = (res.data as any[]).find((g: any) => {
             const slug = generateGuideSlug(
@@ -287,7 +286,7 @@ const GuideProfilePage = () => {
         "@type": "AggregateRating",
         "ratingValue": avgRatingValue,
         "reviewCount": reviews.length,
-        "bestRating": "5",
+        "bestRating": "10",
         "worstRating": "1"
       };
     }
@@ -386,7 +385,8 @@ const GuideProfilePage = () => {
   const seoDescription = bioSnippet
     ? `${bioSnippet}${bioSnippet.endsWith(".") ? "" : "."} Book directly on GuidesDirectly — zero commission.`
     : `Meet ${fullName}, a private tour guide in ${cityName}. Book directly on GuidesDirectly — zero commission.`;
-  const profileUrl = `https://iguidetours.net/guide/${guide.user_id}`;
+  const slug = generateGuideSlug(fd.firstName, fd.lastName, guide.service_areas?.[0] || "");
+  const profileUrl = `https://iguidetours.net/guide/${slug}`;
 
   return (
     <div className="min-h-screen" style={{ background: "#0A1628" }}>
