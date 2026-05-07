@@ -69,6 +69,10 @@ serve(async (req) => {
 
       if (paymentError) {
         console.error("Failed to update payment:", paymentError);
+        return new Response(
+          JSON.stringify({ error: "Database update failed" }),
+          { status: 500 }
+        );
       }
 
       // Update booking status to confirmed if booking_id exists
