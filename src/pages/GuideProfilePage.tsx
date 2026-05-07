@@ -100,82 +100,88 @@ const GuideProfilePage = () => {
     const fetchGuide = async () => {
       if (!id) return;
 
-      let data: any = null;
-      let error: any = null;
+      try {
+        let data: any = null;
+        let error: any = null;
 
-      if (isUUID(id)) {
-        // Fetch by UUID directly
-        const res = await (supabase
-          .from("guide_profiles_public" as any)
-          .select("id, user_id, form_data, service_areas, translations")
-          .eq("id", id)
-          .single() as any);
-        data = res.data;
-        error = res.error;
-      } else {
-        // Slug-based lookup: fetch all approved guides and match by generated slug
-        const res = await (supabase
-          .from("guide_profiles_public" as any)
-          .select("id, user_id, form_data, service_areas, translations, activation_status") as any);
-        if (res.data && !res.error) {
-          data = (res.data as any[]).find((g: any) => {
-            const slug = generateGuideSlug(
-              g.form_data?.firstName || "",
-              g.form_data?.lastName || "",
-              (g.service_areas || [])[0] || ""
-            );
-            return slug === id;
-          }) || null;
+        if (isUUID(id)) {
+          // Fetch by UUID directly
+          const res = await (supabase
+            .from("guide_profiles_public" as any)
+            .select("id, user_id, form_data, service_areas, translations")
+            .eq("id", id)
+            .single() as any);
+          data = res.data;
+          error = res.error;
+        } else {
+          // Slug-based lookup: fetch all approved guides and match by generated slug
+          const res = await (supabase
+            .from("guide_profiles_public" as any)
+            .select("id, user_id, form_data, service_areas, translations, activation_status") as any);
+          if (res.data && !res.error) {
+            data = (res.data as any[]).find((g: any) => {
+              const slug = generateGuideSlug(
+                g.form_data?.firstName || "",
+                g.form_data?.lastName || "",
+                (g.service_areas || [])[0] || ""
+              );
+              return slug === id;
+            }) || null;
+          }
+          error = res.error;
         }
-        error = res.error;
-      }
 
-      if (error || !data) {
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
+        if (error || !data) {
+          setNotFound(true);
+          setLoading(false);
+          return;
+        }
 
-      setGuide(data);
+        setGuide(data);
+        console.log("[GuideProfilePage] guide set:", data);
 
-      const { data: photoFiles } = await supabase.storage
-        .from("guide-photos")
-        .list(data.user_id, { limit: 10 });
-      const profileFile = photoFiles?.find(f => f.name.startsWith("profile"));
-      if (profileFile) {
-        const { data: photoData } = supabase.storage
+        const { data: photoFiles } = await supabase.storage
           .from("guide-photos")
-          .getPublicUrl(`${data.user_id}/${profileFile.name}`);
-        setPhotoUrl(photoData?.publicUrl || null);
+          .list(data.user_id, { limit: 10 });
+        const profileFile = photoFiles?.find(f => f.name.startsWith("profile"));
+        if (profileFile) {
+          const { data: photoData } = supabase.storage
+            .from("guide-photos")
+            .getPublicUrl(`${data.user_id}/${profileFile.name}`);
+          setPhotoUrl(photoData?.publicUrl || null);
+        }
+
+        const { data: reviewData } = await (supabase
+          .from("reviews_public" as any)
+          .select("id, reviewer_name, rating, comment, created_at, translations")
+          .eq("guide_user_id", data.user_id)
+          .eq("hidden", false)
+          .order("created_at", { ascending: false }) as any);
+
+        setReviews(reviewData || []);
+
+        const { data: badgeData } = await supabase
+          .from("guide_badges" as any)
+          .select("badge_type")
+          .eq("guide_user_id", data.user_id);
+        setBadges((badgeData as any[] || []).map((b: any) => b.badge_type as BadgeType));
+
+        const { data: availData } = await supabase
+          .from("guide_availability" as any)
+          .select("date, status")
+          .eq("guide_user_id", data.user_id)
+          .eq("status", "available")
+          .gte("date", format(new Date(), "yyyy-MM-dd"));
+
+        setAvailableDates(
+          (availData as any[] || []).map((e: any) => new Date(e.date + "T00:00:00"))
+        );
+
+        setLoading(false);
+      } catch (err: any) {
+        console.error("[GuideProfilePage] fetchGuide error:", err);
+        setLoading(false);
       }
-
-      const { data: reviewData } = await (supabase
-        .from("reviews_public" as any)
-        .select("id, reviewer_name, rating, comment, created_at, translations")
-        .eq("guide_user_id", data.user_id)
-        .eq("hidden", false)
-        .order("created_at", { ascending: false }) as any);
-
-      setReviews(reviewData || []);
-
-      const { data: badgeData } = await supabase
-        .from("guide_badges" as any)
-        .select("badge_type")
-        .eq("guide_user_id", data.user_id);
-      setBadges((badgeData as any[] || []).map((b: any) => b.badge_type as BadgeType));
-
-      const { data: availData } = await supabase
-        .from("guide_availability" as any)
-        .select("date, status")
-        .eq("guide_user_id", data.user_id)
-        .eq("status", "available")
-        .gte("date", format(new Date(), "yyyy-MM-dd"));
-
-      setAvailableDates(
-        (availData as any[] || []).map((e: any) => new Date(e.date + "T00:00:00"))
-      );
-
-      setLoading(false);
     };
 
     fetchGuide();
