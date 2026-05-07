@@ -1,32 +1,20 @@
-Three targeted edits to `src/pages/GuideProfilePage.tsx`:
+# Two Targeted Fixes
 
-1. **Share URL uses slug, not user_id**
-   Replace:
-   ```ts
-   const profileUrl = `https://iguidetours.net/guide/${guide.user_id}`;
-   ```
-   with:
-   ```ts
-   const slug = generateGuideSlug(fd.firstName, fd.lastName, guide.service_areas?.[0] || "");
-   const profileUrl = `https://iguidetours.net/guide/${slug}`;
-   ```
-   (Verify `generateGuideSlug` is already imported from `@/lib/utils`; if not, add the import.)
+## Fix 1 — `src/pages/GuideProfilePage.tsx`
+In the slug-based lookup branch of `fetchGuide` (line 119), add `activation_status` to the select so the page doesn't render blank when filtering on it later:
 
-2. **Remove redundant status filter in slug lookup**
-   Inside `fetchGuide`, in the slug-based query against `guide_profiles_public`, remove:
-   ```ts
-   .eq("status", "approved")
-   ```
-   The view already enforces status + activation_status.
+```ts
+.select("id, user_id, form_data, service_areas, translations, activation_status") as any);
+```
 
-3. **Fix JSON-LD rating scale to 1–10**
-   In the `aggregateRating` block, replace:
-   ```json
-   "bestRating": "5", "worstRating": "1"
-   ```
-   with:
-   ```json
-   "bestRating": "10", "worstRating": "1"
-   ```
+(UUID branch on line 110 is left untouched per request.)
+
+## Fix 2 — `src/pages/GuidesPage.tsx`
+Make each guide card clickable to `/guide/{slug}` while keeping the Message button independent.
+
+- Add `cursor: "pointer"` to the card's outer `<div>` style.
+- Add `onClick` on the outer `<div>` that navigates to `/guide/${generateGuideSlug(fd.firstName || "", fd.lastName || "", city)}`.
+- On the existing specialization pill `<button>`s (which already navigate), add `e.stopPropagation()` so they aren't double-handled.
+- Wrap the `MessageGuideButton` in a container `<div>` with `onClick={(e) => e.stopPropagation()}` so clicking the message button (and its dialog) does not trigger card navigation.
 
 No other logic, styling, or behavior changes.

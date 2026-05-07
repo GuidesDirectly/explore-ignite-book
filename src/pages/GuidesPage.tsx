@@ -327,7 +327,9 @@ const GuidesPage = () => {
                     style={{
                       background: "#1A2F50",
                       border: "0.5px solid rgba(201,168,76,0.15)",
+                      cursor: "pointer",
                     }}
+                    onClick={() => navigate(`/guide/${generateGuideSlug(fd.firstName || "", fd.lastName || "", city)}`)}
                     onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)")}
                     onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.15)")}
                   >
@@ -468,7 +470,7 @@ const GuidesPage = () => {
                         {specs.map((s) => (
                           <button
                             key={s}
-                            onClick={() => navigate(`/guide/${generateGuideSlug(fd.firstName || "", fd.lastName || "", city)}?specialization=${encodeURIComponent(s)}`)}
+                            onClick={(e) => { e.stopPropagation(); navigate(`/guide/${generateGuideSlug(fd.firstName || "", fd.lastName || "", city)}?specialization=${encodeURIComponent(s)}`); }}
                             className="cursor-pointer"
                             style={{
                               background: "rgba(201,168,76,0.1)",
@@ -486,29 +488,31 @@ const GuidesPage = () => {
                     )}
 
                     {/* Message button */}
-                    <MessageGuideButton
-                      guideUserId={guide.user_id}
-                      guideFirstName={fd.firstName || firstName}
-                      guideLastName={fd.lastName || ""}
-                      guideCity={city}
-                    >
-                      <button
-                        className="w-full flex items-center justify-center gap-2 font-semibold transition-colors"
-                        style={{
-                          background: "#C9A84C",
-                          color: "#0A1628",
-                          padding: 14,
-                          borderRadius: "0 0 12px 12px",
-                          border: "none",
-                          width: "100%",
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "#B8924A")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "#C9A84C")}
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <MessageGuideButton
+                        guideUserId={guide.user_id}
+                        guideFirstName={fd.firstName || firstName}
+                        guideLastName={fd.lastName || ""}
+                        guideCity={city}
                       >
-                        <MessageCircle size={16} />
-                        Message {firstName}
-                      </button>
-                    </MessageGuideButton>
+                        <button
+                          className="w-full flex items-center justify-center gap-2 font-semibold transition-colors"
+                          style={{
+                            background: "#C9A84C",
+                            color: "#0A1628",
+                            padding: 14,
+                            borderRadius: "0 0 12px 12px",
+                            border: "none",
+                            width: "100%",
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = "#B8924A")}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = "#C9A84C")}
+                        >
+                          <MessageCircle size={16} />
+                          Message {firstName}
+                        </button>
+                      </MessageGuideButton>
+                    </div>
                   </div>
                 );
               })}
