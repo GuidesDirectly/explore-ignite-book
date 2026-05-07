@@ -116,7 +116,7 @@ const GuideProfilePage = () => {
         // Slug-based lookup: fetch all approved guides and match by generated slug
         const res = await (supabase
           .from("guide_profiles_public" as any)
-          .select("id, user_id, form_data, service_areas, translations") as any);
+          .select("id, user_id, form_data, service_areas, translations, activation_status") as any);
         if (res.data && !res.error) {
           data = (res.data as any[]).find((g: any) => {
             const slug = generateGuideSlug(
