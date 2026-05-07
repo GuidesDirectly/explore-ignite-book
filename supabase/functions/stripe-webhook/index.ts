@@ -39,6 +39,21 @@ serve(async (req) => {
 
     console.log(`Stripe webhook received: ${event.type}`);
 
+    // Check if already processed
+    const { data: existing } = await supabase
+      .from("stripe_processed_events")
+      .select("id")
+      .eq("stripe_event_id", event.id)
+      .maybeSingle();
+    if (existing) {
+      console.log(`Duplicate event ${event.id} — skipping`);
+      return new Response(JSON.stringify({ received: true, duplicate: true }), { status: 200 });
+    }
+    // Mark as processed immediately before handling
+    await supabase
+      .from("stripe_processed_events")
+      .insert({ stripe_event_id: event.id });
+
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const meta = session.metadata || {};
@@ -54,6 +69,10 @@ serve(async (req) => {
 
       if (paymentError) {
         console.error("Failed to update payment:", paymentError);
+        return new Response(
+          JSON.stringify({ error: "Database update failed" }),
+          { status: 500 }
+        );
       }
 
       // Update booking status to confirmed if booking_id exists
@@ -241,9 +260,14 @@ serve(async (req) => {
     });
   } catch (e) {
     console.error("stripe-webhook error:", e);
+    const isSignatureError = e.message?.includes("signature") ||
+      e.message?.includes("No signatures found");
     return new Response(
-      JSON.stringify({ error: e.message || "Webhook handler failed" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({ error: "Webhook handler failed" }),
+      {
+        status: isSignatureError ? 400 : 500,
+        headers: { "Content-Type": "application/json" }
+      }
     );
   }
 });
