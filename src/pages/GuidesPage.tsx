@@ -470,7 +470,7 @@ const GuidesPage = () => {
                         {specs.map((s) => (
                           <button
                             key={s}
-                            onClick={() => navigate(`/guide/${generateGuideSlug(fd.firstName || "", fd.lastName || "", city)}?specialization=${encodeURIComponent(s)}`)}
+                            onClick={(e) => { e.stopPropagation(); navigate(`/guide/${generateGuideSlug(fd.firstName || "", fd.lastName || "", city)}?specialization=${encodeURIComponent(s)}`); }}
                             className="cursor-pointer"
                             style={{
                               background: "rgba(201,168,76,0.1)",
