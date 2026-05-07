@@ -260,9 +260,14 @@ serve(async (req) => {
     });
   } catch (e) {
     console.error("stripe-webhook error:", e);
+    const isSignatureError = e.message?.includes("signature") ||
+      e.message?.includes("No signatures found");
     return new Response(
-      JSON.stringify({ error: e.message || "Webhook handler failed" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({ error: "Webhook handler failed" }),
+      {
+        status: isSignatureError ? 400 : 500,
+        headers: { "Content-Type": "application/json" }
+      }
     );
   }
 });
