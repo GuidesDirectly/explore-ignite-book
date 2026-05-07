@@ -39,6 +39,21 @@ serve(async (req) => {
 
     console.log(`Stripe webhook received: ${event.type}`);
 
+    // Check if already processed
+    const { data: existing } = await supabase
+      .from("stripe_processed_events")
+      .select("id")
+      .eq("stripe_event_id", event.id)
+      .maybeSingle();
+    if (existing) {
+      console.log(`Duplicate event ${event.id} — skipping`);
+      return new Response(JSON.stringify({ received: true, duplicate: true }), { status: 200 });
+    }
+    // Mark as processed immediately before handling
+    await supabase
+      .from("stripe_processed_events")
+      .insert({ stripe_event_id: event.id });
+
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const meta = session.metadata || {};
