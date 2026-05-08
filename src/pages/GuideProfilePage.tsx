@@ -97,27 +97,92 @@ const GuideProfilePage = () => {
   }, [guide?.user_id, foundingProgram?.foundingPlanId]);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const withTimeout = <T,>(p: PromiseLike<T>, ms = 10000, label = "request"): Promise<T> =>
+      Promise.race([
+        Promise.resolve(p),
+        new Promise<T>((_, reject) =>
+          setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+        ),
+      ]);
+
+    const fetchSecondary = async (userId: string) => {
+      // photo
+      try {
+        const res: any = await withTimeout<any>(
+          supabase.storage.from("guide-photos").list(userId, { limit: 10 }),
+          10000, "storage.list"
+        );
+        const photoFiles = res?.data;
+        const profileFile = photoFiles?.find((f: any) => f.name.startsWith("profile"));
+        if (profileFile && !cancelled) {
+          const { data: photoData } = supabase.storage
+            .from("guide-photos")
+            .getPublicUrl(`${userId}/${profileFile.name}`);
+          setPhotoUrl(photoData?.publicUrl || null);
+        }
+      } catch (e) { console.warn("[GuideProfilePage] photo fetch failed:", e); }
+
+      // reviews — query the base `reviews` table (RLS allows hidden=false publicly)
+      try {
+        const res: any = await withTimeout<any>(
+          (supabase.from("reviews" as any)
+            .select("id, reviewer_name, rating, comment, created_at, translations")
+            .eq("guide_user_id", userId)
+            .eq("hidden", false)
+            .order("created_at", { ascending: false }) as any),
+          10000, "reviews"
+        );
+        if (!cancelled) setReviews((res?.data as any) || []);
+      } catch (e) { console.warn("[GuideProfilePage] reviews fetch failed:", e); }
+
+      // badges
+      try {
+        const res: any = await withTimeout<any>(
+          supabase.from("guide_badges" as any).select("badge_type").eq("guide_user_id", userId),
+          10000, "badges"
+        );
+        if (!cancelled) setBadges((res?.data as any[] || []).map((b: any) => b.badge_type as BadgeType));
+      } catch (e) { console.warn("[GuideProfilePage] badges fetch failed:", e); }
+
+      // availability
+      try {
+        const res: any = await withTimeout<any>(
+          supabase.from("guide_availability" as any)
+            .select("date, status")
+            .eq("guide_user_id", userId)
+            .eq("status", "available")
+            .gte("date", format(new Date(), "yyyy-MM-dd")),
+          10000, "availability"
+        );
+        if (!cancelled) {
+          setAvailableDates((res?.data as any[] || []).map((e: any) => new Date(e.date + "T00:00:00")));
+        }
+      } catch (e) { console.warn("[GuideProfilePage] availability fetch failed:", e); }
+    };
+
     const fetchGuide = async () => {
       if (!id) return;
-
       try {
         let data: any = null;
         let error: any = null;
 
         if (isUUID(id)) {
-          // Fetch by UUID directly
-          const res = await (supabase
-            .from("guide_profiles_public" as any)
-            .select("id, user_id, form_data, service_areas, translations")
-            .eq("id", id)
-            .single() as any);
-          data = res.data;
-          error = res.error;
+          const res: any = await withTimeout(
+            (supabase.from("guide_profiles_public" as any)
+              .select("id, user_id, form_data, service_areas, translations")
+              .eq("id", id)
+              .single() as any),
+            10000, "guide by id"
+          );
+          data = res.data; error = res.error;
         } else {
-          // Slug-based lookup: fetch all approved guides and match by generated slug
-          const res = await (supabase
-            .from("guide_profiles_public" as any)
-            .select("id, user_id, form_data, service_areas, translations, activation_status") as any);
+          const res: any = await withTimeout(
+            (supabase.from("guide_profiles_public" as any)
+              .select("id, user_id, form_data, service_areas, translations, activation_status") as any),
+            10000, "guide list for slug"
+          );
           if (res.data && !res.error) {
             data = (res.data as any[]).find((g: any) => {
               const slug = generateGuideSlug(
@@ -131,60 +196,27 @@ const GuideProfilePage = () => {
           error = res.error;
         }
 
+        if (cancelled) return;
+
         if (error || !data) {
           setNotFound(true);
-          setLoading(false);
           return;
         }
 
         setGuide(data);
         console.log("[GuideProfilePage] guide set:", data);
-
-        const { data: photoFiles } = await supabase.storage
-          .from("guide-photos")
-          .list(data.user_id, { limit: 10 });
-        const profileFile = photoFiles?.find(f => f.name.startsWith("profile"));
-        if (profileFile) {
-          const { data: photoData } = supabase.storage
-            .from("guide-photos")
-            .getPublicUrl(`${data.user_id}/${profileFile.name}`);
-          setPhotoUrl(photoData?.publicUrl || null);
-        }
-
-        const { data: reviewData } = await (supabase
-          .from("reviews_public" as any)
-          .select("id, reviewer_name, rating, comment, created_at, translations")
-          .eq("guide_user_id", data.user_id)
-          .eq("hidden", false)
-          .order("created_at", { ascending: false }) as any);
-
-        setReviews(reviewData || []);
-
-        const { data: badgeData } = await supabase
-          .from("guide_badges" as any)
-          .select("badge_type")
-          .eq("guide_user_id", data.user_id);
-        setBadges((badgeData as any[] || []).map((b: any) => b.badge_type as BadgeType));
-
-        const { data: availData } = await supabase
-          .from("guide_availability" as any)
-          .select("date, status")
-          .eq("guide_user_id", data.user_id)
-          .eq("status", "available")
-          .gte("date", format(new Date(), "yyyy-MM-dd"));
-
-        setAvailableDates(
-          (availData as any[] || []).map((e: any) => new Date(e.date + "T00:00:00"))
-        );
-
         setLoading(false);
+
+        await fetchSecondary(data.user_id);
       } catch (err: any) {
         console.error("[GuideProfilePage] fetchGuide error:", err);
-        setLoading(false);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchGuide();
+    return () => { cancelled = true; };
   }, [id]);
 
   // Dynamic SEO meta tags & JSON-LD
