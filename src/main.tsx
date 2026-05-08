@@ -27,9 +27,17 @@ if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
   } else {
     // Auto-reload once when a new SW takes control, so users see the latest build
     let refreshing = false;
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
+    navigator.serviceWorker.addEventListener("controllerchange", async () => {
       if (refreshing) return;
       refreshing = true;
+      try {
+        if ("caches" in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map((k) => caches.delete(k)));
+        }
+      } catch {
+        // ignore — proceed to reload regardless
+      }
       window.location.reload();
     });
   }

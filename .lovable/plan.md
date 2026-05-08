@@ -1,18 +1,21 @@
-## Add try/catch + debug logs to fetchGuide
+## Edits
 
-In `src/pages/GuideProfilePage.tsx`, modify the `fetchGuide` function (lines 100–179):
+### 1. `vite.config.ts`
+- Remove the `runtimeCaching` entry for `https://*.supabase.co/*` (NetworkFirst on RLS-gated API is the root cause of silent stale responses).
+- Extend `navigateFallbackDenylist` to `[/^\/~oauth/, /^\/auth/, /\/functions\/v1\//]`.
+- Keep `skipWaiting`, `clientsClaim`, `cleanupOutdatedCaches` as-is.
 
-1. Wrap the entire function body (after the `if (!id) return;` guard) in a `try { ... } catch (err: any) { ... }` block.
-2. After `setGuide(data);` (line 139), add:
-   ```ts
-   console.log("[GuideProfilePage] guide set:", data);
-   ```
-3. Catch block:
-   ```ts
-   } catch (err: any) {
-     console.error("[GuideProfilePage] fetchGuide error:", err);
-     setLoading(false);
-   }
-   ```
+### 2. `src/main.tsx`
+- In the production `controllerchange` handler, before `window.location.reload()`, await `caches.keys()` and delete every entry. Guarantees stale Supabase responses from the old SW are wiped on the first visit after the new build ships.
 
-No other changes — query logic, selects, and downstream fetches stay identical.
+## After apply
+
+1. Click **Publish → Update** to push to `iguidetours.net`.
+2. One hard reload on the live domain — the new SW installs, claims, wipes caches, reloads. Returning visitors auto-update afterward.
+3. Open a Lovable Support ticket for the domain disconnect + Entri `www` recovery link expiring (not agent-fixable; already escalated via feedback).
+4. Cloudflare → Speed → Optimization: confirm Rocket Loader and Auto Minify (JS) are OFF.
+
+## Files
+
+- `vite.config.ts`
+- `src/main.tsx`
