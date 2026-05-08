@@ -110,10 +110,11 @@ const GuideProfilePage = () => {
     const fetchSecondary = async (userId: string) => {
       // photo
       try {
-        const { data: photoFiles } = await withTimeout(
+        const res: any = await withTimeout<any>(
           supabase.storage.from("guide-photos").list(userId, { limit: 10 }),
           10000, "storage.list"
         );
+        const photoFiles = res?.data;
         const profileFile = photoFiles?.find((f: any) => f.name.startsWith("profile"));
         if (profileFile && !cancelled) {
           const { data: photoData } = supabase.storage
@@ -125,7 +126,7 @@ const GuideProfilePage = () => {
 
       // reviews — query the base `reviews` table (RLS allows hidden=false publicly)
       try {
-        const { data: reviewData } = await withTimeout(
+        const res: any = await withTimeout<any>(
           (supabase.from("reviews" as any)
             .select("id, reviewer_name, rating, comment, created_at, translations")
             .eq("guide_user_id", userId)
@@ -133,21 +134,21 @@ const GuideProfilePage = () => {
             .order("created_at", { ascending: false }) as any),
           10000, "reviews"
         );
-        if (!cancelled) setReviews((reviewData as any) || []);
+        if (!cancelled) setReviews((res?.data as any) || []);
       } catch (e) { console.warn("[GuideProfilePage] reviews fetch failed:", e); }
 
       // badges
       try {
-        const { data: badgeData } = await withTimeout(
+        const res: any = await withTimeout<any>(
           supabase.from("guide_badges" as any).select("badge_type").eq("guide_user_id", userId),
           10000, "badges"
         );
-        if (!cancelled) setBadges((badgeData as any[] || []).map((b: any) => b.badge_type as BadgeType));
+        if (!cancelled) setBadges((res?.data as any[] || []).map((b: any) => b.badge_type as BadgeType));
       } catch (e) { console.warn("[GuideProfilePage] badges fetch failed:", e); }
 
       // availability
       try {
-        const { data: availData } = await withTimeout(
+        const res: any = await withTimeout<any>(
           supabase.from("guide_availability" as any)
             .select("date, status")
             .eq("guide_user_id", userId)
@@ -156,7 +157,7 @@ const GuideProfilePage = () => {
           10000, "availability"
         );
         if (!cancelled) {
-          setAvailableDates((availData as any[] || []).map((e: any) => new Date(e.date + "T00:00:00")));
+          setAvailableDates((res?.data as any[] || []).map((e: any) => new Date(e.date + "T00:00:00")));
         }
       } catch (e) { console.warn("[GuideProfilePage] availability fetch failed:", e); }
     };
