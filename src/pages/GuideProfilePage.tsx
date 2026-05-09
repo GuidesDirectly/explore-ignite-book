@@ -205,6 +205,13 @@ const GuideProfilePage = () => {
 
         setGuide(data);
         console.log("[GuideProfilePage] guide set:", data);
+
+        window.gtag?.('event', 'guide_profile_viewed', {
+          guide_id: data.id,
+          guide_name: `${data.form_data?.firstName ?? ''} ${data.form_data?.lastName ?? ''}`.trim(),
+          guide_city: data.service_areas?.[0] || '',
+        });
+
         setLoading(false);
 
         await fetchSecondary(data.user_id);

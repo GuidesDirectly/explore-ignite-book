@@ -1,21 +1,54 @@
-## Edits
+## GA4 Analytics Integration
 
-### 1. `vite.config.ts`
-- Remove the `runtimeCaching` entry for `https://*.supabase.co/*` (NetworkFirst on RLS-gated API is the root cause of silent stale responses).
-- Extend `navigateFallbackDenylist` to `[/^\/~oauth/, /^\/auth/, /\/functions\/v1\//]`.
-- Keep `skipWaiting`, `clientsClaim`, `cleanupOutdatedCaches` as-is.
+Add Google Analytics 4 (Measurement ID `G-0KGEME028E`) with two custom events.
 
-### 2. `src/main.tsx`
-- In the production `controllerchange` handler, before `window.location.reload()`, await `caches.keys()` and delete every entry. Guarantees stale Supabase responses from the old SW are wiped on the first visit after the new build ships.
+### 1. `index.html` — inject GA4 snippet
+Add the async gtag loader and inline config inside `<head>`, after the JSON-LD block and before `</head>`:
+```html
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0KGEME028E"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0KGEME028E');
+</script>
+```
 
-## After apply
+### 2. `src/vite-env.d.ts` — TypeScript global
+Append a `Window.gtag` declaration so call sites compile cleanly:
+```ts
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+export {};
+```
+All call sites use `window.gtag?.(...)` (optional chaining) so events no-op safely if the script is blocked.
 
-1. Click **Publish → Update** to push to `iguidetours.net`.
-2. One hard reload on the live domain — the new SW installs, claims, wipes caches, reloads. Returning visitors auto-update afterward.
-3. Open a Lovable Support ticket for the domain disconnect + Entri `www` recovery link expiring (not agent-fixable; already escalated via feedback).
-4. Cloudflare → Speed → Optimization: confirm Rocket Loader and Auto Minify (JS) are OFF.
+### 3. `src/pages/GuideProfilePage.tsx` — `guide_profile_viewed`
+Immediately after `setGuide(data)` inside the data fetch:
+```ts
+window.gtag?.('event', 'guide_profile_viewed', {
+  guide_id: data.id,
+  guide_name: `${data.form_data?.firstName ?? ''} ${data.form_data?.lastName ?? ''}`.trim(),
+  guide_city: data.service_areas?.[0] || '',
+});
+```
 
-## Files
+### 4. `src/components/BookingRequestForm.tsx` — `booking_initiated`
+Fire **after a successful insert** (not on submit click). In `handleSubmit`, inside the `if (error) { ... } else { ... }` success branch — alongside `setSubmitted(true)` and the existing `toast.success(...)`:
+```ts
+window.gtag?.('event', 'booking_initiated', {
+  guide_id: guideUserId,
+  guide_name: guideName,
+});
+```
 
-- `vite.config.ts`
-- `src/main.tsx`
+### Skipped
+- **Step 5 (`booking_completed` in `BookingCheckout.tsx`)** — intentionally omitted; checkout flow is disabled per zero-commission direct-contact model.
+- **`stripe-webhook` (server-side)** — already excluded by spec.
+
+### Notes
+- No service-worker, Supabase, Vite, or Cloudflare changes.
+- Two events total: `guide_profile_viewed`, `booking_initiated`.
