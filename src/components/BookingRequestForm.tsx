@@ -124,6 +124,11 @@ const BookingRequestForm = ({ guideUserId, guideName, tourTypes, serviceAreas, a
       setSubmitted(true);
       toast.success("Booking request sent!");
 
+      window.gtag?.('event', 'booking_initiated', {
+        guide_id: guideUserId,
+        guide_name: guideName,
+      });
+
       // Increment inquiry count when this booking is for a specific tour
       if (tourId) {
         try {
