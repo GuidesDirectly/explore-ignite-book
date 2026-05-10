@@ -206,11 +206,17 @@ const GuideProfilePage = () => {
         setGuide(data);
         console.log("[GuideProfilePage] guide set:", data);
 
-        window.gtag?.('event', 'guide_profile_viewed', {
-          guide_id: data.id,
-          guide_name: `${data.form_data?.firstName ?? ''} ${data.form_data?.lastName ?? ''}`.trim(),
-          guide_city: data.service_areas?.[0] || '',
-        });
+        try {
+          const fd = (data.form_data && typeof data.form_data === 'object') ? data.form_data as any : {};
+          const areas = Array.isArray(data.service_areas) ? data.service_areas : [];
+          window.gtag?.('event', 'guide_profile_viewed', {
+            guide_id: data.id,
+            guide_name: `${fd.firstName ?? ''} ${fd.lastName ?? ''}`.trim(),
+            guide_city: areas[0] || '',
+          });
+        } catch (e) {
+          console.warn('[GuideProfilePage] gtag failed:', e);
+        }
 
         setLoading(false);
 
