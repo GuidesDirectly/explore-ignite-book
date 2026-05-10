@@ -98,6 +98,7 @@ const GuidesPage = () => {
         const { data, error } = await supabase
           .from("guide_profiles_public")
           .select("*");
+        console.log("[GuidesPage] fetch result:", data, error);
         if (error) {
           console.error("[GuidesPage] Guides fetch error:", error);
           setFetchStatus("error");
