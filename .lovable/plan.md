@@ -1,32 +1,28 @@
-## Goal
+## Plan: Add Dependabot config and PR template
 
-Add diagnostic `console.log` statements around the slug-based lookup in `fetchGuide` (`src/pages/GuideProfilePage.tsx`) to determine whether the `withTimeout` wrapper is timing out, whether `res.data` is empty, or whether the slug-matching `find()` fails to locate the guide.
+Create two new files under `.github/`. Documentation/config only — no application code changes.
 
-## Changes
+### Files
 
-**File:** `src/pages/GuideProfilePage.tsx` — slug lookup `else` branch (currently lines 180–197)
+**1. `.github/dependabot.yml`**
 
-1. **Before** the `withTimeout` call (line 181):
-   ```ts
-   console.log("[fetchGuide] starting slug lookup for:", id);
-   ```
+Dependabot v2 config with two npm ecosystems:
 
-2. **After** the `withTimeout` call returns (line 185, before the `if (res.data && !res.error)` check):
-   ```ts
-   console.log("[fetchGuide] slug lookup result:", res.data, res.error);
-   ```
+- Root `/` — weekly Mondays, 10 PR limit, reviewer `allharmony`, labels `dependencies` + `security`, ignore all major version bumps.
+- `/supabase/functions` — weekly Mondays, 5 PR limit, labels `dependencies` + `edge-functions`.
 
-3. **After** the `find()` call assigns `data` (after line 194), log the matched result and total candidates scanned:
-   ```ts
-   console.log("[fetchGuide] slug match result:", { matched: data, candidateCount: res.data?.length ?? 0 });
-   ```
+**2. `.github/PULL_REQUEST_TEMPLATE.md`**
 
-## Out of Scope
+Sections:
+- Description
+- Type of change (Bug fix / New feature / Security fix / Documentation update)
+- Schema change checklist (guide_profiles columns; guide_profiles_public allowlist)
+- Testing:
+  - Tested on preview URL
+  - No console errors
+  - RLS policies verified if DB changes made
+  - Stripe webhook tested if payment changes made
 
-- No logic changes to the lookup, timeout duration, or query columns.
-- No changes to the UUID branch, `fetchSecondary`, GA4 event, or rendering.
-- No changes to `withTimeout` itself.
+### Out of scope
 
-## Verification
-
-After approval, reload `/guide/michael-zlotnitsky-washington-dc` on the preview URL and inspect the browser console for the three new log lines to determine which stage fails.
+No edits to source code, edge functions, or existing config.
