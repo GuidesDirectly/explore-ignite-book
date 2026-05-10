@@ -1,54 +1,32 @@
-## GA4 Analytics Integration
+## Goal
 
-Add Google Analytics 4 (Measurement ID `G-0KGEME028E`) with two custom events.
+Add diagnostic `console.log` statements around the slug-based lookup in `fetchGuide` (`src/pages/GuideProfilePage.tsx`) to determine whether the `withTimeout` wrapper is timing out, whether `res.data` is empty, or whether the slug-matching `find()` fails to locate the guide.
 
-### 1. `index.html` — inject GA4 snippet
-Add the async gtag loader and inline config inside `<head>`, after the JSON-LD block and before `</head>`:
-```html
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-0KGEME028E"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-0KGEME028E');
-</script>
-```
+## Changes
 
-### 2. `src/vite-env.d.ts` — TypeScript global
-Append a `Window.gtag` declaration so call sites compile cleanly:
-```ts
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-  }
-}
-export {};
-```
-All call sites use `window.gtag?.(...)` (optional chaining) so events no-op safely if the script is blocked.
+**File:** `src/pages/GuideProfilePage.tsx` — slug lookup `else` branch (currently lines 180–197)
 
-### 3. `src/pages/GuideProfilePage.tsx` — `guide_profile_viewed`
-Immediately after `setGuide(data)` inside the data fetch:
-```ts
-window.gtag?.('event', 'guide_profile_viewed', {
-  guide_id: data.id,
-  guide_name: `${data.form_data?.firstName ?? ''} ${data.form_data?.lastName ?? ''}`.trim(),
-  guide_city: data.service_areas?.[0] || '',
-});
-```
+1. **Before** the `withTimeout` call (line 181):
+   ```ts
+   console.log("[fetchGuide] starting slug lookup for:", id);
+   ```
 
-### 4. `src/components/BookingRequestForm.tsx` — `booking_initiated`
-Fire **after a successful insert** (not on submit click). In `handleSubmit`, inside the `if (error) { ... } else { ... }` success branch — alongside `setSubmitted(true)` and the existing `toast.success(...)`:
-```ts
-window.gtag?.('event', 'booking_initiated', {
-  guide_id: guideUserId,
-  guide_name: guideName,
-});
-```
+2. **After** the `withTimeout` call returns (line 185, before the `if (res.data && !res.error)` check):
+   ```ts
+   console.log("[fetchGuide] slug lookup result:", res.data, res.error);
+   ```
 
-### Skipped
-- **Step 5 (`booking_completed` in `BookingCheckout.tsx`)** — intentionally omitted; checkout flow is disabled per zero-commission direct-contact model.
-- **`stripe-webhook` (server-side)** — already excluded by spec.
+3. **After** the `find()` call assigns `data` (after line 194), log the matched result and total candidates scanned:
+   ```ts
+   console.log("[fetchGuide] slug match result:", { matched: data, candidateCount: res.data?.length ?? 0 });
+   ```
 
-### Notes
-- No service-worker, Supabase, Vite, or Cloudflare changes.
-- Two events total: `guide_profile_viewed`, `booking_initiated`.
+## Out of Scope
+
+- No logic changes to the lookup, timeout duration, or query columns.
+- No changes to the UUID branch, `fetchSecondary`, GA4 event, or rendering.
+- No changes to `withTimeout` itself.
+
+## Verification
+
+After approval, reload `/guide/michael-zlotnitsky-washington-dc` on the preview URL and inspect the browser console for the three new log lines to determine which stage fails.
