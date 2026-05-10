@@ -178,11 +178,13 @@ const GuideProfilePage = () => {
           );
           data = res.data; error = res.error;
         } else {
+          console.log("[fetchGuide] starting slug lookup for:", id);
           const res: any = await withTimeout(
             (supabase.from("guide_profiles_public" as any)
               .select("id, user_id, form_data, service_areas, translations, activation_status") as any),
             10000, "guide list for slug"
           );
+          console.log("[fetchGuide] slug lookup result:", res.data, res.error);
           if (res.data && !res.error) {
             data = (res.data as any[]).find((g: any) => {
               const slug = generateGuideSlug(
@@ -192,6 +194,7 @@ const GuideProfilePage = () => {
               );
               return slug === id;
             }) || null;
+            console.log("[fetchGuide] slug match result:", { matched: data, candidateCount: res.data?.length ?? 0 });
           }
           error = res.error;
         }
