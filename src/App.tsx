@@ -31,6 +31,7 @@ import Login from "./pages/Login";
 import ForGuidesPage from "./pages/ForGuidesPage";
 import TravelerOnboarding from "./pages/TravelerOnboarding";
 import TravelerDashboard from "./pages/TravelerDashboard";
+import About from "./pages/About";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -76,6 +77,7 @@ const App = () => (
               <Route path="/for-guides" element={<ForGuidesPage />} />
               <Route path="/traveler/onboarding" element={<TravelerOnboarding />} />
               <Route path="/traveler/dashboard" element={<TravelerDashboard />} />
+              <Route path="/about" element={<About />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
