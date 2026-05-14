@@ -73,7 +73,7 @@ const Navbar = () => {
     { label: "Destinations", href: "#destinations", isDestinations: true },
     { label: "Guides", href: "/guides", isRoute: true },
     { label: t("nav.services", "How it Works"), href: "#how-it-works" },
-    { label: t("nav.contact", "About"), href: "#about" },
+    { label: t("nav.contact", "About"), href: "/about", isRoute: true },
   ];
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, href: string) => {
